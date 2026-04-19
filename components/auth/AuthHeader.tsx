@@ -8,7 +8,7 @@ export default function AuthHeader() {
   const name = pathname.slice(1);
   return (
     <div className="flex items-center flex-col gap-2">
-      <div className="aspect-video md:hidden rounded-full border-2 border-light-green   relative size-14">
+      <div className="aspect-video lg:hidden rounded-full border-2 border-light-green   relative size-14">
         <Image
           src={Logo}
           className="rounded-full  p-1 object-center object-cover "

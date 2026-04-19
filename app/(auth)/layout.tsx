@@ -20,7 +20,7 @@ export default function RootLayout({
           <AuthImage />
           <div className="hidden lg:block w-[50%]" />
           <main className="w-full lg:w-[50%] flex flex-col relative items-center py-4 justify-center ">
-            <div className="aspect-video hidden md:block rounded-full top-2 border-2 border-light-green md:right-3  absolute size-16">
+            <div className="aspect-video hidden lg:block rounded-full top-2 border-2 border-light-green md:right-3  absolute size-16">
               <Image
                 src={Logo}
                 className="rounded-full  p-1 object-center object-cover "
@@ -28,7 +28,7 @@ export default function RootLayout({
                 alt=";"
               />
             </div>
-            <div className="aspect-video hidden md:block rounded-full bottom-2 border-2 border-light-green right-3  absolute size-16">
+            <div className="aspect-video hidden lg:block rounded-full bottom-2 border-2 border-light-green right-3  absolute size-16">
               <Image
                 src={Logo}
                 className="rounded-full  p-1 object-center object-cover "

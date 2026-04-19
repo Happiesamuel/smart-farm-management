@@ -64,7 +64,7 @@ export function LoginForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-3 md:space-y-5 pt-6 w-[90%] md:w-[70%]"
+        className="space-y-3 md:space-y-4 pt-6 w-[90%] md:w-[70%]"
       >
         <Field
           name="email"
