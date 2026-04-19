@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import AuthImg from "../../public/auth.png";
+import AuthImg from "../../public/auth-2.png";
 
 export default function AuthImage() {
   const pathname = usePathname();

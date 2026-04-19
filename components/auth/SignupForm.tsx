@@ -96,7 +96,8 @@ export function SignupForm() {
           />
           <div className="flex items-end justify-end py-2">
             <Link href="/login" className="text-xs ">
-              Already have an account? Login
+              Already have an account?{" "}
+              <span className="font-semibold text-primary-green">Login</span>
             </Link>
           </div>
         </div>

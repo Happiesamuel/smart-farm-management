@@ -86,7 +86,8 @@ export function LoginForm() {
               Forgotten Password?
             </Link>
             <Link href="/sign-up" className="text-xs cursor-pointer">
-              Don&apos;t have an account? Sign up
+              Don&apos;t have an account?{" "}
+              <span className="font-semibold text-primary-green">Sign up</span>
             </Link>
           </div>
         </div>
