@@ -60,7 +60,7 @@ export default function DashboardLinechart() {
   ];
 
   return (
-    <Card className="flex-1 bg-white  rounded-xl border border-border/80 shadow shadow-dark/10 flex flex-col h-[300px] shrink-0">
+    <Card className="lg:flex-1 w-full bg-white  rounded-xl border border-border/80 shadow shadow-dark/10 flex flex-col h-[300px] shrink-0">
       <CardHeader className="pb-0 shrink-0">
         <div className="flex justify-between items-center">
           <h3 className="text-dark font-semibold text-base">

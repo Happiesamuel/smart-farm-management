@@ -4,8 +4,8 @@ import { FaMoneyBillTrendUp } from "react-icons/fa6";
 
 export default function DashboardMass() {
   return (
-    <div className="flex-1 min-h-full justify-between flex gap-1 flex-col">
-      <div className="flex  p-4 items-start justify-between bg-white  rounded-xl border border-border/80  hover:shadow-sm transition">
+    <div className="flex-1 sm:col-span-2 md:col-span-2 xl:col-span-1  min-h-full justify-between flex gap-3 flex-col  xl:flex-col sm:flex-row ">
+      <div className="flex w-full  p-4 items-start justify-between bg-white  rounded-xl border border-border/80  hover:shadow-sm transition">
         <div className="space-y-1">
           <p className="text-dark font-medium text-sm">Total Land Area</p>
           <div className="space-y-0.5">
@@ -19,7 +19,7 @@ export default function DashboardMass() {
           <FaGlobeAfrica className="text-white" />
         </div>
       </div>
-      <div className="flex  p-4 items-start justify-between bg-white  rounded-xl border border-border/80  hover:shadow-sm transition">
+      <div className="flex w-full p-4 items-start justify-between bg-white  rounded-xl border border-border/80  hover:shadow-sm transition">
         <div className="space-y-1">
           <p className="text-dark font-medium text-sm">Revenue</p>
           <div className="space-y-0.5">

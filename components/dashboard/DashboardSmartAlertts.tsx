@@ -6,9 +6,9 @@ import { PiPlant } from "react-icons/pi";
 export default function DashboardSmartAlerts() {
   return (
     <div className="pt-4">
-      <div className="space-y-3 grid grid-cols-3 gap-4">
+      <div className="space-y-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 sm:gap-4">
         {/* FIELD ACTIVITIES */}
-        <div className="bg-green-50 h-[175px] pb-2 no-scroll overflow-scroll border border-green-200 p-3 rounded-lg hover:shadow-sm transition">
+        <div className="bg-green-50 h-[180px] pb-2  no-scroll overflow-scroll border border-green-200 p-3 rounded-lg hover:shadow-sm transition">
           <div className="flex items-center justify-between">
             <div>
               <h6 className="text-base font-semibold">Field Activities</h6>
@@ -30,7 +30,9 @@ export default function DashboardSmartAlerts() {
                   <GiDigDug className="text-white text-sm" />
                 </div>
                 <div>
-                  <p className="text-sm">3 Active crops growing</p>
+                  <p className="text-sm text-zinc-700">
+                    3 Active crops growing
+                  </p>
                   <p className="text-xs text-gray-400">Updated just now</p>
                 </div>
               </div>
@@ -43,7 +45,9 @@ export default function DashboardSmartAlerts() {
                   <CiBag1 className="text-white text-sm" />
                 </div>
                 <div>
-                  <p className="text-sm">Field B has no activity for 7 days</p>
+                  <p className="text-sm text-zinc-700">
+                    Field B has no activity for 7 days
+                  </p>
                   <p className="text-xs text-gray-400">Critical • 7 days ago</p>
                   <p className="text-xs italic text-gray-600">
                     Recommendation: Check and irrigate field
@@ -55,7 +59,7 @@ export default function DashboardSmartAlerts() {
         </div>
 
         {/* RECENT ACTIVITIES */}
-        <div className="bg-blue-50 h-[175px] pb-2 no-scroll overflow-scroll  border border-blue-200 p-3 rounded-lg hover:shadow-sm transition">
+        <div className="bg-blue-50 h-[180px] pb-2  no-scroll overflow-scroll  border border-blue-200 p-3 rounded-lg hover:shadow-sm transition">
           <div className="flex items-center justify-between">
             <div>
               <h6 className="text-base font-semibold">Recent Activities</h6>
@@ -75,7 +79,9 @@ export default function DashboardSmartAlerts() {
                   <GiDigDug className="text-white text-sm" />
                 </div>
                 <div>
-                  <p className="text-sm">No irrigation recorded in 5 days</p>
+                  <p className="text-sm text-zinc-700">
+                    No irrigation recorded in 5 days
+                  </p>
                   <p className="text-xs text-gray-400">Critical • 5 days ago</p>
                   <p className="text-xs italic text-gray-600">
                     Recommendation: Irrigate crops today
@@ -91,7 +97,9 @@ export default function DashboardSmartAlerts() {
                   <CiBag1 className="text-white text-sm" />
                 </div>
                 <div>
-                  <p className="text-sm">Fertilizer was added 3 days ago</p>
+                  <p className="text-sm text-zinc-700">
+                    Fertilizer was added 3 days ago
+                  </p>
                   <p className="text-xs text-gray-400">Info • 3 days ago</p>
                 </div>
               </div>
@@ -100,7 +108,7 @@ export default function DashboardSmartAlerts() {
         </div>
 
         {/* UPCOMING HARVEST */}
-        <div className="bg-yellow-50 h-[175px] pb-2 no-scroll overflow-scroll border border-yellow-200 p-3 rounded-lg hover:shadow-sm transition">
+        <div className="bg-yellow-50  h-[180px] sm:col-span-3 lg:col-span-1 pb-2 no-scroll overflow-scroll border border-yellow-200 p-3 rounded-lg hover:shadow-sm transition">
           <div className="flex items-center justify-between">
             <div>
               <h6 className="text-base font-semibold">Upcoming Harvests</h6>
@@ -120,7 +128,9 @@ export default function DashboardSmartAlerts() {
                   <PiPlant className="text-white text-sm" />
                 </div>
                 <div>
-                  <p className="text-sm">Maize will be ready in 5 days</p>
+                  <p className="text-sm text-zinc-700">
+                    Maize will be ready in 5 days
+                  </p>
                   <p className="text-xs text-gray-400">Warning • Upcoming</p>
                 </div>
               </div>
@@ -133,7 +143,9 @@ export default function DashboardSmartAlerts() {
                   <PiPlant className="text-white text-sm" />
                 </div>
                 <div>
-                  <p className="text-sm">Wheat was harvested 2 days ago</p>
+                  <p className="text-sm text-zinc-700">
+                    Wheat was harvested 2 days ago
+                  </p>
                   <p className="text-xs text-gray-400">
                     Completed • 2 days ago
                   </p>

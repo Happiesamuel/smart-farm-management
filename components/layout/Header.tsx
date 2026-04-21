@@ -58,7 +58,7 @@ export default function Header() {
   const route = usePathname();
   const active = links.find((x) => x.route === route);
   return (
-    <div className="flex border-b border-border fixed max-w-424 py-3 bg-white px-4  min-w-0    z-50 w-[calc(100%-14rem)] items-center justify-between">
+    <div className="flex border-b border-border fixed max-w-424 py-3 bg-white px-4  min-w-0 z-100 w-full lg:w-[calc(100%-14rem)] items-center justify-between">
       <div className="flex items-center gap-2">
         <div>{active?.svg}</div>
         <MdArrowForwardIos className="text-zinc-500 text-sm" />

@@ -97,7 +97,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className="bg-[#f3f3f3] flex-col flex w-[16.7%] fixed h-full">
+    <div className="bg-[#f3f3f3] flex-col flex lg:w-[12.5rem] xl:w-[14rem] fixed h-full">
       <div className="flex items-center gap-2 px-2 pt-5">
         <div className="aspect-video hidden lg:block rounded-full  border- border-light-green relative size-12">
           <Image

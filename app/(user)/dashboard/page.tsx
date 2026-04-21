@@ -10,7 +10,7 @@ import DashboardWeather from "@/components/dashboard/DashboardWeather";
 
 export default function page() {
   return (
-    <div className="pt-18 px-4">
+    <div className="pt-18 px-2 sm:px-4">
       <div className="pb-5 space-y-1">
         <h6 className="text-dark font-semibold tracking-[3px] text-2xl">
           Good Morning !
@@ -20,17 +20,17 @@ export default function page() {
         </p>
       </div>
       <DashboardFarms />
-      <div className="flex md:flex-row flex-col items-stretch lg:h-[220px] justify-between gap-4">
+      <div className=" grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 items-stretch xl:h-[220px] justify-between gap-4">
         <DashboardWeather />
         <DashboardProductionOveriew />
         <DashboardMass />
       </div>
       <DashboardSmartAlerts />
-      <div className="w-full flex items-center justify-between gap-4 pt-4">
+      <div className="w-full lg:flex-row flex-col flex lg:items-center justify-between gap-4 pt-4">
         <DashboardLinechart />
         <DashboardFarm />
       </div>
-      <div className="w-full flex items-start h-[220px] justify-between gap-4 pt-4">
+      <div className="w-full  xl:flex-row flex-col flex items-start  xl:h-[220px] justify-between gap-4 pt-4">
         <DashboardTaskManagement />
         <DashboardRecentTask />
       </div>

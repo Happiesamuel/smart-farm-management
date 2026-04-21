@@ -31,7 +31,7 @@ export default function DashboardRecentTask() {
   };
 
   return (
-    <div className="bg-gray-50 flex-[0.5] h-full border border-gray-200 p-4 rounded-xl hover:shadow-sm transition">
+    <div className="bg-gray-50 w-full lg:flex-[0.5] h-full border border-gray-200 p-4 rounded-xl hover:shadow-sm transition">
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <h6 className="text-base font-semibold text-dark">

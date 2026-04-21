@@ -52,15 +52,15 @@ export default function DashboardFarms() {
   ];
   return (
     <div className="pb-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
         {stats.map((item, i) => (
           <div
             key={i}
-            className={`p-5 rounded-2xl border ${item.bg} ${item.border} flex items-center gap-4`}
+            className={`p-5 rounded-2xl border ${item.bg} ${item.border} flex sm:flex-row flex-col items-center gap-4`}
           >
             <div className={`text-2xl ${item.iconColor}`}>{item.icon}</div>
 
-            <div>
+            <div className="text-center sm:text-left">
               <p className="text-sm text-gray-500">{item.name}</p>
               <h3 className="text-xl font-semibold text-gray-900">
                 {item.num}
