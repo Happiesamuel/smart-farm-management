@@ -17,7 +17,7 @@ export default function RootLayout({
             <Sidebar />
           </div>
 
-          <div className="flex bg-zinc-50  h-[200vh] flex-col relative min-w-0">
+          <div className="flex bg-zinc-50  min-h-screen h-full pb-10 flex-col relative min-w-0">
             <Header />
             {children}
           </div>

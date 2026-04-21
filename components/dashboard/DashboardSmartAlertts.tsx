@@ -144,27 +144,6 @@ export default function DashboardSmartAlerts() {
         </div>
 
         {/* TASK PREVIEW (NEW 🔥) */}
-        {/* <div className="bg-gray-50 border border-gray-200 p-3 rounded-lg hover:shadow-sm transition">
-          <div className="flex items-center justify-between">
-            <h6 className="text-base font-semibold">Today&apos;s Tasks</h6>
-
-            <span className="text-xs cursor-pointer rounded-full px-3 py-1 text-white bg-gray-800 hover:bg-black transition">
-              View
-            </span>
-          </div>
-
-          <div className="space-y-2 mt-2">
-            <div className="flex items-center gap-2">
-              <input type="checkbox" />
-              <p className="text-sm">Irrigate Field A</p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input type="checkbox" />
-              <p className="text-sm">Apply fertilizer (Rice)</p>
-            </div>
-          </div>
-        </div> */}
       </div>
     </div>
   );

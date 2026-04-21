@@ -1,119 +1,160 @@
-const farms = [
-  {
-    id: "farm_1",
-    name: "My Village Farm",
-    location: "Ibadan, Nigeria",
-    size: "5 Acres",
+// const farms = [
+//   {
+//     id: "farm_1",
+//     name: "My Village Farm",
+//     location: "Ibadan, Nigeria",
+//     size: "5 Acres",
 
-    // 📊 SUMMARY (for dashboard cards)
-    totalFields: 3,
-    totalCrops: 3,
-    totalHarvests: 2,
-    totalSales: 180000,
-    totalExpenses: 80000,
-    netProfit: 100000,
+//     // 📊 SUMMARY (for dashboard cards)
+//     totalFields: 3,
+//     totalCrops: 3,
+//     totalHarvests: 2,
+//     totalSales: 180000,
+//     totalExpenses: 80000,
+//     netProfit: 100000,
 
-    // 🧱 FIELDS
-    fields: [
-      {
-        id: "field_1",
-        name: "Field A",
-        size: "2 Acres",
+//     // 🧱 FIELDS
+//     fields: [
+//       {
+//         id: "field_1",
+//         name: "Field A",
+//         size: "2 Acres",
 
-        crop: {
-          id: "crop_1",
-          name: "Maize",
-          plantingDate: "2026-04-01",
-          harvestDate: "2026-05-30",
+//         crop: {
+//           id: "crop_1",
+//           name: "Maize",
+//           plantingDate: "2026-04-01",
+//           harvestDate: "2026-05-30",
 
-          // 📋 ACTIVITIES
-          activities: [
-            {
-              type: "Irrigation",
-              date: "2026-04-05",
-            },
-            {
-              type: "Fertilizer",
-              date: "2026-04-10",
-            },
-          ],
+//           // 📋 ACTIVITIES
+//           activities: [
+//             {
+//               type: "Irrigation",
+//               date: "2026-04-05",
+//             },
+//             {
+//               type: "Fertilizer",
+//               date: "2026-04-10",
+//             },
+//           ],
 
-          // 📦 HARVEST
-          harvests: [
-            {
-              id: "harvest_1",
-              quantity: 500, // kg
-              date: "2026-05-30",
+//           // 📦 HARVEST
+//           harvests: [
+//             {
+//               id: "harvest_1",
+//               quantity: 500, // kg
+//               date: "2026-05-30",
 
-              // 💰 SALES
-              sales: [
-                {
-                  quantitySold: 200,
-                  pricePerUnit: 500,
-                  totalAmount: 100000,
-                  date: "2026-06-01",
-                },
-              ],
-            },
-          ],
-        },
-      },
+//               // 💰 SALES
+//               sales: [
+//                 {
+//                   quantitySold: 200,
+//                   pricePerUnit: 500,
+//                   totalAmount: 100000,
+//                   date: "2026-06-01",
+//                 },
+//               ],
+//             },
+//           ],
+//         },
+//       },
 
-      {
-        id: "field_2",
-        name: "Field B",
-        size: "1 Acre",
+//       {
+//         id: "field_2",
+//         name: "Field B",
+//         size: "1 Acre",
 
-        crop: {
-          id: "crop_2",
-          name: "Rice",
-          plantingDate: "2026-04-10",
-          harvestDate: "2026-06-15",
+//         crop: {
+//           id: "crop_2",
+//           name: "Rice",
+//           plantingDate: "2026-04-10",
+//           harvestDate: "2026-06-15",
 
-          activities: [],
-          harvests: [],
-        },
-      },
-    ],
+//           activities: [],
+//           harvests: [],
+//         },
+//       },
+//     ],
 
-    // 💸 EXPENSES (Farm Level)
-    expenses: [
-      {
-        type: "Fertilizer",
-        amount: 50000,
-        date: "2026-04-08",
-      },
-      {
-        type: "Labor",
-        amount: 30000,
-        date: "2026-04-15",
-      },
-    ],
-  },
-];
+//     // 💸 EXPENSES (Farm Level)
+//     expenses: [
+//       {
+//         type: "Fertilizer",
+//         amount: 50000,
+//         date: "2026-04-08",
+//       },
+//       {
+//         type: "Labor",
+//         amount: 30000,
+//         date: "2026-04-15",
+//       },
+//     ],
+//   },
+// ];
 
+// Tasks {
+//   id: string
 
-Tasks {
-  id: string
+//   title: string            // "Irrigate Field A"
+//   description: string      // optional notes
 
-  title: string            // "Irrigate Field A"
-  description: string      // optional notes
+//   farm_id: string
+//   field_id: string
+//   crop_id: string
 
-  farm_id: string
-  field_id: string
-  crop_id: string
+//   assigned_to: string     // user_id (optional)
 
-  assigned_to: string     // user_id (optional)
+//   type: string            // irrigation, fertilizer, harvest, etc.
 
-  type: string            // irrigation, fertilizer, harvest, etc.
+//   priority: string        // low | medium | high
 
-  priority: string        // low | medium | high
+//   status: string          // pending | in_progress | completed
 
-  status: string          // pending | in_progress | completed
+//   due_date: string        // when it should be done
+//   completed_at: string    // when it was completed
 
-  due_date: string        // when it should be done
-  completed_at: string    // when it was completed
+//   created_at: string
+//   updated_at: string
+// }
 
-  created_at: string
-  updated_at: string
-}
+// 🧩 WHERE ALERTS LIVE IN YOUR SYSTEM
+// 🔹 1. You Generate Alerts in Logic (JS / Backend)
+
+// Example:
+
+// const alerts = [
+//   {
+//     type: "critical",
+//     category: "field",
+//     message: "Field B has no activity for 7 days",
+//   },
+//   {
+//     type: "warning",
+//     category: "harvest",
+//     message: "Maize will be ready in 5 days",
+//   },
+// ];
+// 🔹 2. You FILTER THEM INTO EACH BOX
+// Field Activities Box:
+// const fieldAlerts = alerts.filter(a => a.category === "field");
+// Recent Activities Box:
+// const activityAlerts = alerts.filter(a => a.category === "activity");
+// Harvest Box:
+// const harvestAlerts = alerts.filter(a => a.category === "harvest");
+// 🎯 THEN RENDER IN YOUR UI
+// Instead of this ❌
+// <p>Field B has no activity for 7 days</p>
+// You do this ✅
+// {fieldAlerts.map((alert, index) => (
+//   <p key={index}>{alert.message}</p>
+// ))}
+// 🔥 FULL FLOW (IMPORTANT)
+// Database (activities, crops, etc.)
+//         ↓
+// Alert Logic Engine (rules)
+//         ↓
+// Generated Alerts Array
+//         ↓
+// Grouped by Category
+//         ↓
+// Displayed in Smart Alert Boxes (your UI)
