@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 type WeatherType = {
   location: {
@@ -42,8 +42,8 @@ export default function DashboardWeather() {
   if (!weather) return <p>Loading...</p>;
 
   return (
-    <div className="flex-1 space-y-1.5 min-h-full bg-white p-4 rounded-xl border border-border/80 shadow shadow-dark/10">
-      <div className="flex items-center justify-between">
+    <div className="flex-1 space-y-1.5 relative gap-4 flex flex-col min-h-full bg-white p-4 rounded-xl border border-border/80 hover:shadow-sm transition">
+      <div className="flex items-center relative justify-between">
         <div className="flex items-center gap-1 bg-primary-green shadow shadow-light-green text-white text-sm w-fit rounded-full px-2.5 py-1">
           <HiOutlineLocationMarker />
           <p>Chicago</p>
@@ -61,20 +61,20 @@ export default function DashboardWeather() {
         </div>
       </div>
       <div className="flex items-center relative justify-between">
-        <div className="space">
+        <div className="space relative">
           <h6 className="text-dark font-semibold text-lg">Monday</h6>
           <p className="text-sm font-normal text-dark">27 Aug, 2024</p>
         </div>
         <Image
           alt="icon"
           width={100}
-          className="relative left-0"
+          className="absolute left-45"
           height={100}
           src={`https:${weather?.current?.condition?.icon}`}
         />
         <div />
       </div>
-      <div className="flex items-center justify-between ">
+      <div className="flex items-center gap-3 justify-between ">
         <div className="space">
           <h6 className="text-dark font-semibold text-lg">
             {weather?.current[active === "C" ? "temp_c" : "temp_f"]}&#xb0;{" "}
@@ -86,11 +86,11 @@ export default function DashboardWeather() {
             &#xb0; {active}
           </p>
         </div>
-        <div>
-          <h6 className="text-dark font-semibold text-lg">
+        <div className="w-ful">
+          <h6 className="text-dark text-end font-semibold text-lg">
             {weather?.current?.condition?.text}
           </h6>
-          <p className="text-sm font-normal text-dark">
+          <p className="text-sm text-end font-normal text-dark">
             Feels like{" "}
             {weather?.current[active === "C" ? "feelslike_c" : "feelslike_f"]}
             &#xb0; {active}

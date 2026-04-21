@@ -48,7 +48,7 @@ export function DashboardProductionOveriew() {
   ];
 
   return (
-    <Card className="w-full bg-white flex-1 rounded-xl border border-border/80 shadow shadow-dark/10 flex flex-col h-[220px] shrink-0">
+    <Card className="w-full  bg-white flex-1 rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[220px] shrink-0">
       <CardHeader className="pb-0 shrink-0">
         <div className="flex justify-between items-center">
           <h3 className="text-dark font-semibold text-base">
