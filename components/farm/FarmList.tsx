@@ -10,6 +10,7 @@ import { PiFarm, PiPlantDuotone } from "react-icons/pi";
 import { GiMoneyStack } from "react-icons/gi";
 import { MdArrowForwardIos } from "react-icons/md";
 import Paginate from "../layout/Pagination";
+import Link from "next/link";
 const farms = [
   {
     id: 1,
@@ -134,10 +135,13 @@ export default function FarmList() {
                 </div>
               </div>
             </div>
-            <div className="flex items-center cursor-pointer px-3 justify-between border-t border-border py-4">
+            <Link
+              href={`/farms/1`}
+              className="flex items-center cursor-pointer px-3 justify-between border-t border-border py-4"
+            >
               <p className="text-sm text-dark font-medium">View Details</p>
               <MdArrowForwardIos className="text-sm text-dark font-medium" />
-            </div>
+            </Link>
           </div>
         ))}
       </div>
