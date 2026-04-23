@@ -12,7 +12,7 @@ import {
 export default function Paginate() {
   return (
     <Pagination className="w-full pt-8">
-      <PaginationContent className="justify-between  w-[25%]">
+      <PaginationContent className=" gap-5">
         <PaginationItem>
           <PaginationPrevious className="border border-zinc-300" href="#" />
         </PaginationItem>

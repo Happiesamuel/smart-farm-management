@@ -3,7 +3,7 @@ import { GoPlus } from "react-icons/go";
 
 export default function FarmHeader() {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex gap-2 sm:flex-row flex-col sm:items-center justify-between">
       <div className="space-y-2">
         <h5 className="text-xl text-dark font-semibold">Farms</h5>
         <p className="text-sm text-zinc-500 font-medium">

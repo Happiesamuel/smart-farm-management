@@ -75,10 +75,10 @@ const farms = [
 export default function FarmList() {
   return (
     <div className="py-4">
-      <div className="grid grid-cols-3 gap-4 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         {farms.map((farm) => (
           <div
-            className=" w-full group  bg-white  rounded-xl border border-border/80  hover:shadow-sm transition-all duration-500 hover:-translate-y-1"
+            className=" w-full group  bg-white max-w-sm mx-auto rounded-xl border border-border/80  hover:shadow-sm transition-all duration-500 hover:-translate-y-1"
             key={farm.id}
           >
             <div className="relative h-[160px] overflow-hidden w-full aspect-video">
@@ -134,7 +134,7 @@ export default function FarmList() {
                 </div>
               </div>
             </div>
-            <div className="flex items-center cursor-pointer px-3 justify-between border-t border-border py-2.5">
+            <div className="flex items-center cursor-pointer px-3 justify-between border-t border-border py-4">
               <p className="text-sm text-dark font-medium">View Details</p>
               <MdArrowForwardIos className="text-sm text-dark font-medium" />
             </div>

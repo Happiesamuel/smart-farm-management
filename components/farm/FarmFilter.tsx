@@ -17,8 +17,8 @@ export default function FarmFilter() {
     { id: 3, name: "Enugu", value: "enugu" },
   ];
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex w-[35%] items-center border border-border gap-2 rounded-lg px-2">
+    <div className="flex flex-col gap-2 sm:flex-row items-center justify-between">
+      <div className="flex w-full sm:w-[35%] items-center border border-border gap-2 rounded-lg px-2">
         <IoSearch />
         <Input
           placeholder="Search Farms..."
@@ -27,7 +27,7 @@ export default function FarmFilter() {
       </div>
 
       <Select onValueChange={(e) => setLocation(e)} defaultValue={location}>
-        <SelectTrigger className="text-dark border w-[130px]  border-border bg-white rounded-lg">
+        <SelectTrigger className="text-dark border w-full sm:w-[130px]  border-border bg-white rounded-lg">
           <SelectValue placeholder="All Locations" className="text-dark" />
         </SelectTrigger>
         <SelectContent className="bg-white border-border text-zinc-400">
