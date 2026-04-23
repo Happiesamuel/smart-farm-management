@@ -7,7 +7,9 @@ import DashboardRecentTask from "@/components/dashboard/DashboardRecentTask";
 import DashboardSmartAlerts from "@/components/dashboard/DashboardSmartAlertts";
 import DashboardTaskManagement from "@/components/dashboard/DashboardTaskManagement";
 import DashboardWeather from "@/components/dashboard/DashboardWeather";
-
+export const metadata = {
+  title: "Dashboard",
+};
 export default function page() {
   return (
     <div className="pt-18 px-2 sm:px-4">
@@ -21,7 +23,7 @@ export default function page() {
       </div>
       <DashboardFarms />
       <div className=" grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 items-stretch xl:h-[220px] justify-between gap-4">
-        <DashboardWeather />
+        {/* <DashboardWeather /> */}
         <DashboardProductionOveriew />
         <DashboardMass />
       </div>
