@@ -1,16 +1,8 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
@@ -54,7 +46,7 @@ export default function DashboardLinechart() {
     { id: 3, value: "2026" },
   ];
   const crops = [
-    { id: 1, name: "Rice", value: "corn" },
+    { id: 1, name: "Corn", value: "corn" },
     { id: 2, name: "Wheat", value: "wheat" },
     { id: 3, name: "Rice", value: "rice" },
   ];

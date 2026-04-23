@@ -111,7 +111,7 @@ export default function Sidebar() {
           Smart Farm Management System
         </h6>
       </div>
-      <div className="flex flex-col gap-1 mt-6">
+      <div className="flex flex-col gap-1 mt-8">
         {links.map((link) => (
           <Link
             key={link.slug}
