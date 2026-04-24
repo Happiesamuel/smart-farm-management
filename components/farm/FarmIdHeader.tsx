@@ -6,7 +6,7 @@ import Link from "next/link";
 import { MdArrowForwardIos } from "react-icons/md";
 export default function FarmIdHeader() {
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <div className=" flex items-center gap-3 text-sm text-zinc-500 font-normal">
         <Link
           className="duration-500 transition-all cursor-pointer hover:text-green-500"
@@ -23,7 +23,7 @@ export default function FarmIdHeader() {
         </Link>
       </div>
       <div className="flex gap-2 sm:flex-row flex-col sm:items-center justify-between">
-        <div className="space-y-2">
+        <div className="space-y-3.5">
           <h5 className="text-xl text-dark font-semibold">Green Valley Farm</h5>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-0.5">
