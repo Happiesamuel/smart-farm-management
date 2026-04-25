@@ -7,7 +7,7 @@ export default function FarmOverview() {
   return (
     <div>
       <FarmOvervewBoxes />
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 flex-col lg:flex-row">
         <FarmLineChart />
         <FarmPieChart />
       </div>

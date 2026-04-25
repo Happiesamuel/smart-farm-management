@@ -37,18 +37,12 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function FarmLineChart() {
-  const [val, setVal] = useState("2024");
-  const [crop, setCrop] = useState("corn");
+  const [crop, setCrop] = useState("month");
 
-  const year = [
-    { id: 1, value: "2024" },
-    { id: 2, value: "2025" },
-    { id: 3, value: "2026" },
-  ];
   const crops = [
-    { id: 1, name: "Corn", value: "corn" },
-    { id: 2, name: "Wheat", value: "wheat" },
-    { id: 3, name: "Rice", value: "rice" },
+    { id: 1, name: "This Year", value: "week" },
+    { id: 2, name: "This Month", value: "month" },
+    { id: 3, name: "This Year", value: "year" },
   ];
 
   return (
@@ -56,7 +50,7 @@ export default function FarmLineChart() {
       <CardHeader className="pb-0 shrink-0">
         <div className="flex justify-between items-center">
           <h3 className="text-dark font-semibold text-base">
-            Monthly Yield Analysis
+            Revenue Overview
           </h3>
           <div className="flex items-center gap-3">
             <Select onValueChange={(e) => setCrop(e)} defaultValue={crop}>
@@ -71,22 +65,6 @@ export default function FarmLineChart() {
                     className="hover:bg-zinc-900 transition-all duration-500 cursor-pointer"
                   >
                     {x.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select onValueChange={(e) => setVal(e)} defaultValue={val}>
-              <SelectTrigger className="text-dark border border-border bg-white rounded-lg">
-                <SelectValue placeholder="2024" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border-border text-zinc-400">
-                {year.map((x) => (
-                  <SelectItem
-                    key={x.id}
-                    value={x.value.toString()}
-                    className="hover:bg-zinc-900 transition-all duration-500 cursor-pointer"
-                  >
-                    {x.value}
                   </SelectItem>
                 ))}
               </SelectContent>
