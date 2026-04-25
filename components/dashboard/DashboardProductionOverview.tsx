@@ -21,9 +21,9 @@ import {
 export const description = "A donut chart with text";
 
 const chartData = [
-  { food: "wheat", value: 40, fill: "#fbc02d" },
+  { food: "wheat", value: 40, fill: "#2d90fb" },
   { food: "corn", value: 35, fill: "#ffeb3b" },
-  { food: "rice", value: 25, fill: "#a5d6a7" },
+  { food: "rice", value: 25, fill: "#18841b" },
 ];
 
 const chartConfig = {

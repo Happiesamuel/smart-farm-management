@@ -9,7 +9,7 @@ export default function DashboardMass() {
         <div className="space-y-1">
           <p className="text-dark font-medium text-sm">Total Land Area</p>
           <div className="space-y-0.5">
-            <h6 className="text-xl font-semibold">1,200 acres</h6>
+            <h6 className="text-xl font-semibold text-dark">1,200 acres</h6>
             <p className="text-zinc-500  text-xs">
               <span className="text-primary-green">+8.08% </span>from last month
             </p>
@@ -23,7 +23,7 @@ export default function DashboardMass() {
         <div className="space-y-1">
           <p className="text-dark font-medium text-sm">Revenue</p>
           <div className="space-y-0.5">
-            <h6 className="text-xl font-semibold">₦50,000</h6>
+            <h6 className="text-xl font-semibold text-dark">₦50,000</h6>
             <p className="text-zinc-500  text-xs">
               <span className="text-primary-green">+12.45% </span>from last
               month

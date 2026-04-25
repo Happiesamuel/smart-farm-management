@@ -62,9 +62,7 @@ export default function DashboardFarms() {
 
             <div className="text-center sm:text-left">
               <p className="text-sm text-gray-500">{item.name}</p>
-              <h3 className="text-xl font-semibold text-gray-900">
-                {item.num}
-              </h3>
+              <h3 className="text-xl font-semibold text-dark">{item.num}</h3>
             </div>
           </div>
         ))}

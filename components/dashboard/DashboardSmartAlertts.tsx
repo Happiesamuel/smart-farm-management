@@ -11,7 +11,9 @@ export default function DashboardSmartAlerts() {
         <div className="bg-green-50 h-[180px] pb-2  no-scroll overflow-scroll border border-green-200 p-3 rounded-lg hover:shadow-sm transition">
           <div className="flex items-center justify-between">
             <div>
-              <h6 className="text-base font-semibold">Field Activities</h6>
+              <h6 className="text-base font-semibold text-dark">
+                Field Activities
+              </h6>
               <p className="text-xs text-gray-500">
                 3 active • 1 inactive field
               </p>
@@ -62,7 +64,9 @@ export default function DashboardSmartAlerts() {
         <div className="bg-blue-50 h-[180px] pb-2  no-scroll overflow-scroll  border border-blue-200 p-3 rounded-lg hover:shadow-sm transition">
           <div className="flex items-center justify-between">
             <div>
-              <h6 className="text-base font-semibold">Recent Activities</h6>
+              <h6 className="text-base font-semibold text-dark">
+                Recent Activities
+              </h6>
               <p className="text-xs text-gray-500">Latest farm updates</p>
             </div>
 
@@ -111,7 +115,9 @@ export default function DashboardSmartAlerts() {
         <div className="bg-yellow-50  h-[180px] sm:col-span-3 lg:col-span-1 pb-2 no-scroll overflow-scroll border border-yellow-200 p-3 rounded-lg hover:shadow-sm transition">
           <div className="flex items-center justify-between">
             <div>
-              <h6 className="text-base font-semibold">Upcoming Harvests</h6>
+              <h6 className="text-base font-semibold text-dark">
+                Upcoming Harvests
+              </h6>
               <p className="text-xs text-gray-500">2 crops nearing harvest</p>
             </div>
 

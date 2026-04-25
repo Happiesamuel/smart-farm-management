@@ -23,7 +23,7 @@ export default function page() {
       </div>
       <DashboardFarms />
       <div className=" grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 items-stretch xl:h-[220px] justify-between gap-4">
-        {/* <DashboardWeather /> */}
+        <DashboardWeather />
         <DashboardProductionOveriew />
         <DashboardMass />
       </div>
