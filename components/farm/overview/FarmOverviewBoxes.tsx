@@ -33,7 +33,7 @@ export default function FarmOvervewBoxes() {
         {stats.map((item, i) => (
           <div
             key={i}
-            className={`p-5  bg-white  rounded-xl border border-border/80  hover:shadow-sm transition flex sm:flex-row flex-col items-start gap-4`}
+            className={`p-5  bg-white  rounded-xl border border-border/80  hover:shadow-sm transition flex  flex-col items-start gap-1`}
           >
             <p className="text-sm text-gray-500">{item.name}</p>
             <h3 className="text-xl font-semibold text-gray-900">{item.num}</h3>

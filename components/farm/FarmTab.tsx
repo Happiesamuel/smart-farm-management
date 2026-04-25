@@ -37,7 +37,7 @@ export default function FarmTab() {
     setActive(slug);
   }
   return (
-    <Tabs defaultValue={active} className="py-5">
+    <Tabs defaultValue={active} className="py-4">
       <TabsList
         variant="line"
         className="relatve justify-start w-full pb-[6px] border-b border-border"

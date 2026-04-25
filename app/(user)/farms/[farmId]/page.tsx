@@ -10,12 +10,15 @@ export default function Page() {
     { name: "overview", component: <FarmOverview /> },
     { name: "fields", component: <FarmFields /> },
   ];
+
   const searchParmas = useSearchParams();
   const tab = searchParmas.get("tab") || "overview";
+
   return (
     <div className="pt-18 px-2 sm:px-4">
       <FarmIdHeader />
       <FarmTab />
+
       <div>{tabs.find((t) => t.name === tab)?.component}</div>
     </div>
   );
