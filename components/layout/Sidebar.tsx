@@ -12,7 +12,8 @@ import { usePathname } from "next/navigation";
 export default function Sidebar() {
   const pathname = usePathname();
 
-  const slug = pathname.slice(1);
+  const [fir, sec] = pathname.split("/");
+  const slug = [fir, sec].join("/");
   const links = [
     {
       name: "Dashboard",
@@ -116,7 +117,7 @@ export default function Sidebar() {
           <Link
             key={link.slug}
             href={link.route}
-            className={`flex group  items-center cursor-pointer text-dark/90 font-medium py-2 px-4 gap-2 ${slug === link.slug && "  bg-white text-primary-green"} hover:text-primary-green text-sm rounded-md  mx-3`}
+            className={`flex group  items-center cursor-pointer text-dark/90 font-medium py-2 px-4 gap-2 ${slug === link.route && "  bg-white text-primary-green"} hover:text-primary-green text-sm rounded-md  mx-3`}
           >
             <div>{link.svg}</div> <p className=""> {link.name}</p>
           </Link>

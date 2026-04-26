@@ -56,13 +56,17 @@ export default function Header() {
     },
   ];
   const route = usePathname();
-  const active = links.find((x) => x.route === route);
+  const [fir, sec] = route.split("/");
+  const newRou = [fir, sec].join("/");
+  const active = links.find((x) => x.route === newRou);
   return (
     <div className="flex border-b border-border fixed max-w-424 py-3 bg-white px-4  min-w-0 z-100 w-full lg:w-[calc(100%-14rem)] items-center justify-between">
       <div className="flex items-center gap-2">
         <div>{active?.svg}</div>
         <MdArrowForwardIos className="text-zinc-500 text-sm" />
-        <p className="text-dark text-base font-normal">{active?.name}</p>
+        <Link href={`${newRou}`} className="text-dark text-base font-normal">
+          {active?.name}
+        </Link>
       </div>
 
       <div className="flex items-center gap-5">

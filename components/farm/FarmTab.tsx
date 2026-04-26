@@ -37,24 +37,28 @@ export default function FarmTab() {
     setActive(slug);
   }
   return (
-    <Tabs defaultValue={active} className="py-4">
-      <TabsList
-        variant="line"
-        className="relatve justify-start w-full pb-[6px] border-b border-border"
-      >
-        <div className="space-x-6">
-          {tabs.map((tab) => (
-            <TabsTrigger
-              className={`cursor-pointer pb-1 hover:text-green-600 data-active:text-green-600 after:bg-green-600`}
-              onClick={() => handleClick(tab.slug)}
-              key={tab.slug}
-              value={tab.slug}
-            >
-              {tab.name}
-            </TabsTrigger>
-          ))}
-        </div>
-      </TabsList>
-    </Tabs>
+    <div className="overflow-auto no-scroll w-full">
+      <div className=" min-w-[400px]  overflow-scroll no-scroll  ">
+        <Tabs defaultValue={active} className="py-4">
+          <TabsList
+            variant="line"
+            className="relatve justify-start w-full pb-[6px] border-b border-border"
+          >
+            <div className="space-x-6">
+              {tabs.map((tab) => (
+                <TabsTrigger
+                  className={`cursor-pointer pb-1 hover:text-green-600 data-active:text-green-600 after:bg-green-600`}
+                  onClick={() => handleClick(tab.slug)}
+                  key={tab.slug}
+                  value={tab.slug}
+                >
+                  {tab.name}
+                </TabsTrigger>
+              ))}
+            </div>
+          </TabsList>
+        </Tabs>
+      </div>
+    </div>
   );
 }

@@ -4,6 +4,7 @@ import FarmLineChart from "./FarmLineChart";
 import { FarmPieChart } from "./FarmPieChart";
 import FarmActivites from "./FarmActivites";
 import FarmUpcomingHarvest from "./FarmUpcomingHarvest";
+import FarmSmartAlerts from "./FarmSmartAlert";
 
 export default function FarmOverview() {
   return (
@@ -13,10 +14,11 @@ export default function FarmOverview() {
         <FarmLineChart />
         <FarmPieChart />
       </div>
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex md:flex-row flex-col pt-4 items-center justify-between gap-4">
         <FarmActivites />
         <FarmUpcomingHarvest />
       </div>
+      <FarmSmartAlerts />
     </div>
   );
 }

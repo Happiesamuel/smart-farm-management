@@ -4,22 +4,20 @@ import FarmTab from "@/components/farm/FarmTab";
 import FarmFields from "@/components/farm/fields/FarmFields";
 import FarmOverview from "@/components/farm/overview/FarmOverview";
 import { useSearchParams } from "next/navigation";
-
+import { ReactNode } from "react";
+type Tab = "overview" | "fields";
 export default function Page() {
-  const tabs = [
-    { name: "overview", component: <FarmOverview /> },
-    { name: "fields", component: <FarmFields /> },
-  ];
-
+  const tabs: Record<Tab, ReactNode> = {
+    overview: <FarmOverview />,
+    fields: <FarmFields />,
+  };
   const searchParmas = useSearchParams();
-  const tab = searchParmas.get("tab") || "overview";
-
+  const tab = (searchParmas.get("tab") || "overview") as Tab;
   return (
     <div className="pt-18 px-2 sm:px-4">
       <FarmIdHeader />
       <FarmTab />
-
-      <div>{tabs.find((t) => t.name === tab)?.component}</div>
+      <div>{tabs[tab]}</div>
     </div>
   );
 }

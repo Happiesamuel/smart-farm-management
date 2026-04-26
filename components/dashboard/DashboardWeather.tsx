@@ -40,13 +40,22 @@ export default function DashboardWeather() {
   }, []);
 
   if (!weather) return <p>Loading...</p>;
+  const today = new Date();
 
+  const day = today.toLocaleDateString("en-US", { weekday: "long" });
+  const date = today.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
   return (
     <div className="flex-1 space-y-1.5 relative gap-4 flex flex-col min-h-full bg-white p-4 rounded-xl border border-border/80 hover:shadow-sm transition">
       <div className="flex items-center relative justify-between">
         <div className="flex items-center gap-1 bg-primary-green shadow shadow-light-green text-white text-sm w-fit rounded-full px-2.5 py-1">
           <HiOutlineLocationMarker />
-          <p>Chicago</p>
+          <p>
+            {weather.location.name}, {weather.location.country}
+          </p>
         </div>
         <div className="flex transition-all duration-500 items-center bg-primary-green/15 w-fit rounded-md">
           {temps.map((temp) => (
@@ -62,8 +71,8 @@ export default function DashboardWeather() {
       </div>
       <div className="flex items-center relative justify-between">
         <div className="space relative">
-          <h6 className="text-dark font-semibold text-lg">Monday</h6>
-          <p className="text-sm font-normal text-dark">27 Aug, 2024</p>
+          <h6 className="text-dark font-semibold text-lg">{day}</h6>
+          <p className="text-sm font-normal text-dark">{date}</p>
         </div>
         <Image
           alt="icon"

@@ -29,14 +29,14 @@ export default function FarmOvervewBoxes() {
 
   return (
     <div className="py-4">
-      <div className="grid grid-cols-2  sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2  sm:grid-cols-3 md:grid-cols-5 lg:gap-4 md:gap-1 gap-4">
         {stats.map((item, i) => (
           <div
             key={i}
             className={`p-5  bg-white  rounded-xl border border-border/80  hover:shadow-sm transition flex  flex-col items-start gap-1`}
           >
             <p className="text-sm text-gray-500">{item.name}</p>
-            <h3 className="text-xl font-semibold text-gray-900">{item.num}</h3>
+            <h3 className="text-xl font-semibold text-dark">{item.num}</h3>
             <p className="text-sm text-gray-500">{item.sub}</p>
           </div>
         ))}
