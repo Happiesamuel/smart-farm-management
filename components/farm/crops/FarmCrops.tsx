@@ -4,7 +4,7 @@ import CropPagination from "../../layout/CropPagination";
 
 export default function FarmCrops() {
   return (
-    <div>
+    <div className="pt-4">
       <FarmCropsFilter />
       <FarmCropsTable />
       <CropPagination />
