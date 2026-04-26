@@ -13,7 +13,7 @@ export default function DashboardRecentTask() {
   >([
     { id: 1, name: "Irrigate Field A", done: false, priority: "high" },
     { id: 2, name: "Clear weed", done: false, priority: "low" },
-    { id: 2, name: "Apply fertilizer (Rice)", done: false, priority: "medium" },
+    { id: 3, name: "Apply fertilizer (Rice)", done: false, priority: "medium" },
   ]);
 
   const toggleTask = (id: number) => {
