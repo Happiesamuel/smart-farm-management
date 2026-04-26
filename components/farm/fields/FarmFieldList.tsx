@@ -109,7 +109,7 @@ export default function FarmFieldList() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pb-2">
+              <div className="flex items-center gap-2 py-2.5">
                 <div className="flex gap-2 items-center flex-1">
                   <Button className="bg-transparent w-[48%] font-medium  border border-primary-green cursor-pointer rounded-md text-primary-green">
                     View Details
