@@ -24,7 +24,7 @@ export default function FinanceCalendar() {
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="w-fit justify-start text-dark/80 text-sm text-left font-normal"
+          className="sm:w-fit w-full justify-center text-dark/80 text-sm text-left font-normal"
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
 

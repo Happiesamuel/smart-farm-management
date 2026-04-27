@@ -42,7 +42,7 @@ export default function FarmFinanceBoxes() {
   };
   return (
     <div className="pb-4">
-      <div className="grid grid-cols-2   md:grid-cols-4 lg:gap-4 md:gap-1 gap-4">
+      <div className="grid grid-cols-2   md:grid-cols-4 lg:gap-4 md:gap-1 gap-2">
         {stats.map((item, i) => {
           const Icon = item.icon;
           return (

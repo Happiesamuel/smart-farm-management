@@ -72,7 +72,7 @@ export default function FinanceExpenseTable() {
       </div>
 
       {/* Desktop Table */}
-      <div className="hidden md:block overflow-x-auto">
+      <div className="block overflow-x-auto">
         <table className="w-full text-sm ">
           <thead className=" bg-zinc-200/50 border rounded-t-2xl border-border text-gray-600">
             <tr className="text-left ">

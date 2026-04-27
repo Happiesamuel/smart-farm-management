@@ -40,8 +40,8 @@ export function FinanceCategoryPieChart() {
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1    min-h-0 relative overflow-hidden">
-        <div className="flex sm:flex-row xl:flex-row lg:flex-col flex-col items-center h-full">
+      <CardContent className="flex-1   min-h-0 relative overflow-hidden">
+        <div className="flex sm:flex-row lg:flex-row  flex-col items-center h-full">
           {/* LEFT → PIE CHART */}
           <div className="w-full sm:w-[65%] lg:w-full xl:w-[62%] h-full">
             <ChartContainer config={chartConfig} className="w-full h-full">
@@ -66,7 +66,7 @@ export function FinanceCategoryPieChart() {
             </ChartContainer>
           </div>
 
-          <div className="w-full sm:w-[35%] lg:w-full xl:w-full  ">
+          <div className="w-full sm:w-[35%] lg:w-full  ">
             <CustomLegend />
           </div>
         </div>
@@ -76,11 +76,11 @@ export function FinanceCategoryPieChart() {
 }
 const CustomLegend = () => {
   return (
-    <div className="flex overflow-scroll no-scroll lg:gap-4 xl:gap-2 sm:justify-start justify-center flex-row lg:flex-row xl:flex-col sm:flex-col gap-2 text-xs">
+    <div className="flex overflow-scroll no-scroll lg:gap-2 sm:justify-start justify-center flex-row lg:flex-col sm:flex-col gap-2 text-xs">
       {chartData.map((item, index) => (
         <div
           key={index}
-          className="flex items-center lg:gap-2 xl:gap-5 gap-5 lg:justify-start xl:justify-between sm:justify-between"
+          className="flex items-center lg:gap-5 gap-5 lg:justify-between sm:justify-between"
         >
           {/* Left */}
           <div className="flex items-center gap-2">

@@ -82,7 +82,7 @@ export default function FinanceSalesTable() {
       </div>
 
       {/* Desktop Table */}
-      <div className="hidden md:block overflow-x-auto">
+      <div className="block overflow-x-auto">
         <table className="w-full text-sm ">
           <thead className=" bg-zinc-200/50 border rounded-t-2xl border-border text-gray-600">
             <tr className="text-left ">
@@ -179,7 +179,7 @@ export default function FinanceSalesTable() {
       </div>
 
       {/* Mobile Cards */}
-      <div className="md:hidden space-y-3 p-4">
+      {/* <div className="md:hidden space-y-3 p-4">
         {sales.map((s) => (
           <div key={s.id} className="border rounded-lg p-4 shadow-sm">
             <div className="flex justify-between">
@@ -212,7 +212,7 @@ export default function FinanceSalesTable() {
             </div>
           </div>
         ))}
-      </div>
+      </div> */}
 
       <FinancePagination type="sales" />
     </div>

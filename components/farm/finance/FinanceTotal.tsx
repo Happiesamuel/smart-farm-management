@@ -37,7 +37,7 @@ export default function FinanceTotal() {
     },
   ];
   return (
-    <div className="space-y-3 border-b border-border pb-3">
+    <div className="space-y-3  border-b border-border pb-3">
       <div className="flex items-center justify-between gap-3">
         <p className="text-dark text-sm font-semibold">Finance Summary</p>
         <Select onValueChange={(e) => setCrop(e)} defaultValue={crop}>
