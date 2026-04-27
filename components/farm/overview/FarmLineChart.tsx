@@ -40,7 +40,7 @@ export default function FarmLineChart() {
   const [crop, setCrop] = useState("month");
 
   const crops = [
-    { id: 1, name: "This Year", value: "week" },
+    { id: 1, name: "This Week", value: "week" },
     { id: 2, name: "This Month", value: "month" },
     { id: 3, name: "This Year", value: "year" },
   ];
