@@ -10,10 +10,10 @@ import {
 
 export default function FinancePagination({ type }: { type: string }) {
   return (
-    <div className="flex items-center justify-between px-2 py-3 text-xs text-gray-500 border-t">
+    <div className="flex items-center justify-between px-2 py-3 text-xs text-gray-500 border-t gap-1">
       <p className="w-full">Showing 1 to 5 of 24 {type}</p>
       <Pagination className="w-full justify-end ">
-        <PaginationContent className=" gap-3">
+        <PaginationContent className=" gap-1 sm:gap-3">
           <PaginationItem>
             <PaginationPrevious
               size={"sm"}

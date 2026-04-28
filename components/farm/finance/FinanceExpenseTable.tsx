@@ -110,7 +110,7 @@ export default function FinanceExpenseTable() {
 
                 <td
                   title={s.description}
-                  className="py-3 truncate font-medium max-w-[70px] pr-4 text-xs text-zinc-700"
+                  className="py-3 truncate font-medium max-w-[70px] px-4 text-xs text-zinc-700"
                 >
                   {s.description}
                 </td>
