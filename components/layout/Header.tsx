@@ -11,6 +11,7 @@ import User from "../../public/user.png";
 import { MdArrowForwardIos } from "react-icons/md";
 import Image from "next/image";
 import { IoMdNotificationsOutline } from "react-icons/io";
+import { useCollaspe } from "@/context/SidebarCollasibleContext";
 
 export default function Header() {
   const links = [
@@ -59,8 +60,11 @@ export default function Header() {
   const [fir, sec] = route.split("/");
   const newRou = [fir, sec].join("/");
   const active = links.find((x) => x.route === newRou);
+  const { collaspe } = useCollaspe();
   return (
-    <div className="flex border-b border-border fixed max-w-424 py-3 bg-white px-4  min-w-0 z-100 w-full lg:w-[calc(100%-14rem)] items-center justify-between">
+    <div
+      className={`flex border-b border-border fixed max-w-424 py-3 bg-white px-4  min-w-0 z-100 w-full  ${collaspe ? "lg:w-[calc(100%-4.8rem)]" : "lg:w-[calc(100%-14rem)]"} items-center justify-between`}
+    >
       <div className="flex items-center gap-2">
         <div>{active?.svg}</div>
         <MdArrowForwardIos className="text-zinc-500 text-sm" />
