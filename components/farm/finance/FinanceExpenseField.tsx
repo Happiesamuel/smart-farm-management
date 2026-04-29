@@ -219,7 +219,7 @@ export function FinanceText({ name, label, placeholder, control }: Input) {
             <Textarea
               placeholder={placeholder}
               maxLength={2000}
-              className="resize-none"
+              className="resize-none font-normal"
               {...field}
               onChange={(e) => field.onChange(e.target.value)}
               value={typeof field.value === "string" ? field.value : ""}

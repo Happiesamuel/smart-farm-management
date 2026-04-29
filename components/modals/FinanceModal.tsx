@@ -39,7 +39,7 @@ export function FinanceModal({
     <div className="fixed inset-0 z-150 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40 " />
 
-      <div className="relative bg-white w-full max-w-3xl rounded-xl shadow-lg p-5 animate-fadeIn">
+      <div className="relative bg-white w-full max-w-3xl md:rounded-xl shadow-lg p-2.5 md:p-5 animate-fadeIn">
         <div>
           <div className="pb-3 flex items-center justify-between">
             <div className="text-xl text-dark font-semibold ">Add {type}</div>

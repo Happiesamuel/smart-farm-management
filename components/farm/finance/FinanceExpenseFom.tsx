@@ -15,8 +15,7 @@ import FinanceInput, {
   FinanceText,
   FinanceUpload,
 } from "./FinanceExpenseField";
-import { IoMdGrid } from "react-icons/io";
-import { PiPlant } from "react-icons/pi";
+
 import { MdOutlinePayment } from "react-icons/md";
 import { FaRegSave } from "react-icons/fa";
 // import Field from "./Field";
@@ -46,38 +45,7 @@ export default function FinanceExpenseFom() {
       value: "transport",
     },
   ];
-  const arrField = [
-    {
-      value: "fieldA",
-      name: "Field A ",
-    },
-    {
-      value: "fieldB",
-      name: "Field B ",
-    },
-    {
-      value: "fieldC",
-      name: "Field C ",
-    },
-    {
-      value: "fieldD",
-      name: "Field D ",
-    },
-  ];
-  const arrQuantity = [
-    {
-      name: "kg",
-      value: "kg",
-    },
-    {
-      name: "bags",
-      value: "bags",
-    },
-    {
-      name: "crates",
-      value: "crates",
-    },
-  ];
+
   const arrPayment = [
     {
       name: "Cash",
@@ -97,9 +65,9 @@ export default function FinanceExpenseFom() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-6 pt-6 w-full overflow-scroll no-scroll max-h-[73vh]"
+          className="space-y-4 md:space-y-6 pt-6 w-full overflow-scroll no-scroll max-h-[73vh]"
         >
-          <div className="flex gap-6 items-center justify-between">
+          <div className="flex gap-4 md:gap-6 items-center justify-between flex-col md:flex-row">
             <FinanceSelect
               name="category"
               control={form.control}
@@ -111,7 +79,7 @@ export default function FinanceExpenseFom() {
             <FinanceDate label="Date" name="date" control={form.control} />
           </div>
 
-          <div className="flex item justify-between gap-6">
+          <div className="flex item justify-between flex-col md:flex-row gap-4 md:gap-6">
             <FinanceSelect
               name="paymentMethod"
               control={form.control}
@@ -128,7 +96,7 @@ export default function FinanceExpenseFom() {
             />
           </div>
 
-          <div className="flex items-start justify-between gap-6">
+          <div className="flex items-start justify-between flex-col md:flex-row gap-4 md:gap-6">
             <FinanceText
               label="Description"
               placeholder="Enter expense description"

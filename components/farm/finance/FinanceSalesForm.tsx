@@ -92,9 +92,9 @@ export default function FinanceSalesForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-6 pt-6 w-full overflow-scroll no-scroll max-h-[73vh]"
+          className="space-y-4 md:space-y-6 pt-6 w-full overflow-scroll no-scroll max-h-[73vh]"
         >
-          <div className="flex gap-6 items-center justify-between">
+          <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
             <FinanceSelect
               name="crop"
               control={form.control}
@@ -113,7 +113,7 @@ export default function FinanceSalesForm() {
             />
           </div>
 
-          <div className="flex item justify-between gap-6">
+          <div className="flex item flex-col md:flex-row justify-between gap-4 md:gap-6">
             <FinanceInputSelect
               array={arrQuantity}
               control={form.control}
@@ -130,7 +130,7 @@ export default function FinanceSalesForm() {
               control={form.control}
             />
           </div>
-          <div className="flex item justify-between gap-6">
+          <div className="flex item flex-col md:flex-row justify-between gap-4 md:gap-6">
             <FinanceAmount
               label="Total Amount"
               placeholder="e.g. 0.00"
@@ -143,7 +143,7 @@ export default function FinanceSalesForm() {
               control={form.control}
             />
           </div>
-          <div className="flex item justify-between gap-6">
+          <div className="flex item flex-col md:flex-row justify-between gap-4 md:gap-6">
             <FinanceInput
               label="Buyer"
               placeholder="Enter buyer name or company"
