@@ -54,12 +54,14 @@ export default function FarmFinanceBoxes() {
           return (
             <div
               key={i}
-              className={`p-5  ${item.bg}  rounded-xl border ${item.border} hover:shadow-sm transition flex  flex-col sm:flex-row justify-between items-start sm:items-center gap-2`}
+              className={`p-5  ${item.bg}  rounded-xl border ${item.border} hover:shadow-sm transition flex  flex-col sm:flex-row justify-between items-center gap-2`}
             >
-              <div className="space-y-2">
+              <div className="space-y-2 sm:text-start text-center">
                 <p className="text-sm text-gray-500">{item.name}</p>
                 <h3 className="text-xl font-semibold text-dark">{item.num}</h3>
-                <p className="text-sm text-gray-500">{item.sub}</p>
+                <p className="text-sm text-center sm:text-start text-gray-500">
+                  {item.sub}
+                </p>
               </div>
               <div
                 className={`size-10 ${item.iconColor} flex items-center justify-center rounded-md`}

@@ -57,7 +57,7 @@ export default function DashboardQucikActions() {
   ];
   return (
     <div className="w-full p-4 bg-white flex-1 rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[350px shrink-0">
-      <h3 className="font-medium pb-6 text-base text-dark">Quick Actions</h3>
+      <h3 className="font-medium pb-4 text-base text-dark">Quick Actions</h3>
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-2">
         {stats.map((item, i) => (
           <div

@@ -53,7 +53,7 @@ export default function DashboardTopPerforming() {
   ];
 
   return (
-    <div className="w-full p-4 bg-white flex-1 rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[250px] no-scroll shrink-0">
+    <div className="w-full p-4 bg-white flex-1 rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[300px] lg:h-[250px] no-scroll shrink-0">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-medium text-base text-dark">
@@ -79,7 +79,7 @@ export default function DashboardTopPerforming() {
       </div>
 
       {/* Desktop Table */}
-      <div className="hidden md:block no-scroll overflow-x-auto">
+      <div className="hidden sm:block no-scroll overflow-x-auto">
         <table className="w-full no-scroll text-sm">
           <thead className="text-gray-500 text-left">
             <tr>
@@ -158,20 +158,24 @@ export default function DashboardTopPerforming() {
       </div>
 
       {/* Mobile Cards */}
-      <div className="md:hidden space-y-3">
+      <div className="sm:hidden overflow-scroll no-scroll space-y-3">
         {farms.map((f) => (
           <div key={f.id} className="border rounded-lg p-3">
             <div className="flex justify-between">
-              <h4 className="font-medium">{f.name}</h4>
+              <h4 className="font-medium text-base text-dark/80">{f.name}</h4>
               <span className="text-xs">{f.margin}%</span>
             </div>
 
-            <p className="text-sm mt-1">Revenue: {formatNaira(f.revenue)}</p>
+            <p className="text-xs text-zinc-700 mt-1">
+              Revenue: {formatNaira(f.revenue)}
+            </p>
 
-            <p className="text-sm">Expenses: {formatNaira(f.expenses)}</p>
+            <p className="text-xs text-zinc-700">
+              Expenses: {formatNaira(f.expenses)}
+            </p>
 
             <p
-              className={`text-sm font-medium ${
+              className={`text-sm font-medium  pt-1.5 ${
                 f.profit > 0
                   ? "text-green-600"
                   : f.profit === 0

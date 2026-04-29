@@ -67,7 +67,7 @@ export function DashboardAreachart() {
     },
   ];
   return (
-    <Card className="w-full gap-0 bg-white flex-1 relative rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[300px] shrink-0">
+    <Card className="w-full gap-0 bg-white flex-1 relative rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[500px] md:h-[300px] shrink-0">
       <CardHeader className="pb-0 shrink-0">
         <div className="flex justify-between items-center">
           <h3 className="text-dark  text-base">Farm Overview</h3>
@@ -94,7 +94,7 @@ export function DashboardAreachart() {
       <CardContent className="">
         <ChartContainer
           config={chartConfig}
-          className="w-full h-[130px] pb-2"
+          className="w-full h-[185px] md:h-[130px] pb-2"
           style={{ minHeight: 0 }}
         >
           <AreaChart
@@ -158,7 +158,7 @@ export function DashboardAreachart() {
             />
           </AreaChart>
         </ChartContainer>
-        <div className="flex items-center justify-center gap-2 pb-2">
+        <div className="flex  items-center justify-center gap-2 pb-2">
           <div className="flex items-center gap-1">
             <div className="size-2 bg-[#53bf62]" />
             <p>Revenue</p>
@@ -169,7 +169,7 @@ export function DashboardAreachart() {
             <p>Expenses</p>
           </div>
         </div>
-        <div className="grid gap-2 bg-none border-none bor grid-cols-3 items-center">
+        <div className="grid gap-2 bg-none border-none grid-cols-1 md:grid-cols-3 items-center">
           {arr.map((a) => (
             <div
               className={`space-y-2 ${a.border} rounded-md border p-2 ${a.bg}`}

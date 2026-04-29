@@ -61,7 +61,9 @@ export default function DashboardSmartAlertts() {
             </div>
             <div className="space-y-0.5">
               <p className="text-dark/80 text-sm">{alert.title}</p>
-              <p className="text-xs truncate text-zinc-500">{alert.text}</p>
+              <p className="text-xs truncate max-w-[200px] md:max-w-full text-zinc-500">
+                {alert.text}
+              </p>
               <p className="text-xs text-zinc-500">{alert.farm}</p>
             </div>
           </div>

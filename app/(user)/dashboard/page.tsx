@@ -26,16 +26,16 @@ export default function page() {
       </div>
       <DashboardFarms />
       {/* <DashboardWeather /> */}
-      <div className=" grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-[1fr_0.8fr] items-stretch xl:h-[300px] justify-between gap-4">
+      <div className=" grid grid-cols-1 lg:grid-cols-[1fr_0.5fr] xl:grid-cols-[1fr_0.8fr] items-stretch xl:h-[300px] justify-between gap-4">
         <DashboardAreachart />
         <DashboardPieChart />
       </div>
-      <div className=" grid grid-cols-1 pt-4 sm:grid-cols-2 xl:grid-cols-3 items-stretch  justify-between gap-4">
+      <div className=" grid grid-cols-1 pt-4  md:grid-cols-2 xl:grid-cols-3 items-stretch  justify-between gap-4">
         <DashboardSmartAlerts />
         <DashboardCropsStatus />
         <DashboardRecentTasks />
       </div>
-      <div className="w-full   xl:h-[220px] grid grid-cols-[1fr_0.8fr] gap-4 pt-4">
+      <div className="w-full   xl:h-[220px grid grid-cols-1 lg:grid-cols-[1fr_0.8fr] gap-4 pt-4">
         <DashboardTopPerforming />
         <DashboardQucikActions />
       </div>

@@ -56,14 +56,17 @@ export default function DashboardRecentTasks() {
   };
 
   return (
-    <div className="w-full p-4 bg-white flex-1 rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[220px shrink-0">
+    <div className="w-full md:col-span-2 xl:col-span-1 p-4 bg-white flex-1 rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[320px] shrink-0">
       <div className="flex items-center justify-between pb-4">
         <h6 className="text-base text-dark">Recent Tasks</h6>
         <p className="text-sm text-primary-green">View All</p>
       </div>
-      <div className="flex  flex-col gap-3">
+      <div className="flex overflow-scroll no-scroll  flex-col gap-3">
         {tasks.map((task) => (
-          <div key={task.id} className="grid grid-cols-[1fr_0.5fr] gap-2">
+          <div
+            key={task.id}
+            className="grid grid-cols-1 md:grid-cols-[1fr_0.5fr] gap-2"
+          >
             <div className="flex items-center gap-2">
               <Checkbox
                 id="terms-checkbox-2"
@@ -81,7 +84,7 @@ export default function DashboardRecentTasks() {
                 </div>
               </div>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex justify-end items-center gap-4 md:justify-between">
               <p
                 className={`${priorityColor[task.priority]} w-fit text-xs rounded py-0.5 p-1`}
               >

@@ -49,7 +49,7 @@ const statusStyles: Record<string, string> = {
 
 export default function DashboardCropsStatus() {
   return (
-    <div className="w-full p-4 bg-white flex-1 rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[320px] shrink-0">
+    <div className="w-full  p-4 bg-white flex-1 rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[320px] shrink-0">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-medium text-dark text-base">Crops Status</h3>
@@ -118,7 +118,7 @@ export default function DashboardCropsStatus() {
       </div>
 
       {/* Mobile Cards */}
-      <div className="md:hidden space-y-3">
+      <div className="md:hidden overflow-scroll no-scroll space-y-3">
         {crops.map((c) => (
           <div key={c.id} className="border rounded-lg p-3">
             <div className="flex justify-between items-center">
