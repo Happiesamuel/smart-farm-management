@@ -63,3 +63,62 @@ export const signupFormSchema = z
     message: "Passwords don't match",
     path: ["confirmPassword"], // Set error on confirmPassword field
   });
+
+export const financeSaleSchema = z.object({
+  crop: z
+    .string({ message: "Please select a crop" })
+    .min(1, "Please select a crop"),
+  field: z.string({ message: "Field is required" }).min(1, "Field is required"),
+  quantity: z.string({ message: "Quantity is required" }).min(1, {
+    message: "Quantity must be at least a characters.",
+  }),
+  unit: z.string({ message: "Unit is required" }).min(1, "Please select  unit"),
+  unitPrice: z.string({ message: "Please enter unit price" }).min(2, {
+    message: "Unit price must be at least 2 characters.",
+  }),
+  totalAmount: z.string({ message: "Please enter total amount" }).min(2, {
+    message: "Total amountt must be at least 2 characters.",
+  }),
+  saleDate: z
+    .string({ message: " Date is required" })
+    .min(1, "Date is required"),
+  buyer: z.string({ message: "Please enter buyer's name" }).min(2, {
+    message: "Buyer's must be at least 2 characters.",
+  }),
+  paymentMethod: z
+    .string({ message: "Please select payment method" })
+    .min(1, "Please select a payment method"),
+  notes: z.string().optional(),
+});
+export const financeExpenseSchema = z.object({
+  category: z
+    .string({ message: "Please select a category" })
+    .min(1, "Please select a category"),
+
+  amount: z.string({ message: "Please enter total amount" }).min(2, {
+    message: "Total amountt must be at least 2 characters.",
+  }),
+  date: z.string({ message: " Date is required" }).min(1, "Date is required"),
+
+  paymentMethod: z
+    .string({ message: "Please select payment method" })
+    .min(1, "Please select a payment method"),
+  notes: z.string().optional(),
+  description: z
+    .string({ message: "descripton is required" })
+    .min(10, { message: "description must be at least 10 characters." }),
+  receipt: z
+    .any()
+    .refine((file) => !file || file.size <= 5 * 1024 * 1024, {
+      message: "Max file size is 5MB",
+    })
+    .refine(
+      (file) =>
+        !file ||
+        ["image/jpeg", "image/png", "application/pdf"].includes(file.type),
+      {
+        message: "Only JPG, PNG or PDF allowed",
+      },
+    )
+    .optional(),
+});

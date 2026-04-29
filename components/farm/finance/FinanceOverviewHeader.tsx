@@ -9,8 +9,10 @@ import { FiShoppingCart } from "react-icons/fi";
 import { GrMoney } from "react-icons/gr";
 import FinanceSalesForm from "./FinanceSalesForm";
 import FinanceExpenseFom from "./FinanceExpenseFom";
+import { FinanceModal } from "@/components/modals/FinanceModal";
 export default function FinanceOverviewHeader() {
   const [type, setType] = useState("sales");
+  const [open, setOpen] = useState(false);
   const rec = [
     {
       slug: "sales",
@@ -45,7 +47,16 @@ export default function FinanceOverviewHeader() {
           <CiFilter />
           <p>Filter</p>
         </Button>
-        <AddModal
+
+        <Button
+          onClick={() => setOpen(true)}
+          className="bg-primary-green w-full sm:w-fit cursor-pointer text-white rounded"
+        >
+          <GoPlus />
+          <p>Add {type === "sales" ? "Sale" : "Expense"}</p>
+        </Button>
+
+        <FinanceModal
           text={
             type === "sales"
               ? "Record a new sale made from your farm"
@@ -58,15 +69,11 @@ export default function FinanceOverviewHeader() {
               : "bg-red-100 text-red-500"
           }
           Icon={type === "sales" ? FiShoppingCart : GrMoney}
-          trigger={
-            <Button className="bg-primary-green w-full sm:w-fit cursor-pointer text-white rounded">
-              <GoPlus />
-              <p>Add {type === "sales" ? "Sale" : "Expense"}</p>
-            </Button>
-          }
+          open={open}
+          onClose={() => setOpen(false)}
         >
           {type === "sales" ? <FinanceSalesForm /> : <FinanceExpenseFom />}
-        </AddModal>
+        </FinanceModal>
       </div>
     </div>
   );

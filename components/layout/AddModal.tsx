@@ -34,14 +34,18 @@ export default function AddModal({
       <AlertDialogContent className="w-full">
         <AlertDialogHeader className="w-full">
           <AlertDialogTitle className="w-full">
-            <h6 className="text-xl text-dark font-semibold pb-2">Add {type}</h6>
-            <div className={`flex items-center  gap-2`}>
-              <div
-                className={` ${iconColor} size-10 rounded-xl items-center justify-center flex `}
-              >
-                <Icon className="text-xl" />
+            <div>
+              <div className="text-xl text-dark font-semibold pb-2">
+                Add {type}
               </div>
-              <p className="text-sm text-dark/80 font-medium">{text}</p>
+              <div className={`flex items-center  gap-2`}>
+                <div
+                  className={` ${iconColor} size-10 rounded-xl items-center justify-center flex `}
+                >
+                  <Icon className="text-xl" />
+                </div>
+                <p className="text-sm text-dark/80 font-medium">{text}</p>
+              </div>
             </div>
           </AlertDialogTitle>
           <AlertDialogDescription className="w-full">
