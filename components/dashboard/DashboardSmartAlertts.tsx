@@ -1,167 +1,71 @@
-import React from "react";
-import { CiBag1 } from "react-icons/ci";
-import { GiDigDug } from "react-icons/gi";
+import { IoReceiptOutline } from "react-icons/io5";
 import { PiPlant } from "react-icons/pi";
-
-export default function DashboardSmartAlerts() {
+import { SiOverleaf } from "react-icons/si";
+import { CgSandClock } from "react-icons/cg";
+export default function DashboardSmartAlertts() {
+  const alerts = [
+    {
+      title: "Maize in Field A will be ready in 5 days",
+      farm: "Green Valley Farm",
+      text: "",
+      icon: <PiPlant />,
+      iconColor: "bg-[#e7f5eb] text-[#056b36] ",
+      border: "bg-[#1a914c]",
+      id: 1,
+    },
+    {
+      title: "Irrigation overdue in Field B",
+      farm: "Green Valley Farm",
+      text: "Last irrigation was 4 days ago.",
+      icon: <SiOverleaf />,
+      iconColor: "bg-[#e1eefd] text-[#1058d6] ",
+      border: "bg-[#1058d6]",
+      id: 2,
+    },
+    {
+      title: "High Expense detected",
+      farm: "Green Valley Farm",
+      text: "Fertilizer expenses are 20% higher than last month",
+      icon: <IoReceiptOutline />,
+      iconColor: "bg-[#fff1dd] text-[#de852c] ",
+      border: "bg-[#de852c]",
+      id: 3,
+    },
+    {
+      title: "Task overdue",
+      farm: "Green Valley Farm",
+      text: "2 tasks are past their due date.",
+      icon: <CgSandClock />,
+      iconColor: "bg-[#fee7e7] text-[#e82a2d] ",
+      border: "bg-[#de852c]",
+      id: 4,
+    },
+  ];
   return (
-    <div className="pt-4">
-      <div className="space-y-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 sm:gap-4">
-        {/* FIELD ACTIVITIES */}
-        <div className="bg-green-50 h-[180px] pb-2  no-scroll overflow-scroll border border-green-200 p-3 rounded-lg hover:shadow-sm transition">
-          <div className="flex items-center justify-between">
-            <div>
-              <h6 className="text-base font-semibold text-dark">
-                Field Activities
-              </h6>
-              <p className="text-xs text-gray-500">
-                3 active • 1 inactive field
-              </p>
+    <div className="w-full p-4 bg-white flex-1 rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[320px] shrink-0">
+      <div className="flex items-center justify-between pb-4">
+        <h6 className="text-base text-dark">Smart Alerts</h6>
+        <p className="text-sm text-primary-green">View All</p>
+      </div>
+      <div className="flex overflow-scroll no-scroll  flex-col gap-2">
+        {alerts.map((alert) => (
+          <div
+            key={alert.id}
+            className={`  flex last:border-b-0 items-center pb-2 border-b border-border gap-3 `}
+          >
+            <div className={`${alert.border} w-0.5 h-10`} />
+            <div
+              className={`text-xl  size-8 flex items-center justify-center rounded-md ${alert.iconColor}`}
+            >
+              {alert.icon}
             </div>
-
-            <span className="text-xs cursor-pointer rounded-full px-3 py-1 text-white bg-green-500 hover:bg-green-600 transition">
-              View
-            </span>
-          </div>
-
-          <div className="space-y-2 mt-2">
-            <div className="flex items-start gap-2">
-              <div className="w-2 h-2 mt-2 rounded-full bg-green-500"></div>
-              <div className="flex items-start gap-2">
-                <div className="rounded-full bg-green-500 size-6 flex items-center justify-center">
-                  <GiDigDug className="text-white text-sm" />
-                </div>
-                <div>
-                  <p className="text-sm text-zinc-700">
-                    3 Active crops growing
-                  </p>
-                  <p className="text-xs text-gray-400">Updated just now</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2">
-              <div className="w-2 h-2 mt-2 rounded-full bg-red-500"></div>
-              <div className="flex items-start gap-2">
-                <div className="rounded-full bg-red-500 size-6 flex items-center justify-center">
-                  <CiBag1 className="text-white text-sm" />
-                </div>
-                <div>
-                  <p className="text-sm text-zinc-700">
-                    Field B has no activity for 7 days
-                  </p>
-                  <p className="text-xs text-gray-400">Critical • 7 days ago</p>
-                  <p className="text-xs italic text-gray-600">
-                    Recommendation: Check and irrigate field
-                  </p>
-                </div>
-              </div>
+            <div className="space-y-0.5">
+              <p className="text-dark/80 text-sm">{alert.title}</p>
+              <p className="text-xs truncate text-zinc-500">{alert.text}</p>
+              <p className="text-xs text-zinc-500">{alert.farm}</p>
             </div>
           </div>
-        </div>
-
-        {/* RECENT ACTIVITIES */}
-        <div className="bg-blue-50 h-[180px] pb-2  no-scroll overflow-scroll  border border-blue-200 p-3 rounded-lg hover:shadow-sm transition">
-          <div className="flex items-center justify-between">
-            <div>
-              <h6 className="text-base font-semibold text-dark">
-                Recent Activities
-              </h6>
-              <p className="text-xs text-gray-500">Latest farm updates</p>
-            </div>
-
-            <span className="text-xs cursor-pointer rounded-full px-3 py-1 text-white bg-blue-500 hover:bg-blue-600 transition">
-              View
-            </span>
-          </div>
-
-          <div className="space-y-2 mt-2">
-            <div className="flex items-start gap-2">
-              <div className="w-2 h-2 mt-2 rounded-full bg-red-500"></div>
-              <div className="flex items-start gap-2">
-                <div className="rounded-full bg-red-500 size-6 flex items-center justify-center">
-                  <GiDigDug className="text-white text-sm" />
-                </div>
-                <div>
-                  <p className="text-sm text-zinc-700">
-                    No irrigation recorded in 5 days
-                  </p>
-                  <p className="text-xs text-gray-400">Critical • 5 days ago</p>
-                  <p className="text-xs italic text-gray-600">
-                    Recommendation: Irrigate crops today
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2">
-              <div className="w-2 h-2 mt-2 rounded-full bg-green-500"></div>
-              <div className="flex items-start gap-2">
-                <div className="rounded-full bg-green-500 size-6 flex items-center justify-center">
-                  <CiBag1 className="text-white text-sm" />
-                </div>
-                <div>
-                  <p className="text-sm text-zinc-700">
-                    Fertilizer was added 3 days ago
-                  </p>
-                  <p className="text-xs text-gray-400">Info • 3 days ago</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* UPCOMING HARVEST */}
-        <div className="bg-yellow-50  h-[180px] sm:col-span-3 lg:col-span-1 pb-2 no-scroll overflow-scroll border border-yellow-200 p-3 rounded-lg hover:shadow-sm transition">
-          <div className="flex items-center justify-between">
-            <div>
-              <h6 className="text-base font-semibold text-dark">
-                Upcoming Harvests
-              </h6>
-              <p className="text-xs text-gray-500">2 crops nearing harvest</p>
-            </div>
-
-            <span className="text-xs cursor-pointer rounded-full px-3 py-1 text-white bg-yellow-500 hover:bg-yellow-600 transition">
-              View
-            </span>
-          </div>
-
-          <div className="space-y-2 mt-2">
-            <div className="flex items-start gap-2">
-              <div className="w-2 h-2 mt-2 rounded-full bg-yellow-500"></div>
-              <div className="flex items-start gap-2">
-                <div className="rounded-full bg-yellow-500 size-6 flex items-center justify-center">
-                  <PiPlant className="text-white text-sm" />
-                </div>
-                <div>
-                  <p className="text-sm text-zinc-700">
-                    Maize will be ready in 5 days
-                  </p>
-                  <p className="text-xs text-gray-400">Warning • Upcoming</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2">
-              <div className="w-2 h-2 mt-2 rounded-full bg-green-500"></div>
-              <div className="flex items-start gap-2">
-                <div className="rounded-full bg-green-500 size-6 flex items-center justify-center">
-                  <PiPlant className="text-white text-sm" />
-                </div>
-                <div>
-                  <p className="text-sm text-zinc-700">
-                    Wheat was harvested 2 days ago
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Completed • 2 days ago
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* TASK PREVIEW (NEW 🔥) */}
+        ))}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { Label, Pie, PieChart } from "recharts";
+import { Pie, PieChart } from "recharts";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
@@ -13,11 +13,11 @@ import {
 export const description = "A donut chart with text";
 
 const chartData = [
-  { food: "Fertilizer", value: 40, fill: "#7c0e9b" },
-  { food: "Labour", value: 28, fill: "#e3c21a" },
-  { food: "Seeds", value: 16, fill: "#1ae324" },
-  { food: "Transport", value: 10, fill: "#009aed" },
-  { food: "Others", value: 6, fill: "#6e6e6e" },
+  { food: "Fertilizer", value: 40, fill: "#ab75e0" },
+  { food: "Labour", value: 28, fill: "#ffab07" },
+  { food: "Seeds", value: 16, fill: "#63c634" },
+  { food: "Transport", value: 10, fill: "#5c8de2" },
+  { food: "Others", value: 6, fill: "#808692" },
 ];
 
 const chartConfig = {
@@ -60,7 +60,6 @@ export function FinanceCategoryPieChart() {
                   innerRadius="50%"
                   outerRadius="80%"
                   strokeWidth={4}
-                  paddingAngle={2}
                 ></Pie>
               </PieChart>
             </ChartContainer>

@@ -10,6 +10,9 @@ export default function FarmFinanceBoxes() {
       sub: "12.5% vs last month",
       slug: "revenue",
       icon: GiMoneyStack,
+      iconColor: "bg-[#e8f5ec] text-[#2d8952] ",
+      bg: "bg-[#f8fdf9]",
+      border: "border-green-100",
     },
     {
       num: "₦50,000",
@@ -17,6 +20,9 @@ export default function FarmFinanceBoxes() {
       sub: "-8.3% vs last month",
       slug: "expenses",
       icon: GrMoney,
+      iconColor: "bg-[#fee7e7] text-[#e82a2d] ",
+      bg: "bg-[#fef5f5]",
+      border: "border-red-100",
     },
     {
       num: "₦70,000",
@@ -24,6 +30,9 @@ export default function FarmFinanceBoxes() {
       sub: "25.3% vs last month",
       slug: "profit",
       icon: GiTakeMyMoney,
+      iconColor: "bg-[#e1eefd] text-[#1058d6] ",
+      bg: "bg-[#f7fafe]",
+      border: "border-blue-100",
     },
     {
       num: "58.3%",
@@ -31,15 +40,12 @@ export default function FarmFinanceBoxes() {
       sub: "6.7% vs last month",
       slug: "margin",
       icon: TbPigMoney,
+      iconColor: "bg-[#f1ecfd] text-[#5837e8] ",
+      bg: "bg-[#f9f7fd]",
+      border: "border-green-100",
     },
   ];
 
-  const slugStyles: Record<string, string> = {
-    revenue: "bg-green-100 border-green-200 text-green-500",
-    expenses: "bg-red-100 border-red-200 text-red-500",
-    profit: "bg-green-100 border-green-200 text-green-500",
-    margin: "bg-purple-100 border-purple-200 text-purple-500",
-  };
   return (
     <div className="pb-4">
       <div className="grid grid-cols-2   md:grid-cols-4 lg:gap-4 md:gap-1 gap-2">
@@ -48,17 +54,17 @@ export default function FarmFinanceBoxes() {
           return (
             <div
               key={i}
-              className={`p-5  bg-white  rounded-xl border border-border/80  hover:shadow-sm transition flex  flex-col sm:flex-row items-start sm:items-center gap-2`}
+              className={`p-5  ${item.bg}  rounded-xl border ${item.border} hover:shadow-sm transition flex  flex-col sm:flex-row justify-between items-start sm:items-center gap-2`}
             >
-              <div
-                className={`size-8 border ${slugStyles[item.slug]} flex items-center justify-center rounded-full`}
-              >
-                <Icon className="text-xl" />
-              </div>
               <div className="space-y-2">
                 <p className="text-sm text-gray-500">{item.name}</p>
                 <h3 className="text-xl font-semibold text-dark">{item.num}</h3>
                 <p className="text-sm text-gray-500">{item.sub}</p>
+              </div>
+              <div
+                className={`size-10 ${item.iconColor} flex items-center justify-center rounded-md`}
+              >
+                <Icon className="text-2xl" />
               </div>
             </div>
           );

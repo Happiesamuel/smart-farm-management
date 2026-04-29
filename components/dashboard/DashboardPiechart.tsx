@@ -13,37 +13,37 @@ import {
 export const description = "A donut chart with text";
 
 const chartData = [
-  { food: "Seeds", value: 40, fill: "#0e9b36", exp: "₦20,000" },
-  { food: "Fertilizer", value: 28, fill: "#2283c3", exp: "₦14,000" },
-  { food: "Labour", value: 16, fill: "#e3c21a", exp: "₦8,000" },
-  { food: "Transport", value: 10, fill: "#ed0000", exp: "₦5,000" },
-  { food: "Others", value: 6, fill: "#6e6e6e", exp: "₦3,000" },
+  { food: "Fertilizer", value: 40, fill: "#3f86ee", exp: "₦248,000" },
+  { food: "Labour", value: 25, fill: "#53bf62", exp: "₦155,000" },
+  { food: "Seeds", value: 15, fill: "#fdb214", exp: "₦93,000" },
+  { food: "Transport", value: 10, fill: "#e9575a", exp: "₦62,000" },
+  { food: "Pesticides", value: 6, fill: "#b893ed", exp: "₦37,000" },
+  { food: "Others", value: 4, fill: "#c8c7ee", exp: "₦24,000" },
 ];
 
 const chartConfig = {
   value: { label: "Value" },
-  Seeds: { label: "Seeds" },
   Fertilizer: { label: "Fertilizer" },
   Labour: { label: "Labour" },
+  Seeds: { label: "Seeds" },
   Transport: { label: "Transport" },
+  Pesticides: { label: "Pesticides" },
   Others: { label: "Others" },
 } satisfies ChartConfig;
 
-export function FinancePieChart() {
+export function DashboardPieChart() {
   return (
     <Card className="w-full gap-0 bg-white flex-1 relative rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[300px] shrink-0">
       <CardHeader className="pb-0 shrink-0">
         <div className="flex justify-between items-center">
-          <h3 className="text-dark font-semibold text-base">
-            Expense Breakdown
-          </h3>
+          <h3 className="text-dark  text-base">Expense Breakdown</h3>
         </div>
       </CardHeader>
 
       <CardContent className="flex-1    min-h-0 relative overflow-hidden">
         <div className="flex sm:flex-row xl:flex-row lg:flex-col flex-col items-center h-full">
           {/* LEFT → PIE CHART */}
-          <div className="w-full sm:w-[65%] lg:w-full xl:w-[60%] h-full">
+          <div className="w-full sm:w-[65%] lg:w-full xl:w-[50%] h-full">
             <ChartContainer config={chartConfig} className="w-full h-full">
               <PieChart>
                 <ChartTooltip
@@ -60,7 +60,6 @@ export function FinancePieChart() {
                   innerRadius="60%"
                   outerRadius="90%"
                   strokeWidth={4}
-                  paddingAngle={2}
                 >
                   <Label
                     content={({ viewBox }) => {
@@ -77,7 +76,7 @@ export function FinancePieChart() {
                               dy="-0.3em"
                               className="text-base sm:text-lg font-semibold"
                             >
-                              ₦50,000
+                              ₦620,000
                             </tspan>
 
                             <tspan
@@ -98,7 +97,7 @@ export function FinancePieChart() {
             </ChartContainer>
           </div>
 
-          <div className="w-full sm:w-[35%] lg:w-full xl:w-[40%] ">
+          <div className="w-full sm:w-[35%] lg:w-full xl:w-[50%] ">
             <CustomLegend />
           </div>
         </div>
@@ -117,7 +116,7 @@ const CustomLegend = () => {
           {/* Left */}
           <div className="flex items-center gap-2">
             <span
-              className="w-2 h-2 rounded-full"
+              className="w-2 h-2 rounded-full text-dark/80"
               style={{ backgroundColor: item.fill }}
             />
             {item.food}

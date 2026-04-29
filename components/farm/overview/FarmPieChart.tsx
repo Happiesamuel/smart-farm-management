@@ -14,11 +14,11 @@ import {
 export const description = "A donut chart with text";
 
 const chartData = [
-  { food: "Maize", value: 33, fill: "#0e9b36" },
-  { food: "Rice", value: 25, fill: "#2283c3" },
-  { food: "Tomatoes", value: 17, fill: "#e3c21a" },
-  { food: "Pepper", value: 15, fill: "#ed0000" },
-  { food: "Others", value: 10, fill: "#6e6e6e" },
+  { food: "Maize", value: 33, fill: "#03732b" },
+  { food: "Rice", value: 25, fill: "#4e8afd" },
+  { food: "Tomatoes", value: 17, fill: "#fcb304" },
+  { food: "Pepper", value: 15, fill: "#60c03e" },
+  { food: "Others", value: 10, fill: "#bfbfc0" },
 ];
 
 const chartConfig = {
@@ -66,7 +66,6 @@ export function FarmPieChart() {
                   innerRadius="60%"
                   outerRadius="90%"
                   strokeWidth={4}
-                  paddingAngle={2}
                 >
                   <Label
                     content={({ viewBox }) => {
