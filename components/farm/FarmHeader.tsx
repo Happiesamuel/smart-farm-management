@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { GoPlus } from "react-icons/go";
 
 export default function FarmHeader() {
@@ -11,8 +12,10 @@ export default function FarmHeader() {
         </p>
       </div>
       <Button className="bg-primary-green cursor-pointer text-white">
-        <GoPlus />
-        <p>Add Farm</p>
+        <Link href={"/farms/create"} className="flex items-center gap-1">
+          <GoPlus />
+          <p>Add Farm</p>
+        </Link>
       </Button>
     </div>
   );

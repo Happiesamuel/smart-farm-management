@@ -90,6 +90,41 @@ export const financeSaleSchema = z.object({
     .min(1, "Please select a payment method"),
   notes: z.string().optional(),
 });
+export const createFarmSchema = z.object({
+  farmName: z.string({ message: "Farm name is required" }).min(4, {
+    message: "Farm name must be at least 4 characters.",
+  }),
+  size: z.string({ message: "Total size is required" }).min(1, {
+    message: "Total size must be at least a characters.",
+  }),
+  unit: z.string({ message: "Unit is required" }).min(1, "Please select  unit"),
+  location: z.object(
+    {
+      address: z.string(),
+      lat: z.number(),
+      lng: z.number(),
+    },
+    { message: "Location is required" },
+  ),
+  description: z
+    .string({ message: "descripton is required" })
+    .min(10, { message: "description must be at least 10 characters." }),
+  paymentMethod: z
+    .string({ message: "Please select payment method" })
+    .min(1, "Please select a payment method"),
+  notes: z.string().optional(),
+  soilType: z
+    .string({ message: "Please select a soil type" })
+    .min(1, "Please select a soil type"),
+  status: z
+    .string({ message: "Please select a status" })
+    .min(1, "Please select a status"),
+  farmImage: z
+    .instanceof(File, { message: "Please upload farm image." })
+    .refine((file) => file.size < 5 * 1024 * 1024, {
+      message: "image must be smaller than 5MB.",
+    }),
+});
 export const financeExpenseSchema = z.object({
   category: z
     .string({ message: "Please select a category" })
