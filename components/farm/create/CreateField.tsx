@@ -23,6 +23,15 @@ import { createFarmSchema } from "@/lib/schemas";
 import { IoLocationOutline } from "react-icons/io5";
 import { Textarea } from "@/components/ui/textarea";
 import { Upload } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import {
+  Map,
+  MapControls,
+  MapMarker,
+  MarkerContent,
+  MarkerLabel,
+  MarkerPopup,
+} from "@/components/ui/map";
 interface Inputs {
   control: Control<z.infer<typeof createFarmSchema>>;
   name: FieldPath<z.infer<typeof createFarmSchema>>;
@@ -265,9 +274,7 @@ export function CreateLocationField({
           { signal: controller.signal },
         );
 
-        console.log(res);
         if (!res.ok) {
-          console.log(res);
           throw new Error("Failed to fetch locations");
         }
 
@@ -281,6 +288,7 @@ export function CreateLocationField({
         }
 
         setResults(data);
+        console.log(data);
       } catch (err: unknown) {
         const e = err as unknown as Error;
         if (e.name === "AbortError") return; // ignore cancelled
@@ -354,12 +362,54 @@ export function CreateLocationField({
               ))}
             </div>
           )}
-          {field?.value?.lat && field?.value?.lng && (
-            <iframe
-              className="w-full h-60 mt-3 rounded-md no-scroll"
-              src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.NEXT_PUBLIC_LOCATIONIQ_KEY}&center=${field.value?.lat},${field.value?.lng}&zoom=16&size=1500x200&markers=icon:large-red-cutout|${field.value?.lat},${field.value?.lng}`}
-            />
+
+          {field?.value?.lat && field?.value?.lng ? (
+            <Card className="h-[320px] p-0 overflow-hidden">
+              <Map
+                theme="light"
+                key={`${field.value.lng}-${field.value.lat}`}
+                center={[field.value.lng, field.value.lat]}
+                zoom={16}
+              >
+                <MapControls />
+
+                <MapMarker
+                  longitude={field.value.lng}
+                  latitude={field.value.lat}
+                >
+                  <MarkerContent>
+                    <div className="size-4 cursor-pointer rounded-full border-2 border-white bg-green-500 shadow-md hover:scale-110 transition-transform" />
+
+                    <MarkerLabel className="text-xs" position="bottom">
+                      {field.value.address}
+                    </MarkerLabel>
+                  </MarkerContent>
+
+                  <MarkerPopup className="w-60 p-3">
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground uppercase">
+                        Location
+                      </p>
+
+                      <h3 className="font-semibold text-sm">
+                        {field.value.address || "Unknown location"}
+                      </h3>
+
+                      <p className="text-xs text-muted-foreground">
+                        Lat: {field.value.lat.toFixed(5)} <br />
+                        Lng: {field.value.lng.toFixed(5)}
+                      </p>
+                    </div>
+                  </MarkerPopup>
+                </MapMarker>
+              </Map>
+            </Card>
+          ) : (
+            <Card className="h-[320px] flex items-center justify-center text-sm text-muted-foreground">
+              No location selected
+            </Card>
           )}
+
           <FormMessage />
         </FormItem>
       )}

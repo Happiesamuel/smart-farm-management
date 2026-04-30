@@ -49,7 +49,7 @@ export default function DashboardWeather() {
     year: "numeric",
   });
   return (
-    <div className="flex-1 space-y-1.5 relative gap-4 flex flex-col min-h-full bg-white p-4 rounded-xl border border-border/80 hover:shadow-sm transition">
+    <div className=" h-[320px] space-y-1.5 relative gap-4 flex flex-col min-h-full bg-white p-4 rounded-xl border border-border/80 hover:shadow-sm transition">
       <div className="flex items-center relative justify-between">
         <div className="flex items-center gap-1 bg-primary-green shadow shadow-light-green text-white text-sm w-fit rounded-full px-2.5 py-1">
           <HiOutlineLocationMarker />
