@@ -158,3 +158,373 @@
 // Grouped by Category
 //         ↓
 // Displayed in Smart Alert Boxes (your UI)
+
+
+const compatibleCrops = {
+  Maize: ["Beans", "Soybean", "Cassava"],
+  Cassava: ["Maize", "Beans"],
+  Rice: [],
+};
+
+const selectedCrop = watch("cropName.name"); // if using object
+const existingCrops = fieldCrops.map(c => c.cropName.name);
+
+const incompatible = existingCrops.some(
+  (c) => !compatibleCrops[c]?.includes(selectedCrop)
+);
+
+const warnings = [];
+
+fieldCrops.forEach((crop) => {
+  fieldCrops.forEach((other) => {
+    if (
+      crop !== other &&
+      !compatibleCrops[crop]?.includes(other)
+    ) {
+      warnings.push(`${crop} may not grow well with ${other}`);
+    }
+  });
+});
+
+{incompatible && (
+  <p className="text-yellow-600 text-xs mt-1">
+    ⚠️ This crop may not grow well with existing crops in this field.
+  </p>
+)}
+<p className="text-green-600 text-xs mt-1">
+  ✅ Try Beans or Soybean with Maize
+</p>
+<p className="text-yellow-600 text-xs mt-1">
+  ⚠️ Rice requires wet conditions, while Beans need dry soil.
+</p>
+
+type Farm = {
+  id: string;
+  userId: string;
+
+  name: string;
+
+  location: {
+    address: string;
+    lat: number;
+    lng: number;
+  };
+
+  size: number;
+  sizeUnit: "ha" | "acre";
+
+  description?: string;
+
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+
+type Field = {
+  id: string;
+  farmId: string;
+
+  name: string;
+
+  size: number;
+  sizeUnit: "ha" | "acre";
+
+  soilType?: "loamy" | "sandy" | "clay";
+
+  location?: {
+    lat: number;
+    lng: number;
+  };
+
+  notes?: string;
+
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type Crop = {
+  id: string;
+
+  farmId: string;
+  fieldId: string;
+
+  cropName: {
+    id?: string;
+    name: string;
+    isCustom?: boolean;
+  };
+
+  variety?: string;
+
+  plantingDate: Date;
+  expectedHarvestDate: Date;
+
+  areaPlanted: number;
+  areaUnit: "ha" | "acre";
+
+  seedQuantity?: number;
+  seedUnit?: "kg" | "g" | "bags";
+
+  expectedYield?: number;
+  yieldUnit?: "kg" | "tonnes" | "bags";
+
+  irrigationType?: 
+    | "rain-fed"
+    | "drip"
+    | "sprinkler"
+    | "manual";
+
+  status:
+    | "planted"
+    | "growing"
+    | "harvested"
+    | "failed"
+    | "drying"
+    | "stored";
+
+  notes?: string;
+
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type Harvest = {
+  id: string;
+
+  cropId: string;
+  fieldId: string;
+  farmId: string;
+
+  quantity: number;
+  unit: "kg" | "bags" | "tonnes";
+
+  date: Date;
+
+  notes?: string;
+
+  createdAt: Date;
+};
+
+type Sale = {
+  id: string;
+
+  harvestId: string;
+  cropId: string;
+
+  quantity: number;
+  unit: "kg" | "bags";
+
+  pricePerUnit: number;
+
+  totalAmount: number;
+
+  date: Date;
+
+  createdAt: Date;
+};
+
+type Expense = {
+  id: string;
+
+  farmId: string;
+  fieldId?: string;
+  cropId?: string;
+
+  type:
+    | "fertilizer"
+    | "labor"
+    | "seeds"
+    | "transport"
+    | "equipment";
+
+  amount: number;
+
+  date: Date;
+
+  notes?: string;
+
+  createdAt: Date;
+};
+
+
+const farm = {
+  id: "farm_1",
+  userId: "user_123",
+
+  name: "Green Valley Farm",
+
+  location: {
+    address: "Ibadan, Oyo, Nigeria",
+    lat: 7.3775,
+    lng: 3.9470,
+  },
+
+  size: 5,
+  sizeUnit: "ha",
+
+  createdAt: "2026-05-01T10:00:00Z",
+  updatedAt: "2026-05-01T10:00:00Z",
+
+  fields: [
+    {
+      id: "field_1",
+      farmId: "farm_1",
+
+      name: "North Field",
+      size: 2,
+      sizeUnit: "ha",
+
+      soilType: "loamy",
+
+      createdAt: "2026-05-01T10:10:00Z",
+
+      crops: [
+        {
+          id: "crop_1",
+          fieldId: "field_1",
+          farmId: "farm_1",
+
+          cropName: {
+            id: "maize_id",
+            name: "Maize",
+            isCustom: false,
+          },
+
+          variety: "Hybrid",
+
+          plantingDate: "2026-05-01",
+          expectedHarvestDate: "2026-08-01",
+
+          areaPlanted: 1.2,
+          areaUnit: "ha",
+
+          seedQuantity: 25,
+          seedUnit: "kg",
+
+          expectedYield: 80,
+          yieldUnit: "bags",
+
+          irrigationType: "rain-fed",
+
+          status: "growing",
+
+          createdAt: "2026-05-01T10:15:00Z",
+
+          harvests: [
+            {
+              id: "harvest_1",
+              cropId: "crop_1",
+
+              quantity: 70,
+              unit: "bags",
+
+              date: "2026-08-05",
+
+              sales: [
+                {
+                  id: "sale_1",
+                  harvestId: "harvest_1",
+
+                  quantity: 40,
+                  unit: "bags",
+
+                  pricePerUnit: 25000,
+                  totalAmount: 1000000,
+
+                  date: "2026-08-06",
+                },
+              ],
+            },
+          ],
+        },
+
+        {
+          id: "crop_2",
+          fieldId: "field_1",
+          farmId: "farm_1",
+
+          cropName: {
+            name: "Beans",
+            isCustom: false,
+          },
+
+          plantingDate: "2026-05-03",
+          expectedHarvestDate: "2026-07-20",
+
+          areaPlanted: 0.8,
+          areaUnit: "ha",
+
+          status: "growing",
+
+          createdAt: "2026-05-01T10:20:00Z",
+
+          harvests: [],
+        },
+      ],
+    },
+
+    {
+      id: "field_2",
+      farmId: "farm_1",
+
+      name: "South Field",
+      size: 3,
+      sizeUnit: "ha",
+
+      soilType: "sandy",
+
+      createdAt: "2026-05-01T10:30:00Z",
+
+      crops: [
+        {
+          id: "crop_3",
+          fieldId: "field_2",
+          farmId: "farm_1",
+
+          cropName: {
+            id: "rice_id",
+            name: "Rice",
+          },
+
+          plantingDate: "2026-05-10",
+          expectedHarvestDate: "2026-09-15",
+
+          areaPlanted: 3,
+          areaUnit: "ha",
+
+          irrigationType: "flood",
+
+          status: "growing",
+
+          createdAt: "2026-05-01T10:35:00Z",
+
+          harvests: [],
+        },
+      ],
+    },
+  ],
+
+  expenses: [
+    {
+      id: "exp_1",
+      farmId: "farm_1",
+
+      type: "fertilizer",
+      amount: 150000,
+
+      date: "2026-05-15",
+    },
+    {
+      id: "exp_2",
+      farmId: "farm_1",
+
+      type: "labor",
+      amount: 80000,
+
+      date: "2026-05-20",
+    },
+  ],
+};
+
+
+//harvest inside crop shoul be harvest inside field

@@ -8,18 +8,20 @@ import { Form } from "@/components/ui/form";
 
 import { useState } from "react";
 import { createFieldSchema } from "@/lib/schemas";
-import { PiFarm, PiPlantDuotone } from "react-icons/pi";
+import { PiFarm, PiPlant, PiPlantDuotone } from "react-icons/pi";
 import { ImDroplet } from "react-icons/im";
 import { FiUser } from "react-icons/fi";
 import { FaRegSave } from "react-icons/fa";
 import { GrFlag } from "react-icons/gr";
 import CreateFieldInput, {
+  CreateFieldCombo,
   CreateFieldDate,
   CreateFieldInputSelect,
   CreateFieldSelect,
   CreateFieldText,
 } from "./CreateFieldField";
 import { TbRipple } from "react-icons/tb";
+import { CreateCropCombo } from "../crops/CreateCropField";
 export default function CreateFieldForm() {
   const [load, setLoad] = useState(false);
   //   const { login, status } = useLogin();
@@ -110,6 +112,18 @@ export default function CreateFieldForm() {
       value: "pivot",
     },
   ];
+  const cropOptions = [
+    "🌽Maize",
+    "🌾Rice",
+    "🥔Yam",
+    "🍅Tomato",
+    "🫑Pepper",
+    "🥔Cassava",
+    "🌾Beans",
+    "🌱Wheat",
+    "🥜Sorghum",
+    "🌾Soyabean",
+  ];
 
   return (
     <div className="w-full lg:w-[90%] mx-auto ">
@@ -174,10 +188,12 @@ export default function CreateFieldForm() {
             />
           </div>
           <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
-            <CreateFieldInput
-              label="Crop Type"
-              placeholder="e.g Maize"
+            <CreateFieldCombo
               Icon={PiPlantDuotone}
+              array={cropOptions}
+              label="Crop Type"
+              placeholder1="Select or search crop"
+              placeholder2="Select"
               name="cropType"
               control={form.control}
             />

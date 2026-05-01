@@ -143,9 +143,7 @@ export const createFieldSchema = z.object({
     .string({ message: "Please select a irrigation type" })
     .min(1, "Please select a irrigation type")
     .optional(),
-  cropType: z.string({ message: "Crop type is required" }).min(3, {
-    message: "Crop type must be at least 3 characters.",
-  }),
+  cropType: comboSchema("Crop type is required"),
   plantingToHarvest: z
     .object(
       {

@@ -13,7 +13,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
@@ -27,10 +33,21 @@ import z from "zod";
 import { createFieldSchema } from "@/lib/schemas";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Check, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
-
+import { useState } from "react";
+import { IoIosArrowDown } from "react-icons/io";
+import { cn } from "@/lib/utils";
+interface InputCombo {
+  control: Control<z.infer<typeof createFieldSchema>>;
+  name: FieldPath<z.infer<typeof createFieldSchema>>;
+  label: string;
+  placeholder1: string;
+  placeholder2: string;
+  array: string[];
+  Icon: IconType;
+}
 interface Inputs {
   control: Control<z.infer<typeof createFieldSchema>>;
   name: FieldPath<z.infer<typeof createFieldSchema>>;
@@ -304,6 +321,103 @@ export function CreateFieldDate({
           </FormItem>
         );
       }}
+    />
+  );
+}
+
+export function CreateFieldCombo({
+  control,
+  label,
+  placeholder1,
+  placeholder2,
+  name,
+  array,
+  Icon,
+}: InputCombo) {
+  const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className="flex flex-col w-full">
+          <FormLabel>{label}</FormLabel>
+
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <FormControl>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className={cn(
+                    "w-full justify-between text-sm",
+                    !field.value && "text-dark/80",
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    {Icon && <Icon className="text-primary-green" />}
+                    {(field.value as string) || (placeholder1 as string)}
+                  </div>
+                  <IoIosArrowDown className="ml-2 h-4 w-4 opacity-50" />
+                </Button>
+              </FormControl>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-full p-0">
+              <Command>
+                <CommandInput
+                  placeholder={placeholder2}
+                  value={inputValue}
+                  onValueChange={setInputValue}
+                />
+
+                <CommandEmpty>
+                  <div
+                    className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-accent"
+                    onClick={() => {
+                      field.onChange(inputValue);
+                      setOpen(false);
+                    }}
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add &quot;{inputValue}&quot;
+                  </div>
+                </CommandEmpty>
+
+                <CommandGroup className="max-h-[200px] overflow-scroll no-scroll">
+                  {array
+                    .filter((crop) =>
+                      crop.toLowerCase().includes(inputValue.toLowerCase()),
+                    )
+                    .map((crop) => (
+                      <CommandItem
+                        key={crop}
+                        value={crop}
+                        className="pr-2 hover:bg-primary-green hover:text-white cursor-pointer"
+                        onSelect={() => {
+                          field.onChange(crop);
+                          setOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            field.value === crop ? "opacity-100" : "opacity-0",
+                          )}
+                        />
+                        {crop}
+                      </CommandItem>
+                    ))}
+                </CommandGroup>
+              </Command>
+            </PopoverContent>
+          </Popover>
+
+          <FormMessage />
+        </FormItem>
+      )}
     />
   );
 }
