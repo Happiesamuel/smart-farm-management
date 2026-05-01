@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Link from "next/link";
 import React, { useState } from "react";
 import { GoPlus } from "react-icons/go";
 import { IoSearch } from "react-icons/io5";
@@ -71,9 +72,12 @@ export default function FarmCropsFilter() {
           />
         </div>
       </div>
+
       <Button className="bg-primary-green w-full sm:w-fit cursor-pointer text-white">
-        <GoPlus />
-        <p>Add Crop</p>
+        <Link href={"/farms/1/add-crop"} className="flex items-center gap-1">
+          <GoPlus />
+          <p>Add Crop</p>
+        </Link>
       </Button>
     </div>
   );

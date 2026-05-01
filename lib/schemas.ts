@@ -146,18 +146,82 @@ export const createFieldSchema = z.object({
   cropType: z.string({ message: "Crop type is required" }).min(3, {
     message: "Crop type must be at least 3 characters.",
   }),
-  plantingToHarvest: z.object(
-    {
-      from: z.date({
-        error: "Planting date is required",
-      }),
-      to: z.date({
-        error: "Harvest date is required",
-      }),
-    },
-    { message: "Planting date to Harvest date is required" },
-  ),
+  plantingToHarvest: z
+    .object(
+      {
+        from: z.date({
+          error: "Planting date is required",
+        }),
+        to: z.date({
+          error: "Harvest date is required",
+        }),
+      },
+      { message: "Planting date to Harvest date is required" },
+    )
+    .refine((data) => data.to > data.from, {
+      message: "Harvest date must be after planting date",
+      path: ["to"],
+    }),
 
+  description: z
+    .string({ message: "descripton is required" })
+    .min(10, { message: "description must be at least 10 characters." }),
+});
+export const createCropSchema = z.object({
+  cropName: comboSchema("Crop is required"),
+  plantingToHarvest: z
+    .object(
+      {
+        from: z.date({
+          error: "Planting date is required",
+        }),
+        to: z.date({
+          error: "Harvest date is required",
+        }),
+      },
+      { message: "Planting date to Harvest date is required" },
+    )
+    .refine((data) => data.to > data.from, {
+      message: "Harvest date must be after planting date",
+      path: ["to"],
+    }),
+  irrigationType: z
+    .string({ message: "Please select a irrigation type" })
+    .min(1, "Please select a irrigation type")
+    .optional(),
+  farm: z
+    .string({ message: "Please select farm" })
+    .min(1, "Please select a farm"),
+  field: z
+    .string({ message: "Please select field" })
+    .min(1, "Please select a field"),
+  variety: z
+    .string({ message: "Please select variety" })
+    .min(1, "Please select variety"),
+  expectedYield: z.string({ message: "Expected yield is required" }).min(1, {
+    message: "Expected Yield must be at least a characters.",
+  }),
+  yieldUnit: z
+    .string({ message: "Unit is required" })
+    .min(1, "Please select  unit"),
+  seedQuantity: z.string({ message: "Seed quantity is required" }).min(1, {
+    message: "Seed quantity must be at least a characters.",
+  }),
+  seedUnit: z
+    .string({ message: "Unit is required" })
+    .min(1, "Please select  unit"),
+  areaPlanted: z.string({ message: "Area planted is required" }).min(1, {
+    message: "Area planted must be at least a characters.",
+  }),
+  areaUnit: z
+    .string({ message: "Unit is required" })
+    .min(1, "Please select  unit"),
+  status: z
+    .string({ message: "Please select a status" })
+    .min(1, "Please select a status"),
+  soilType: z
+    .string({ message: "Please select a soil type" })
+    .min(1, "Please select a soil type"),
   description: z
     .string({ message: "descripton is required" })
     .min(10, { message: "description must be at least 10 characters." }),
@@ -220,3 +284,13 @@ export const financeExpenseSchema = z.object({
     )
     .optional(),
 });
+function comboSchema(message: string) {
+  return z.object(
+    {
+      id: z.string().optional(),
+      name: z.string().min(1, message),
+      isCustom: z.boolean().optional(),
+    },
+    { message: message },
+  );
+}

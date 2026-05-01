@@ -28,28 +28,44 @@ export default function CreateFarmForm() {
 
   async function onSubmit(values: z.infer<typeof createFarmSchema>) {}
 
-  const soilType = [
-    {
-      value: "loamy",
-      name: "Loamy Soil",
-    },
+  const soil = [
     {
       value: "sandy",
-      name: "Sandy Soil ",
+      name: "Sandy",
+    },
+    {
+      value: "loamy",
+      name: "Loamy",
     },
     {
       value: "clay",
-      name: "Clay Soil ",
+      name: "Clay",
+    },
+    {
+      value: "silty",
+      name: "Silty",
+    },
+    {
+      value: "peaty",
+      name: "Peaty",
+    },
+    {
+      value: "chalky",
+      name: "Chalky",
     },
   ];
   const arrSize = [
     {
       name: "acres",
-      value: "acres",
+      value: "acre",
     },
     {
       name: "hectares",
-      value: "hectares",
+      value: "ha",
+    },
+    {
+      name: "square.m",
+      value: "mm",
     },
   ];
   const stat = [
@@ -105,7 +121,7 @@ export default function CreateFarmForm() {
               control={form.control}
               label="Soil Type"
               placeholder="Select soil type"
-              array={soilType}
+              array={soil}
               Icon={PiPlant}
             />
             <CreateFarmSelect

@@ -14,6 +14,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { useState } from "react";
+import { Check, Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 import {
   Popover,
   PopoverContent,
@@ -22,47 +26,59 @@ import {
 
 import { Control, FieldPath } from "react-hook-form";
 import { IconType } from "react-icons";
-
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
 import z from "zod";
-import { createFieldSchema } from "@/lib/schemas";
+import { createCropSchema } from "@/lib/schemas";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import { IoIosArrowDown } from "react-icons/io";
 
 interface Inputs {
-  control: Control<z.infer<typeof createFieldSchema>>;
-  name: FieldPath<z.infer<typeof createFieldSchema>>;
+  control: Control<z.infer<typeof createCropSchema>>;
+  name: FieldPath<z.infer<typeof createCropSchema>>;
   label: string;
   placeholder: string;
   Icon?: IconType;
 }
+interface InputCombo {
+  control: Control<z.infer<typeof createCropSchema>>;
+  name: FieldPath<z.infer<typeof createCropSchema>>;
+  label: string;
+  placeholder1: string;
+  placeholder2: string;
+  array: string[];
+  Icon: IconType;
+}
+
 interface InputSelect {
-  control: Control<z.infer<typeof createFieldSchema>>;
-  name1: FieldPath<z.infer<typeof createFieldSchema>>;
-  name2: FieldPath<z.infer<typeof createFieldSchema>>;
+  control: Control<z.infer<typeof createCropSchema>>;
+  name1: FieldPath<z.infer<typeof createCropSchema>>;
+  name2: FieldPath<z.infer<typeof createCropSchema>>;
   label: string;
   placeholder: string;
   placeholder2: string;
   array: { [key: string]: string }[];
 }
-interface Dates {
-  control: Control<z.infer<typeof createFieldSchema>>;
-  name: FieldPath<z.infer<typeof createFieldSchema>>;
-  label: string;
-}
 
 interface Select {
-  control: Control<z.infer<typeof createFieldSchema>>;
-  name: FieldPath<z.infer<typeof createFieldSchema>>;
+  control: Control<z.infer<typeof createCropSchema>>;
+  name: FieldPath<z.infer<typeof createCropSchema>>;
   label: string;
   placeholder: string;
   array: { [key: string]: string }[];
   Icon: IconType;
 }
 
-export function CreateFieldSelect({
+export function CreateCropSelect({
   control,
   name,
   label,
@@ -110,7 +126,7 @@ export function CreateFieldSelect({
   );
 }
 
-export function CreateFieldInputSelect({
+export function CreateCropInputSelect({
   control,
   name1,
   name2,
@@ -175,7 +191,7 @@ export function CreateFieldInputSelect({
   );
 }
 
-export default function CreateFieldInput({
+export default function CreateCropInput({
   name,
   label,
   placeholder,
@@ -207,7 +223,7 @@ export default function CreateFieldInput({
   );
 }
 
-export function CreateFieldText({ name, label, placeholder, control }: Inputs) {
+export function CreateCropText({ name, label, placeholder, control }: Inputs) {
   return (
     <FormField
       control={control}
@@ -233,14 +249,14 @@ export function CreateFieldText({ name, label, placeholder, control }: Inputs) {
   );
 }
 
-export function CreateFieldDate({
+export function CreateCropDate({
   control,
   name,
   label,
 }: {
-  control: Control<z.infer<typeof createFieldSchema>>;
+  control: Control<z.infer<typeof createCropSchema>>;
   label: string;
-  name: FieldPath<z.infer<typeof createFieldSchema>>;
+  name: FieldPath<z.infer<typeof createCropSchema>>;
 }) {
   return (
     <FormField
@@ -304,6 +320,103 @@ export function CreateFieldDate({
           </FormItem>
         );
       }}
+    />
+  );
+}
+
+export function CreateCropCombo({
+  control,
+  label,
+  placeholder1,
+  placeholder2,
+  name,
+  array,
+  Icon,
+}: InputCombo) {
+  const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className="flex flex-col w-full">
+          <FormLabel>{label}</FormLabel>
+
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <FormControl>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className={cn(
+                    "w-full justify-between text-sm",
+                    !field.value && "text-dark/80",
+                  )}
+                >
+                  <div className="flex items-center gap-2">
+                    {Icon && <Icon className="text-primary-green" />}
+                    {(field.value as string) || (placeholder1 as string)}
+                  </div>
+                  <IoIosArrowDown className="ml-2 h-4 w-4 opacity-50" />
+                </Button>
+              </FormControl>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-full p-0">
+              <Command>
+                <CommandInput
+                  placeholder={placeholder2}
+                  value={inputValue}
+                  onValueChange={setInputValue}
+                />
+
+                <CommandEmpty>
+                  <div
+                    className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-accent"
+                    onClick={() => {
+                      field.onChange(inputValue);
+                      setOpen(false);
+                    }}
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add &quot;{inputValue}&quot;
+                  </div>
+                </CommandEmpty>
+
+                <CommandGroup className="max-h-[200px] overflow-scroll no-scroll">
+                  {array
+                    .filter((crop) =>
+                      crop.toLowerCase().includes(inputValue.toLowerCase()),
+                    )
+                    .map((crop) => (
+                      <CommandItem
+                        key={crop}
+                        value={crop}
+                        className="pr-2 hover:bg-primary-green hover:text-white cursor-pointer"
+                        onSelect={() => {
+                          field.onChange(crop);
+                          setOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            field.value === crop ? "opacity-100" : "opacity-0",
+                          )}
+                        />
+                        {crop}
+                      </CommandItem>
+                    ))}
+                </CommandGroup>
+              </Command>
+            </PopoverContent>
+          </Popover>
+
+          <FormMessage />
+        </FormItem>
+      )}
     />
   );
 }

@@ -56,16 +56,32 @@ export default function CreateFieldForm() {
       value: "clay",
       name: "Clay",
     },
+    {
+      value: "silty",
+      name: "Silty",
+    },
+    {
+      value: "peaty",
+      name: "Peaty",
+    },
+    {
+      value: "chalky",
+      name: "Chalky",
+    },
   ];
 
   const arrSize = [
     {
       name: "acres",
-      value: "acres",
+      value: "acre",
     },
     {
       name: "hectares",
-      value: "hectares",
+      value: "ha",
+    },
+    {
+      name: "square.m",
+      value: "mm",
     },
   ];
   const irrigation = [
@@ -80,6 +96,18 @@ export default function CreateFieldForm() {
     {
       name: "Sprinkler",
       value: "sprinkler",
+    },
+    {
+      name: "Manual",
+      value: "manual",
+    },
+    {
+      name: "Flood",
+      value: "flood",
+    },
+    {
+      name: "Pivot",
+      value: "pivot",
     },
   ];
 
