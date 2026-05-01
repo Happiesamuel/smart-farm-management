@@ -1,6 +1,5 @@
-import React from "react";
 import FarmOvervewBoxes from "./FarmOverviewBoxes";
-import FarmLineChart from "./FarmLineChart";
+import { FarmAreachart } from "./FarmLineChart";
 import { FarmPieChart } from "./FarmPieChart";
 import FarmActivites from "./FarmActivites";
 import FarmUpcomingHarvest from "./FarmUpcomingHarvest";
@@ -16,19 +15,19 @@ import {
 } from "@/components/ui/map";
 import { Card } from "@/components/ui/card";
 import DashboardWeather from "@/components/dashboard/DashboardWeather";
+import { SlLocationPin } from "react-icons/sl";
+import FarmFieldOverview from "./FarmFieldOverview";
 export default function FarmOverview() {
   return (
     <div>
       <FarmOvervewBoxes />
-
-      <div className="flex items-center gap-4 flex-col lg:flex-row">
-        <FarmLineChart />
-        <FarmPieChart />
-      </div>
-      {/* <div className="grid grid-cols-[0.5fr_1fr] gap-4 my-4 ">
-        <DashboardWeather />
-        <Card className="h-[320px] p-0 overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 my-4 ">
+        <Card className="w-full gap-3 h-[400px] bg-white flex-1 p-4 relative rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col  shrink-0">
+          <h6 className="text-sm text-dark/90 font-normal">Farm Location</h6>
           <Map
+            styles={{
+              light: "https://tiles.openfreemap.org/styles/bright",
+            }}
             theme="light"
             key={`${5.61601}-${6.40024}`}
             center={[5.61601, 6.40024]}
@@ -59,11 +58,25 @@ export default function FarmOverview() {
               </MarkerPopup>
             </MapMarker>
           </Map>
+          <div className="flex items-start text-zinc-600 text-xs font-normal gap-3">
+            <SlLocationPin />
+            <div className="space-y-2">
+              <p>Bwari, Abuja, FCT, Nigeria</p>
+              <p>Lat 9.1651&#xb0; N, Long 7.3986&#xb0; E</p>
+            </div>
+          </div>
         </Card>
-      </div> */}
+        <DashboardWeather />
+      </div>
 
-      <div className="flex md:flex-row flex-col pt-4 items-center justify-between gap-4">
+      <div className=" grid grid-cols-1 lg:grid-cols-[1fr_0.5fr] xl:grid-cols-[1fr_0.8fr] items-stretch xl:h-[300px] justify-between gap-4">
+        <FarmAreachart />
+        <FarmPieChart />
+      </div>
+
+      <div className="flex lg:flex-row flex-col pt-4 items-center justify-between gap-4">
         <FarmActivites />
+        <FarmFieldOverview />
         <FarmUpcomingHarvest />
       </div>
       <FarmSmartAlerts />

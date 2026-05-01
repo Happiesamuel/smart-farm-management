@@ -83,7 +83,7 @@ const statusStyles: Record<string, string> = {
 export default function FarmCropsTable() {
   return (
     <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm">
           {/* Header */}
           <thead className="bg-gray-50 text-gray-600">

@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Control, FieldPath } from "react-hook-form";
 import { IconType } from "react-icons";
 
@@ -31,6 +31,7 @@ import {
   MarkerContent,
   MarkerLabel,
   MarkerPopup,
+  useMap,
 } from "@/components/ui/map";
 interface Inputs {
   control: Control<z.infer<typeof createFarmSchema>>;
@@ -242,6 +243,7 @@ export function CreateLocationField({
   const [results, setResults] = useState<LocationResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [mapMode, setMapMode] = useState(false);
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -259,10 +261,7 @@ export function CreateLocationField({
       }
 
       try {
-        // 🔥 cancel previous request
-        if (abortRef.current) {
-          abortRef.current.abort();
-        }
+        if (abortRef.current) abortRef.current.abort();
 
         const controller = new AbortController();
         abortRef.current = controller;
@@ -274,25 +273,20 @@ export function CreateLocationField({
           { signal: controller.signal },
         );
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch locations");
-        }
+        if (!res.ok) throw new Error("Failed to fetch");
 
         const data: LocationResult[] = await res.json();
 
-        // ⚠️ Empty results
         if (!data.length) {
-          setResults([]);
           setError("No locations found");
+          setResults([]);
           return;
         }
 
         setResults(data);
-        console.log(data);
-      } catch (err: unknown) {
+      } catch (err) {
         const e = err as unknown as Error;
-        if (e.name === "AbortError") return; // ignore cancelled
-
+        if (e.name === "AbortError") return;
         setError("Failed to fetch location");
         setResults([]);
       } finally {
@@ -301,118 +295,188 @@ export function CreateLocationField({
     }, 400);
   };
 
+  const handleMapClick = async (
+    lat: number,
+    lng: number,
+    onChange: (val: { address: string; lat: number; lng: number }) => void,
+  ) => {
+    try {
+      const res = await fetch(
+        `https://us1.locationiq.com/v1/reverse?key=${process.env.NEXT_PUBLIC_LOCATIONIQ_KEY}&lat=${lat}&lon=${lng}&format=json`,
+      );
+
+      const data = await res.json();
+
+      onChange({
+        address: data.display_name || "Selected location",
+        lat,
+        lng,
+      });
+
+      setQuery(data.display_name || "");
+      setResults([]);
+      setError("");
+      setMapMode(false); // exit map mode after selection
+    } catch {
+      onChange({
+        address: "Selected from map",
+        lat,
+        lng,
+      });
+      setMapMode(false);
+    }
+  };
+
   return (
     <FormField
       control={control}
       name="location"
-      render={({ field }) => (
-        <FormItem className="w-full relative">
-          <div className="flex items-center justify-between">
-            <FormLabel className="text-sm text-dark">Farm Location</FormLabel>
+      render={({ field }) => {
+        function MapClickListener() {
+          const { map, isLoaded } = useMap();
 
-            {field.value?.address ? (
-              <p className="text-xs max-w-[200px] md:max-w-full truncate text-green-600">
-                {field.value.address}
-              </p>
-            ) : (
-              <p className="text-xs text-zinc-400">Select a location</p>
-            )}
-          </div>
+          useEffect(() => {
+            if (!map || !isLoaded) return;
 
-          <FormControl>
-            <div className="h-9 border border-border px-2 rounded-md flex items-center gap-2">
-              <IoLocationOutline className="text-primary-green" />
+            const handleClick = (e: maplibregl.MapMouseEvent) => {
+              // if (!mapMode) return; // ignore clicks when not in map mode
+              const { lng, lat } = e.lngLat;
+              handleMapClick(lat, lng, field.onChange);
+            };
 
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => fetchLocations(e.target.value)}
-                placeholder="Search location..."
-                className="text-sm w-full border-none p-0 focus:outline-none"
-              />
+            map.on("click", handleClick);
+            return () => {
+              map.off("click", handleClick);
+            };
+          }, [map, isLoaded, mapMode]); // re-register when mapMode changes
 
-              {loading && (
-                <span className="text-xs text-zinc-400">Loading...</span>
+          return null;
+        }
+
+        // Show map if location selected OR if map mode is active
+        const showMap = mapMode || (field?.value?.lat && field?.value?.lng);
+
+        // Default center (e.g. Lagos) when no location selected yet
+        const center: [number, number] =
+          field?.value?.lng && field?.value?.lat
+            ? [field.value.lng, field.value.lat]
+            : [3.3792, 6.5244];
+
+        return (
+          <FormItem className="w-full relative">
+            {/* ================= HEADER ================= */}
+            <div className="flex items-center justify-between">
+              <FormLabel className="text-sm text-dark">Farm Location</FormLabel>
+
+              {field.value?.address ? (
+                <p className="text-xs truncate max-w-[200px] text-green-600">
+                  {field.value.address}
+                </p>
+              ) : (
+                <p className="text-xs text-zinc-400">No location selected</p>
               )}
             </div>
-          </FormControl>
 
-          {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+            {/* ================= INPUT ================= */}
+            <FormControl>
+              <div className="h-9 border border-border px-2 rounded-md flex items-center gap-2">
+                <IoLocationOutline className="text-primary-green" />
 
-          {results.length > 0 && (
-            <div className="absolute z-50 mt-16 max-h-[200px] overflow-y-auto w-full bg-white border rounded-md shadow">
-              {results.map((item, i) => (
-                <div
-                  key={i}
-                  onClick={() => {
-                    setQuery(item.display_name);
-                    setResults([]);
-                    setError("");
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => fetchLocations(e.target.value)}
+                  placeholder="Search location..."
+                  className="text-sm w-full border-none p-0 focus:outline-none"
+                />
 
-                    field.onChange({
-                      address: item.display_name,
-                      lat: parseFloat(item.lat),
-                      lng: parseFloat(item.lon),
-                    });
-                  }}
-                  className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
-                >
-                  {item.display_name}
-                </div>
-              ))}
-            </div>
-          )}
+                {loading && <span className="text-xs text-zinc-400">...</span>}
+              </div>
+            </FormControl>
 
-          {field?.value?.lat && field?.value?.lng ? (
-            <Card className="h-[320px] p-0 overflow-hidden">
-              <Map
-                theme="light"
-                key={`${field.value.lng}-${field.value.lat}`}
-                center={[field.value.lng, field.value.lat]}
-                zoom={16}
+            {/* ================= HELP TEXT ================= */}
+            <div className="flex justify-between items-center mt-1">
+              <p className="text-xs text-zinc-500">Search or pick from map</p>
+
+              <button
+                type="button"
+                onClick={() => setMapMode(!mapMode)}
+                className="text-xs text-primary-green"
               >
-                <MapControls />
+                {mapMode ? "Cancel" : "Pick from map"}
+              </button>
+            </div>
 
-                <MapMarker
-                  longitude={field.value.lng}
-                  latitude={field.value.lat}
+            {/* ================= ERROR ================= */}
+            {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+
+            {/* ================= SEARCH RESULTS ================= */}
+            {results.length > 0 && (
+              <div className="absolute z-50 mt-16 max-h-[200px] overflow-y-auto w-full bg-white border rounded-md shadow">
+                {results.map((item, i) => (
+                  <div
+                    key={i}
+                    onClick={() => {
+                      setQuery(item.display_name);
+                      setResults([]);
+                      setError("");
+
+                      field.onChange({
+                        address: item.display_name,
+                        lat: parseFloat(item.lat),
+                        lng: parseFloat(item.lon),
+                      });
+                    }}
+                    className="px-3 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                  >
+                    {item.display_name}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* ================= MAP ================= */}
+            {showMap && (
+              <Card
+                className={`h-[320px] mt-3 p-0 overflow-hidden transition-all ${
+                  mapMode ? "ring-2 ring-primary-green ring-offset-1" : ""
+                }`}
+              >
+                <Map
+                  theme="light"
+                  key={`${field.value.lng}-${field.value.lat}`}
+                  styles={{
+                    light: "https://tiles.openfreemap.org/styles/bright",
+                  }}
+                  center={center}
+                  zoom={field?.value?.lat ? 16 : 11}
                 >
-                  <MarkerContent>
-                    <div className="size-4 cursor-pointer rounded-full border-2 border-white bg-green-500 shadow-md hover:scale-110 transition-transform" />
+                  <MapClickListener />
+                  <MapControls />
 
-                    <MarkerLabel className="text-xs" position="bottom">
-                      {field.value.address}
-                    </MarkerLabel>
-                  </MarkerContent>
+                  {field?.value?.lat && field?.value?.lng && (
+                    <MapMarker
+                      longitude={field.value.lng}
+                      latitude={field.value.lat}
+                    >
+                      <div className="size-4 rounded-full border-2 border-white bg-green-500 shadow-md" />
+                    </MapMarker>
+                  )}
+                </Map>
 
-                  <MarkerPopup className="w-60 p-3">
-                    <div className="space-y-2">
-                      <p className="text-xs text-muted-foreground uppercase">
-                        Location
-                      </p>
+                {/* Hint overlay when in map mode */}
+                {mapMode && (
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs px-3 py-1.5 rounded-full pointer-events-none">
+                    Click anywhere on the map to select location
+                  </div>
+                )}
+              </Card>
+            )}
 
-                      <h3 className="font-semibold text-sm">
-                        {field.value.address || "Unknown location"}
-                      </h3>
-
-                      <p className="text-xs text-muted-foreground">
-                        Lat: {field.value.lat.toFixed(5)} <br />
-                        Lng: {field.value.lng.toFixed(5)}
-                      </p>
-                    </div>
-                  </MarkerPopup>
-                </MapMarker>
-              </Map>
-            </Card>
-          ) : (
-            <Card className="h-[320px] flex items-center justify-center text-sm text-muted-foreground">
-              No location selected
-            </Card>
-          )}
-
-          <FormMessage />
-        </FormItem>
-      )}
+            <FormMessage />
+          </FormItem>
+        );
+      }}
     />
   );
 }
