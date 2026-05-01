@@ -47,6 +47,10 @@ export default function CreateFarmForm() {
       name: "acres",
       value: "acres",
     },
+    {
+      name: "hectares",
+      value: "hectares",
+    },
   ];
   const stat = [
     {
@@ -125,7 +129,7 @@ export default function CreateFarmForm() {
               type="submit"
               className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              <FaRegSave /> Add sale
+              <FaRegSave /> Save farm
             </Button>
           </div>
         </form>

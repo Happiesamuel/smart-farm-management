@@ -125,6 +125,69 @@ export const createFarmSchema = z.object({
       message: "image must be smaller than 5MB.",
     }),
 });
+export const createFieldSchema = z.object({
+  fieldName: z.string({ message: "Field name is required" }).min(4, {
+    message: "Field name must be at least 4 characters.",
+  }),
+  farm: z
+    .string({ message: "Please select farm" })
+    .min(1, "Please select a farm"),
+  size: z.string({ message: "Total size is required" }).min(1, {
+    message: "Total size must be at least a characters.",
+  }),
+  unit: z.string({ message: "Unit is required" }).min(1, "Please select  unit"),
+  soilType: z
+    .string({ message: "Please select a soil type" })
+    .min(1, "Please select a soil type"),
+  irrigationType: z
+    .string({ message: "Please select a irrigation type" })
+    .min(1, "Please select a irrigation type")
+    .optional(),
+  cropType: z.string({ message: "Crop type is required" }).min(3, {
+    message: "Crop type must be at least 3 characters.",
+  }),
+  plantingToHarvest: z.object(
+    {
+      from: z.date({
+        error: "Planting date is required",
+      }),
+      to: z.date({
+        error: "Harvest date is required",
+      }),
+    },
+    { message: "Planting date to Harvest date is required" },
+  ),
+
+  description: z
+    .string({ message: "descripton is required" })
+    .min(10, { message: "description must be at least 10 characters." }),
+});
+export const createTaskSchema = z.object({
+  taskTitle: z.string({ message: "Task title is required" }).min(4, {
+    message: "Task title must be at least 4 characters.",
+  }),
+  farm: z
+    .string({ message: "Please select farm" })
+    .min(1, "Please select a farm"),
+  field: z
+    .string({ message: "Please select farm field" })
+    .min(1, "Please select farm field"),
+  //optional
+  priority: z
+    .string({ message: "Please select priority" })
+    .min(1, "Please select priority"),
+  assignTo: z
+    .string({ message: "Please select assignee" })
+    .min(1, "Please select assignee"), //assign
+
+  description: z
+    .string({ message: "descripton is required" })
+    .min(10, { message: "description must be at least 10 characters." }),
+
+  dueDate: z
+    .string({ message: " Date is required" })
+    .min(1, "Date is required"),
+});
 export const financeExpenseSchema = z.object({
   category: z
     .string({ message: "Please select a category" })

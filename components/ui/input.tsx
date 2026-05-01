@@ -29,7 +29,9 @@ type InputValue =
   | File
   | (string | File)[]
   | boolean
-  | { address: string; lat: number; lng: number };
+  | Date
+  | { address: string; lat: number; lng: number }
+  | { from: Date; to: Date };
 
 type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "value"> & {
   className?: string;
@@ -42,6 +44,8 @@ type NonFileValue = Exclude<
   | boolean
   | (string | File)[]
   | { address: string; lat: number; lng: number }
+  | Date
+  | { from: Date; to: Date }
 >;
 
 function Input({ className, value, type, ...props }: InputProps) {

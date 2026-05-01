@@ -38,15 +38,7 @@ interface Input {
   label: string;
   placeholder: string;
 }
-interface InputSelect {
-  control: Control<z.infer<typeof financeExpenseSchema>>;
-  name1: FieldPath<z.infer<typeof financeExpenseSchema>>;
-  name2: FieldPath<z.infer<typeof financeExpenseSchema>>;
-  label: string;
-  placeholder: string;
-  placeholder2: string;
-  array: { [key: string]: string }[];
-}
+
 interface Select {
   control: Control<z.infer<typeof financeExpenseSchema>>;
   name: FieldPath<z.infer<typeof financeExpenseSchema>>;

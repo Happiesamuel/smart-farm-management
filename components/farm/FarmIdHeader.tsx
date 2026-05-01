@@ -42,17 +42,22 @@ export default function FarmIdHeader() {
                 Abuja, Nigeria
               </p>
             </div>
-            <span className={`size-1 rounded-full flex-shrink-0 bg-zinc-500`} />
+            <span className={`size-1 rounded-full shrink-0 bg-zinc-500`} />
             <p className="text-sm text-zinc-500 font-medium">120 acres</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <Button className="bg-transparent w-[48%] sm:w-fit border border-border cursor-pointer text-dark">
-            <p>Edit Farm</p>
+            <p>Edit Field</p>
           </Button>
           <Button className="bg-primary-green w-[48%] sm:w-fit cursor-pointer text-white">
-            <GoPlus />
-            <p>Add Farm</p>
+            <Link
+              href={"/farms/1/create-field"}
+              className="flex items-center gap-1"
+            >
+              <GoPlus />
+              <p>Add Field</p>
+            </Link>
           </Button>
         </div>
       </div>
