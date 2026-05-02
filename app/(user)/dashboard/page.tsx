@@ -9,7 +9,6 @@ import DashboardQucikActions from "@/components/dashboard/DashboardQucikActions"
 import DashboardRecentTasks from "@/components/dashboard/DashboardRecentTasks";
 import DashboardSmartAlerts from "@/components/dashboard/DashboardSmartAlertts";
 import DashboardTopPerforming from "@/components/dashboard/DashboardTopPerforming";
-import DashboardWeather from "@/components/dashboard/DashboardWeather";
 export const metadata = {
   title: "Dashboard",
 };
@@ -25,7 +24,6 @@ export default function page() {
         </p>
       </div>
       <DashboardFarms />
-      {/* <DashboardWeather /> */}
       <div className=" grid grid-cols-1 lg:grid-cols-[1fr_0.5fr] xl:grid-cols-[1fr_0.8fr] items-stretch xl:h-[300px] justify-between gap-4">
         <DashboardAreachart />
         <DashboardPieChart />

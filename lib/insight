@@ -1,0 +1,228 @@
+🧠 🟢 1. GENERAL FARM INSIGHTS
+💰 Profit / Loss
+if (profit > 0)
+
+Text:
+
+✅ Your farm is profitable. Keep up the good work.
+
+Severity: success
+Where: Dashboard (top summary)
+
+if (profit === 0)
+
+Text:
+
+⚖️ Your farm is breaking even. Consider optimizing costs or increasing sales.
+
+Severity: info
+
+if (profit < 0)
+
+Text:
+
+🔴 You are running at a loss. Reduce expenses or improve sales.
+
+Severity: warning
+
+💸 High Expense Alert
+if (totalExpenses > totalRevenue * 0.7)
+
+Text:
+
+⚠️ Expenses are consuming most of your revenue. Review spending.
+
+Severity: warning
+Where: Dashboard + Reports
+
+📈 Revenue Growth
+if (growth > 0)
+
+Text:
+
+📈 Your revenue is increasing compared to the previous period.
+
+if (growth < 0)
+
+Text:
+
+📉 Your revenue has decreased. Investigate sales performance.
+
+🌾 🟡 2. CROP-LEVEL INSIGHTS
+🌱 Yield Performance
+if (yieldPerformance >= 100)
+
+Text:
+
+🎉 This crop exceeded expected yield.
+
+if (yieldPerformance >= 70 && yieldPerformance < 100)
+
+Text:
+
+👍 This crop performed close to expectations.
+
+if (yieldPerformance < 70)
+
+Text:
+
+⚠️ This crop underperformed. Review farming practices.
+
+🏆 Best Crop
+if (bestCrop)
+
+Text:
+
+🏆 {cropName} is your most profitable crop.
+
+Where: Insights Dashboard
+
+📉 Worst Crop
+if (worstCrop)
+
+Text:
+
+📉 {cropName} is your least profitable crop.
+
+⏳ Harvest Readiness
+if (daysLeft <= 3 && daysLeft >= 0)
+
+Text:
+
+🌾 This crop is ready for harvest.
+
+if (daysLeft < 0 && !harvestRecorded)
+
+Text:
+
+⚠️ Harvest is overdue. Record your harvest.
+
+📊 Growth Progress
+if (progress < 30)
+
+Text:
+
+🌱 Early growth stage.
+
+if (progress >= 30 && progress < 80)
+
+Text:
+
+🌿 Crop is growing steadily.
+
+if (progress >= 80)
+
+Text:
+
+🌾 Crop is nearing harvest.
+
+💧 🔵 3. ACTIVITY & WEATHER INSIGHTS
+💧 Irrigation Needed
+if (!rainExpected && !recentIrrigation)
+
+Text:
+
+💧 Your crops need watering.
+
+Where: Dashboard Alerts
+
+🌧 Rain Incoming
+if (rainExpected)
+
+Text:
+
+🌧 Rain is expected. Avoid irrigation.
+
+🚫 No Activity
+if (lastActivityDays > 7)
+
+Text:
+
+⚠️ No recent farm activity detected.
+
+🌱 🟣 4. CROP COMPATIBILITY (FIELD LEVEL)
+if (incompatibleCrops)
+
+Text:
+
+⚠️ Some crops in this field may not grow well together.
+
+👉 Better version (dynamic):
+
+Text:
+
+⚠️ {cropA} may not grow well with {cropB}.
+
+👉 Suggestion:
+
+💡 Try planting Beans or Soybean with Maize for better yield.
+
+💰 🟠 5. SALES & FINANCIAL INSIGHTS
+💵 High Revenue Crop
+if (cropRevenue > threshold)
+
+Text:
+
+💰 This crop is generating strong revenue.
+
+📉 Low Sales
+if (cropRevenue === 0 && harvestExists)
+
+Text:
+
+⚠️ Harvest recorded but no sales yet.
+
+📦 Unsold Harvest
+if (unsoldQuantity > 0)
+
+Text:
+
+📦 You still have unsold produce.
+
+📊 🧠 6. SMART SUMMARY (DASHBOARD CARD)
+
+👉 Combine everything:
+
+Example Output:
+
+[
+  "✅ Your farm is profitable",
+  "🏆 Maize is your most profitable crop",
+  "⚠️ Expenses are high",
+  "💧 Your crops need watering",
+  "🌾 Some crops are ready for harvest"
+]
+🧱 7. HOW TO STRUCTURE RETURN
+type Insight = {
+  type: "success" | "warning" | "info";
+  message: string;
+};
+return [
+  {
+    type: "success",
+    message: "Your farm is profitable",
+  },
+  {
+    type: "warning",
+    message: "Expenses are too high",
+  },
+];
+🎯 8. WHERE TO SHOW EACH
+Insight Type	Location
+Profit / Revenue	Dashboard
+Crop insights	Crop page
+Compatibility	Field page
+Weather alerts	Dashboard
+Sales insights	Sales page
+🔥 PRO TIP
+
+👉 Don’t spam the user
+👉 Show top 3–5 most important insights only
+
+🚀 FINAL TAKE
+
+Your system now has:
+
+🧠 Intelligence (logic)
+💬 Human-readable insights
+📊 Actionable feedback
