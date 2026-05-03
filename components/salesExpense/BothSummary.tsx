@@ -6,7 +6,7 @@ export default function BothSummary({
   type: string;
 }) {
   return (
-    <div className="px-3 mt-4">
+    <div className="px-3 xl:mt-4 mt-16">
       <h2 className="text-dark/90 py-3 border-y border-border text-sm font-semibold">
         {type === "sale" ? "Top Crops by Revenue" : "Top Expense Categoies"}
       </h2>

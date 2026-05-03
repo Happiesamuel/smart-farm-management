@@ -89,7 +89,7 @@ export default function page() {
     <div className="pt-18 px-2 sm:px-4 pb-8">
       <BothHeader type="expenses" />
       <BothBoxes stats={stats} />
-      <div className="grid h-[600px] mt-4 grid-cols-1 xl:grid-cols-[1fr_15rem] border border-border rounded-md">
+      <div className="grid h-fit lg:h-[600px] mt-4 grid-cols-1 xl:grid-cols-[1fr_15rem] border border-border rounded-md">
         <BothTable type="expense" arrayOne={categories} />
         <BothOverView type="expense" data={data} arr={arr} />
       </div>

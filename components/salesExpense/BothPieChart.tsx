@@ -39,8 +39,8 @@ export function BothPieChart({
     { id: 2, value: "month", name: "This Month" },
   ];
   return (
-    <Card className="w-full gap-0  flex-1 relative bg-transparent rounded-non   flex flex-col h-[300px] shrink-0">
-      <CardHeader className="pb-0 shrink-0">
+    <div className="w-full gap-0 p-4 flex-1 relative bg-transparent rounded-non   flex flex-col h-[300px] shrink-0">
+      <div className="pb-0 shrink-0">
         <div className="flex justify-between mb-2 gap-2 items-center">
           <h3 className="text-dark font-semibold text-sm">
             {type === "sale" ? "Sales" : "Expenses"} Overview
@@ -62,9 +62,9 @@ export function BothPieChart({
             </SelectContent>
           </Select>
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent className="flex-1    min-h-0 relative overflow-hidden">
+      <div className="flex-1    min-h-0 relative overflow-hidde">
         <div className="flex  flex-col items-center h-full">
           {/* LEFT → PIE CHART */}
           <div className="w-full h-full">
@@ -125,8 +125,8 @@ export function BothPieChart({
             <CustomLegend data={data} />
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 const CustomLegend = ({
@@ -135,7 +135,7 @@ const CustomLegend = ({
   data: { food: string; value: number; fill: string; exp: string }[];
 }) => {
   return (
-    <div className="flex overflow-scroll no-scroll flex-col gap-2 text-sm">
+    <div className="flex  flex-col gap-2 text-sm">
       {data.map((item, index) => (
         <div key={index} className="flex items-center gap-5 justify-between">
           {/* Left */}
@@ -147,7 +147,7 @@ const CustomLegend = ({
             {item.food}
           </div>
 
-          <div className="text-zinc-500 hidden sm:flex items-center lg:gap-3 xl:gap-7 gap-7">
+          <div className="text-zinc-500 flex items-center lg:gap-3 xl:gap-7 gap-7">
             {/* <span>{item.value}%</span> */}
             <span>{item.exp}</span>
           </div>

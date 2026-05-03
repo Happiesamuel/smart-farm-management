@@ -11,7 +11,7 @@ export default function BothTable({
   type: string;
 }) {
   return (
-    <div className=" relative h-full">
+    <div className=" relative h-[720px] sm:h-[630px] md:h-[590px] lg:h-[600px] xl:h-full">
       <BothTableHeader arrayOne={arrayOne} />
 
       {type === "sale" ? <SalesTable /> : <ExpenseTable />}

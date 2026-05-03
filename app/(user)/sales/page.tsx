@@ -93,7 +93,7 @@ export default function page() {
       <BothHeader type="sales" />
       <BothBoxes stats={stats} />
 
-      <div className="grid h-[600px] mt-4 grid-cols-1 xl:grid-cols-[1fr_15rem] border border-border rounded-md">
+      <div className="grid xl:h-[600px] mt-4 grid-cols-1 xl:grid-cols-[1fr_15rem] border border-border rounded-md">
         <BothTable type="sale" arrayOne={crops} />
         <BothOverView type="sale" data={data} arr={arr} />
       </div>

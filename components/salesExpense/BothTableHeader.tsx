@@ -30,8 +30,8 @@ export default function BothTableHeader({ arrayOne }: { arrayOne: string[] }) {
   const pathname = usePathname();
   const slug = pathname.slice(1);
   return (
-    <div className="flex items-center gap-4 p-2.5  justify-between w-full">
-      <div className="flex w-full sm:w-[35%] items-center border border-border gap-2 rounded-lg px-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex  md:flex items-center gap-2 lg:gap-4 p-2.5  justify-between w-full">
+      <div className="flex w-full md:w-full items-center border border-border gap-2 rounded-lg px-2">
         <IoSearch />
         <Input
           placeholder="Search Farms..."
@@ -46,10 +46,6 @@ export default function BothTableHeader({ arrayOne }: { arrayOne: string[] }) {
         placeholder2={`Search ${slug === "sales" ? "crops" : "categories"}`}
       />
       <BothCalendar />
-      <Button className="bg-white w-full sm:w-fit cursor-pointer text-dark border border-border rounded">
-        <CiFilter />
-        <p>Filter</p>
-      </Button>
     </div>
   );
 }

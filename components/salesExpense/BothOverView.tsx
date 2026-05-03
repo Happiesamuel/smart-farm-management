@@ -12,7 +12,7 @@ export default function BothOverView({
   type: string;
 }) {
   return (
-    <div className="border-l border-border rounded-tl-md rounded-bl-md">
+    <div className="border-l border-border mt-4 pb-8 xl:pb-0 lg:mt-0 lg:rounded-tl-md lg:rounded-bl-md">
       <BothPieChart type={type} data={data} />
       <BothSummary type={type} arr={arr} />
     </div>

@@ -34,71 +34,73 @@ export default function BothComboBox({
   );
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          className={cn(
-            "w-[140px] justify-between text-sm",
-            !selectedCombo && "text-dark/80",
-          )}
-        >
-          <div className="flex items-center gap-2">
-            {(selectedCombo as string) || (placeholder1 as string)}
-          </div>
-          <IoIosArrowDown className="ml-2 h-4 w-4 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-
-      <PopoverContent className="w-full p-0">
-        <Command>
-          <CommandInput
-            placeholder={placeholder2}
-            value={inputValue}
-            onValueChange={setInputValue}
-          />
-
-          <CommandEmpty>
-            <div
-              className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-accent"
-              onClick={() => {
-                setSelectedCombo(inputValue);
-                setOpen(false);
-              }}
-            >
-              <Plus className="w-4 h-4" />
-              Add &quot;{inputValue}&quot;
+    <div className="w-full">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            className={cn(
+              "w-full md:w-full justify-between text-sm",
+              !selectedCombo && "text-dark/80",
+            )}
+          >
+            <div className="flex items-center gap-2">
+              {(selectedCombo as string) || (placeholder1 as string)}
             </div>
-          </CommandEmpty>
+            <IoIosArrowDown className="ml-2 h-4 w-4 opacity-50" />
+          </Button>
+        </PopoverTrigger>
 
-          <CommandGroup className="max-h-[200px] overflow-scroll no-scroll">
-            {array
-              .filter((crop) =>
-                crop.toLowerCase().includes(inputValue.toLowerCase()),
-              )
-              .map((crop) => (
-                <CommandItem
-                  key={crop}
-                  value={crop}
-                  className="pr-2 hover:bg-primary-green hover:text-white cursor-pointer"
-                  onSelect={() => {
-                    setSelectedCombo(crop);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedCombo === crop ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                  {crop}
-                </CommandItem>
-              ))}
-          </CommandGroup>
-        </Command>
-      </PopoverContent>
-    </Popover>
+        <PopoverContent className="w-full p-0">
+          <Command>
+            <CommandInput
+              placeholder={placeholder2}
+              value={inputValue}
+              onValueChange={setInputValue}
+            />
+
+            <CommandEmpty>
+              <div
+                className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-accent"
+                onClick={() => {
+                  setSelectedCombo(inputValue);
+                  setOpen(false);
+                }}
+              >
+                <Plus className="w-4 h-4" />
+                Add &quot;{inputValue}&quot;
+              </div>
+            </CommandEmpty>
+
+            <CommandGroup className="max-h-[200px] overflow-scroll no-scroll">
+              {array
+                .filter((crop) =>
+                  crop.toLowerCase().includes(inputValue.toLowerCase()),
+                )
+                .map((crop) => (
+                  <CommandItem
+                    key={crop}
+                    value={crop}
+                    className="pr-2 hover:bg-primary-green hover:text-white cursor-pointer"
+                    onSelect={() => {
+                      setSelectedCombo(crop);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selectedCombo === crop ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                    {crop}
+                  </CommandItem>
+                ))}
+            </CommandGroup>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }
