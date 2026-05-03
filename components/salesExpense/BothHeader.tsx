@@ -14,11 +14,11 @@ export default function BothHeader({ type }: { type: string }) {
         </p>
       </div>
       <div className=" flex items-center gap-2">
-        <Button className="bg-primary-green w-full sm:w-fit cursor-pointer text-white rounded">
+        <Button className="bg-primary-green w-full sm:w-fit cursor-pointer text-white rounded-sm">
           <GoPlus />
           <p>Add {type === "sales" ? "Sale" : "Expense"}</p>
         </Button>
-        <Button className="bg-white border border-dark/40 w-full sm:w-fit cursor-pointer text-dark/90 rounded">
+        <Button className="bg-transparent border border-dark/15 w-full sm:w-fit cursor-pointer text-dark/90 rounded-sm">
           <FiDownload />
 
           <p>Export</p>

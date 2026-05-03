@@ -1,5 +1,6 @@
 import BothBoxes from "@/components/salesExpense/BothBoxes";
 import BothHeader from "@/components/salesExpense/BothHeader";
+import BothOverView from "@/components/salesExpense/BothOverView";
 import BothTable from "@/components/salesExpense/BothTable";
 import { GrMoney } from "react-icons/gr";
 import { MdOutlinePendingActions } from "react-icons/md";
@@ -42,7 +43,7 @@ export default function page() {
       icon: MdOutlinePendingActions,
       iconColor: "bg-[#fff1dd] text-[#de852c] ",
       bg: "bg-[#fefaf2]",
-      border: "border-green-100",
+      border: "border-orange-100",
     },
   ];
 
@@ -60,14 +61,41 @@ export default function page() {
     "🌾Soyabean",
   ];
 
+  const arr = [
+    {
+      name: "Maize",
+      value: "₦100,000",
+    },
+    {
+      name: "Rice",
+      value: "₦90,000",
+    },
+    {
+      name: "Tomatoes",
+      value: "₦80,000",
+    },
+    {
+      name: "Pepper",
+      value: "₦70,000",
+    },
+    {
+      name: "Cabbage",
+      value: "₦40,000",
+    },
+  ];
+  const data = [
+    { food: "Paid", value: 65, fill: "#3d8d54", exp: "₦248,000" },
+    { food: "Pending", value: 25, fill: "#e3a133", exp: "₦155,000" },
+  ];
+
   return (
     <div className="pt-18 px-2 sm:px-4 pb-8">
       <BothHeader type="sales" />
       <BothBoxes stats={stats} />
 
-      <div className="grid h-[400px] grid-cols-1 xl:grid-cols-[1fr_20rem] border border-border rounded-md">
-        <BothTable arrayOne={crops} />
-        <p className="border-l border-border">sam</p>
+      <div className="grid h-[600px] mt-4 grid-cols-1 xl:grid-cols-[1fr_15rem] border border-border rounded-md">
+        <BothTable type="sale" arrayOne={crops} />
+        <BothOverView type="sale" data={data} arr={arr} />
       </div>
     </div>
   );

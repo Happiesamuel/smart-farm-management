@@ -29,7 +29,7 @@ export default function DashboardFarms() {
       icon: <PiPlant />,
       iconColor: "bg-[#f1ecfd] text-[#5837e8] ",
       bg: "bg-[#f9f7fd]",
-      border: "border-green-100",
+      border: "border-purple-100",
     },
     {
       num: 8,
