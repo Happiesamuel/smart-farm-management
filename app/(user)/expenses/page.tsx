@@ -4,6 +4,7 @@ import { MdOutlinePendingActions } from "react-icons/md";
 import { TbMoneybagMove } from "react-icons/tb";
 import { BiCategory } from "react-icons/bi";
 import BothBoxes from "@/components/salesExpense/BothBoxes";
+import BothTable from "@/components/salesExpense/BothTable";
 export default function page() {
   const stats = [
     {
@@ -45,10 +46,26 @@ export default function page() {
       border: "border-green-100",
     },
   ];
+  const categories = [
+    "All Categories",
+    "Fertilizer",
+    "Labour",
+    "Seeds",
+    "Pesticides",
+    "Fuel",
+    "Irrigation",
+    "Equipment",
+    "Transport",
+  ];
+
   return (
     <div className="pt-18 px-2 sm:px-4 pb-8">
       <BothHeader type="expenses" />
       <BothBoxes stats={stats} />
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_20rem] border border-border rounded-md">
+        <BothTable arrayOne={categories} />
+        <p>sam</p>
+      </div>
     </div>
   );
 }

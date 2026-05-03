@@ -1,10 +1,8 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { GoPlus } from "react-icons/go";
 import FinanceCalendar from "./FinanceCalendar";
 import { CiFilter } from "react-icons/ci";
-import AddModal from "@/components/layout/AddModal";
 import { FiShoppingCart } from "react-icons/fi";
 import { GrMoney } from "react-icons/gr";
 import FinanceSalesForm from "./FinanceSalesForm";
