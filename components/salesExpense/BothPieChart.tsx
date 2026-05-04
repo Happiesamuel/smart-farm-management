@@ -39,7 +39,7 @@ export function BothPieChart({
     { id: 2, value: "month", name: "This Month" },
   ];
   return (
-    <div className="w-full gap-0 p-4 flex-1 relative bg-transparent rounded-non   flex flex-col h-[300px] shrink-0">
+    <div className="w-full gap-0 p-4 flex-1 relative bg-transparent rounded-non   flex flex-col  h-[300px] shrink-0">
       <div className="pb-0 shrink-0">
         <div className="flex justify-between mb-2 gap-2 items-center">
           <h3 className="text-dark font-semibold text-sm">

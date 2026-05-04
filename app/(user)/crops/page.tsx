@@ -1,4 +1,5 @@
 import CropBoxes from "@/components/crops/CropBoxes";
+import CropsFooter from "@/components/crops/CropsFooter";
 import CropsHeader from "@/components/crops/CropsHeader";
 import CropTable from "@/components/crops/CropTable";
 
@@ -9,6 +10,7 @@ export default function page() {
       <CropBoxes />
 
       <CropTable />
+      <CropsFooter />
     </div>
   );
 }
