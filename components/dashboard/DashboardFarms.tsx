@@ -80,9 +80,13 @@ export default function DashboardFarms() {
             </div>
 
             <div className="text-center sm:text-left">
-              <p className="text-sm text-gray-500">{item.name}</p>
+              <p
+                className={` text-gray-500 transition-all duration-500 ${collaspe ? "text-sm" : "text-xs"}`}
+              >
+                {item.name}
+              </p>
               <h3
-                className={`text-xl font-medium text-dark truncate ${collaspe ? "max-w-full" : "max-w-[100px]"}`}
+                className={` font-medium text-dark transition-all duration-500  ${collaspe ? "text-xl" : "text-base"}`}
               >
                 {item.num}
               </h3>
