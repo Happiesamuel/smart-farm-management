@@ -1,12 +1,13 @@
+"use client";
 import React, { useState } from "react";
-import CropSelect from "./CropSelect";
 import { IoSearch } from "react-icons/io5";
 import { Input } from "../ui/input";
+import HarvestSelect from "./HarvestSelect";
+import BothComboBox from "../salesExpense/BothComboBox";
 
-export default function CropTableHeader() {
+export default function HarvestTableHeader() {
   const [season, setSeason] = useState("all");
   const [farm, setFarm] = useState("all");
-  const [status, setStatus] = useState("all");
   const farms = [
     {
       value: "all",
@@ -61,19 +62,38 @@ export default function CropTableHeader() {
       name: "Failed",
     },
   ];
+  const crops = [
+    "All Crops",
+    "🌽Maize",
+    "🌾Rice",
+    "🥔Yam",
+    "🍅Tomato",
+    "🫑Pepper",
+    "🥔Cassava",
+    "🌾Beans",
+    "🌱Wheat",
+    "🥜Sorghum",
+    "🌾Soyabean",
+  ];
+
   return (
     <div className="flex gap-2 flex-col sm:flex-row items-center justify-between">
       <div className="flex w-full sm:w-[35%]  items-center border border-border gap-2 rounded-lg px-2">
         <IoSearch />
         <Input
-          placeholder="Search crops..."
+          placeholder="Search harvests..."
           className="border-none p-0 group focus-visible:none shadow-none"
         />
       </div>
       <div className="flex flex-col sm:flex-row w-full items-center gap-2 md:gap-4 justify-between">
-        <CropSelect array={farms} val={farm} setVal={setFarm} />
-        <CropSelect array={seasons} val={season} setVal={setSeason} />
-        <CropSelect array={statuses} val={status} setVal={setStatus} />
+        <HarvestSelect array={farms} val={farm} setVal={setFarm} />
+        <HarvestSelect array={seasons} val={season} setVal={setSeason} />
+        <BothComboBox
+          slug={"sales"}
+          array={crops}
+          placeholder1={`Search or select crops...`}
+          placeholder2={`Search crop`}
+        />
       </div>
     </div>
   );
