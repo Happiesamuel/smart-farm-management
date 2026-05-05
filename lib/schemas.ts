@@ -63,6 +63,26 @@ export const signupFormSchema = z
     message: "Passwords don't match",
     path: ["confirmPassword"], // Set error on confirmPassword field
   });
+export const profileFormSchema = z
+  .object({
+    curPassword: z
+      .string({ message: "Please enter your current password" })
+      .min(8, {
+        message: "Password must be at least 8 characters.",
+      }),
+    password: z.string({ message: "Please enter your password" }).min(8, {
+      message: "Password must be at least 8 characters.",
+    }),
+    confirmPassword: z
+      .string({ message: "Please enter your password" })
+      .min(8, {
+        message: "Password must be at least 8 characters.",
+      }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Password don't match",
+    path: ["confirmPassword"],
+  });
 
 export const financeSaleSchema = z.object({
   crop: z

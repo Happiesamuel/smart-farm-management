@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { FaRegBell, FaRegUser } from "react-icons/fa6";
 import { LuUsers } from "react-icons/lu";
 import { MdCurrencyPound, MdSecurity } from "react-icons/md";
@@ -11,6 +12,7 @@ export default function page() {
       icon: FaRegUser,
       iconColor: "bg-[#e8f5ec] text-[#2d8952] ",
       bg: "bg-[#f8fdf9]",
+      route: "/settings/profile",
     },
     {
       name: "Farm Information",
@@ -18,6 +20,7 @@ export default function page() {
       icon: PiRanking,
       iconColor: "bg-[#e8f5ec] text-[#2d8952] ",
       bg: "bg-[#f8fdf9]",
+      route: "/settings/farm-information",
     },
     {
       name: "Users & Roles",
@@ -25,6 +28,7 @@ export default function page() {
       icon: LuUsers,
       iconColor: "bg-[#f1ecfd] text-[#5837e8] ",
       bg: "bg-[#f9f7fd]",
+      route: "/settings/user-and-roles",
     },
     {
       name: "Notifications",
@@ -32,6 +36,7 @@ export default function page() {
       icon: FaRegBell,
       iconColor: "bg-[#fff1dd] text-[#de852c] ",
       bg: "bg-[#fefaf2]",
+      route: "/settings/notifications",
     },
     {
       name: "Units & Currency",
@@ -39,6 +44,7 @@ export default function page() {
       icon: MdCurrencyPound,
       iconColor: "bg-[#e1eefd] text-[#1058d6] ",
       bg: "bg-[#f7fafe]",
+      route: "/settings/units-and-currency",
     },
 
     {
@@ -47,6 +53,7 @@ export default function page() {
       icon: MdSecurity,
       iconColor: "bg-[#fee7e7] text-[#e82a2d] ",
       bg: "bg-[#fef5f5]",
+      route: "/settings/security",
     },
   ];
 
@@ -67,7 +74,8 @@ export default function page() {
         {boxes.map((box) => {
           const Icon = box.icon;
           return (
-            <div
+            <Link
+              href={box.route}
               key={box.name}
               className="w-full p-4 cursor-pointer h-[125px] max-w-sm gap-4 bg-white items-start justify-center relative rounded-md border border-border/80 hover:shadow-sm transition flex shrink-0"
             >
@@ -80,7 +88,7 @@ export default function page() {
                 <h6 className="text-dark text-sm">{box.name}</h6>
                 <p className="text-sm text-zinc-500 font-normal">{box.text}</p>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
