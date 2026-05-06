@@ -185,6 +185,43 @@ export const createFieldSchema = z.object({
     .string({ message: "descripton is required" })
     .min(10, { message: "description must be at least 10 characters." }),
 });
+export const FarmInformationSchema = z.object({
+  farmName: z.string({ message: "Field name is required" }).min(4, {
+    message: "Field name must be at least 4 characters.",
+  }),
+  location: z.object(
+    {
+      address: z.string(),
+      lat: z.number(),
+      lng: z.number(),
+    },
+    { message: "Location is required" },
+  ),
+  irrigationType: z
+    .string({ message: "Please select a irrigation type" })
+    .min(1, "Please select a irrigation type")
+    .optional(),
+  farm: z
+    .string({ message: "Please select farm" })
+    .min(1, "Please select a farm"),
+
+  farmSize: z.string({ message: "Expected yield is required" }).min(1, {
+    message: "Expected Yield must be at least a characters.",
+  }),
+  unit: z.string({ message: "Unit is required" }).min(1, "Please select  unit"),
+
+  date: z.string({ message: " Date is required" }).min(1, "Date is required"),
+
+  status: z
+    .string({ message: "Please select a status" })
+    .min(1, "Please select a status"),
+  soilType: z
+    .string({ message: "Please select a soil type" })
+    .min(1, "Please select a soil type"),
+  description: z
+    .string({ message: "descripton is required" })
+    .min(10, { message: "description must be at least 10 characters." }),
+});
 export const createCropSchema = z.object({
   cropName: comboSchema("Crop is required"),
   plantingToHarvest: z

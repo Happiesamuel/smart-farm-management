@@ -14,54 +14,68 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
 import { Control, FieldPath } from "react-hook-form";
 import { IconType } from "react-icons";
 
 import z from "zod";
-import { createFarmSchema } from "@/lib/schemas";
-import { IoLocationOutline } from "react-icons/io5";
+import { FarmInformationSchema } from "@/lib/schemas";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import { Map, MapControls, MapMarker, useMap } from "@/components/ui/map";
+import { IoLocationOutline } from "react-icons/io5";
+import { useEffect, useRef, useState } from "react";
+
 interface Inputs {
-  control: Control<z.infer<typeof createFarmSchema>>;
-  name: FieldPath<z.infer<typeof createFarmSchema>>;
+  control: Control<z.infer<typeof FarmInformationSchema>>;
+  name: FieldPath<z.infer<typeof FarmInformationSchema>>;
   label: string;
   placeholder: string;
   Icon?: IconType;
 }
+interface Dates {
+  control: Control<z.infer<typeof FarmInformationSchema>>;
+  name: FieldPath<z.infer<typeof FarmInformationSchema>>;
+  label: string;
+}
+
 interface InputSelect {
-  control: Control<z.infer<typeof createFarmSchema>>;
-  name1: FieldPath<z.infer<typeof createFarmSchema>>;
-  name2: FieldPath<z.infer<typeof createFarmSchema>>;
+  control: Control<z.infer<typeof FarmInformationSchema>>;
+  name1: FieldPath<z.infer<typeof FarmInformationSchema>>;
+  name2: FieldPath<z.infer<typeof FarmInformationSchema>>;
   label: string;
   placeholder: string;
   placeholder2: string;
   array: { [key: string]: string }[];
 }
+
 interface Select {
-  control: Control<z.infer<typeof createFarmSchema>>;
-  name: FieldPath<z.infer<typeof createFarmSchema>>;
+  control: Control<z.infer<typeof FarmInformationSchema>>;
+  name: FieldPath<z.infer<typeof FarmInformationSchema>>;
   label: string;
   placeholder: string;
   array: { [key: string]: string }[];
-  Icon: IconType;
 }
-
 type LocationResult = {
   display_name: string;
   lat: string;
   lon: string;
 };
 
-export function CreateFarmSelect({
+export function FarmInformationSelect({
   control,
   name,
   label,
   placeholder,
-  Icon,
   array,
 }: Select) {
   return (
@@ -78,7 +92,6 @@ export function CreateFarmSelect({
               <FormControl>
                 <SelectTrigger className="cursor-pointer h-9! w-full  bg-transparent  focus-visible:outline-primary rounded-[8px] p-3 text-sm  focus:ring text-dark ring-green-500  data-[placeholder]:text-gray-500 ">
                   <div className="flex items-center  gap-2">
-                    {Icon && <Icon className="text-primary-green" />}
                     <SelectValue placeholder={placeholder} className="" />
                   </div>
                 </SelectTrigger>
@@ -103,7 +116,8 @@ export function CreateFarmSelect({
     />
   );
 }
-export function CreateFarmInputSelect({
+
+export function FarmInformationInputSelect({
   control,
   name1,
   name2,
@@ -168,7 +182,7 @@ export function CreateFarmInputSelect({
   );
 }
 
-export default function CreateFarmInput({
+export default function FarmInformationInput({
   name,
   label,
   placeholder,
@@ -200,7 +214,12 @@ export default function CreateFarmInput({
   );
 }
 
-export function CreateFarmText({ name, label, placeholder, control }: Inputs) {
+export function FarmInformationText({
+  name,
+  label,
+  placeholder,
+  control,
+}: Inputs) {
   return (
     <FormField
       control={control}
@@ -226,10 +245,57 @@ export function CreateFarmText({ name, label, placeholder, control }: Inputs) {
   );
 }
 
-export function CreateLocationField({
+export function FarmInformationDate({ control, name, label }: Dates) {
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className="w-full">
+          <FormLabel className="text-sm text-dark">{label}</FormLabel>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <FormControl>
+                <Button
+                  variant="outline"
+                  className={`w-full h-9! justify-start text-dark/90 text-left font-normal ${
+                    !field.value && "text-muted-foreground"
+                  }`}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+
+                  {field.value ? (
+                    format(field.value as string, "PPP")
+                  ) : (
+                    <span>Pick a date</span>
+                  )}
+                </Button>
+              </FormControl>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-auto z-200 p-0">
+              <Calendar
+                mode="single"
+                selected={
+                  field.value ? new Date(field.value as string) : undefined
+                }
+                onSelect={(date) => field.onChange(date?.toISOString())}
+              />
+            </PopoverContent>
+          </Popover>
+
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+}
+
+export function FarmLocationField({
   control,
 }: {
-  control: Control<z.infer<typeof createFarmSchema>>;
+  control: Control<z.infer<typeof FarmInformationSchema>>;
 }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<LocationResult[]>([]);
@@ -469,86 +535,6 @@ export function CreateLocationField({
           </FormItem>
         );
       }}
-    />
-  );
-}
-
-export function CreateFarmUpload({
-  control,
-}: {
-  control: Control<z.infer<typeof createFarmSchema>>;
-}) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-
-  return (
-    <FormField
-      control={control}
-      name="farmImage"
-      render={({ field }) => (
-        <FormItem className="w-full">
-          <FormLabel className="text-sm text-dark">Farm Image</FormLabel>
-
-          <FormControl>
-            <div
-              onClick={() => inputRef.current?.click()}
-              className="border border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition"
-            >
-              <input
-                type="file"
-                ref={inputRef}
-                className="hidden"
-                accept=".jpg,.jpeg,.png"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-
-                  field.onChange(file);
-
-                  // Create preview only for images
-                  if (file.type.startsWith("image/")) {
-                    const url = URL.createObjectURL(file);
-                    setPreview(url);
-                  } else {
-                    setPreview(null);
-                  }
-                }}
-              />
-
-              {/* Upload UI */}
-              {!preview && (
-                <div className="flex flex-col items-center justify-center gap-2">
-                  <Upload className="w-6 h-6 text-gray-500" />
-
-                  <p className="text-sm font-medium text-gray-700">
-                    Upload Farm Image
-                  </p>
-
-                  <p className="text-xs text-gray-500">JPG, PNG (Max 5MB)</p>
-                </div>
-              )}
-
-              {/* IMAGE PREVIEW */}
-              {preview && (
-                <img
-                  src={preview}
-                  alt="image preview"
-                  className="mt-2 w-full h-40 object-cover object-center rounded-md"
-                />
-              )}
-
-              {/* File name fallback */}
-              {field.value && !preview && (
-                <p className="mt-3 text-xs text-green-600">
-                  {field.value.name}
-                </p>
-              )}
-            </div>
-          </FormControl>
-
-          <FormMessage />
-        </FormItem>
-      )}
     />
   );
 }

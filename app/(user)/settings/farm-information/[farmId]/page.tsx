@@ -1,4 +1,4 @@
-import React from "react";
+import FarmInformationForm from "@/components/manager-settings/farm-information/FarmInformationForm";
 
 export default function page() {
   return (
@@ -20,6 +20,7 @@ export default function page() {
           </p>
         </div>
       </div>
+      <FarmInformationForm />
     </div>
   );
 }
