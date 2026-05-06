@@ -44,7 +44,7 @@ export default function page() {
       icon: MdCurrencyPound,
       iconColor: "bg-[#e1eefd] text-[#1058d6] ",
       bg: "bg-[#f7fafe]",
-      route: "/settings/units-and-currency",
+      route: "/settings#",
     },
 
     {
@@ -53,7 +53,7 @@ export default function page() {
       icon: MdSecurity,
       iconColor: "bg-[#fee7e7] text-[#e82a2d] ",
       bg: "bg-[#fef5f5]",
-      route: "/settings/security",
+      route: "/settings#",
     },
   ];
 
