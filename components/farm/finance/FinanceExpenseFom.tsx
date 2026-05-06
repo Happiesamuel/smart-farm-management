@@ -122,7 +122,7 @@ export default function FinanceExpenseFom() {
               type="submit"
               className="text-white bg-red-600 rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              <FaRegSave /> Save sale
+              <FaRegSave /> Save Expense
             </Button>
           </div>
         </form>
