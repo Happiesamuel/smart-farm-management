@@ -22,6 +22,10 @@ export default function FarmTab() {
       slug: "tasks",
     },
     {
+      name: "Harvests",
+      slug: "harvests",
+    },
+    {
       name: "Finance",
       slug: "finance",
     },
@@ -38,7 +42,7 @@ export default function FarmTab() {
   }
   return (
     <div className="overflow-auto no-scroll w-full">
-      <div className=" min-w-[400px]  overflow-scroll no-scroll  ">
+      <div className=" min-w-[500px]  overflow-scroll no-scroll  ">
         <Tabs defaultValue={active} className="py-4">
           <TabsList
             variant="line"
