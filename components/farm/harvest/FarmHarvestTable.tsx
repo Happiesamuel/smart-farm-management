@@ -115,7 +115,7 @@ export default function FarmHarvestTable() {
                 <tr key={s.id} className="border-t hover:bg-gray-50">
                   <td
                     title={`${s.crop}`}
-                    className="py-3 truncate font-medium max-w-[70px] pr-4 text-[13px] text-zinc-600 flex items-center gap-2"
+                    className="py-3 truncate font-medium max-w-[70px] pl-2 pr-4 text-[13px] text-zinc-600 flex items-center gap-2"
                   >
                     {s.crop}
                   </td>

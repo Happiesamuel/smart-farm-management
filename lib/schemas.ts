@@ -222,6 +222,40 @@ export const FarmInformationSchema = z.object({
     .string({ message: "descripton is required" })
     .min(10, { message: "description must be at least 10 characters." }),
 });
+export const createHarvestSchema = z.object({
+  cropName: comboSchema("Crop is required"),
+  buyer: z
+    .string({ message: "Buyers' is required" })
+    .min(4, {
+      message: "Buyers' must be at least 4 characters.",
+    })
+    .optional(),
+  date: z.string({ message: " Date is required" }).min(1, "Date is required"),
+  farm: z
+    .string({ message: "Please select farm" })
+    .min(1, "Please select a farm"),
+  field: z
+    .string({ message: "Please select field" })
+    .min(1, "Please select a field"),
+
+  quantity: z.string({ message: "harvest quantity is required" }).min(1, {
+    message: "harvest quantity must be at least a characters.",
+  }),
+  unit: z.string({ message: "Unit is required" }).min(1, "Please select  unit"),
+
+  status: z
+    .string({ message: "Please select a status" })
+    .min(1, "Please select a status"),
+  quality: z
+    .string({ message: "Please select a quality" })
+    .min(1, "Please select a quality"),
+  amount: z.string({ message: "Please enter total amount" }).min(2, {
+    message: "Total amountt must be at least 2 characters.",
+  }),
+  description: z
+    .string({ message: "descripton is required" })
+    .min(10, { message: "description must be at least 10 characters." }),
+});
 export const createCropSchema = z.object({
   cropName: comboSchema("Crop is required"),
   plantingToHarvest: z
