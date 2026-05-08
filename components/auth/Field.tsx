@@ -18,7 +18,7 @@ interface FieldType {
   name: FieldPath<z.infer<typeof loginFormSchema>>;
   label: string;
   placeholder: string;
-  Icon: IconType;
+  Icon?: IconType;
   onclick?(): void;
 }
 export default function Field({
@@ -37,7 +37,7 @@ export default function Field({
       render={({ field }) => (
         <FormItem>
           <div className="flex items-center gap-4 border border-border rounded-md px-4 py-2">
-            <Icon className="text-xl text-dark/90" />
+            {Icon && <Icon className="text-xl text-dark/90" />}
             <div className="flex items-center w-full justify-between">
               <div className="">
                 <FormLabel className="text-sm p-0 font-semibold text-dark/90">
