@@ -61,7 +61,10 @@ export function OwnerLoginFom() {
     //   console.log(error);
     // }
   }
-
+  const [show, setShow] = useState(false);
+  function handleClick() {
+    setShow(!show);
+  }
   return (
     <Form {...form}>
       <form
@@ -79,7 +82,8 @@ export function OwnerLoginFom() {
         <div>
           <Field
             name="password"
-            type="password"
+            onclick={handleClick}
+            type={!show ? "password" : "text"}
             placeholder="Enter your password"
             label="Password"
             control={form.control}
@@ -88,12 +92,14 @@ export function OwnerLoginFom() {
           <div className="flex items-end text-zinc-700 justify-between py-2">
             <div className="flex items-center gap-2">
               <Checkbox className="border-primary-green" />
-              <p className="text-sm text-zinc-500 font-medium">Remember me</p>
+              <p className="md:text-sm text-xs text-zinc-500 font-medium">
+                Remember me
+              </p>
             </div>
 
             <Link
               href="/forgot-password"
-              className="text-sm text-primary-green font-medium cursor-pointer"
+              className="md:text-sm text-xs text-primary-green font-medium cursor-pointer"
             >
               Forgotten Password?
             </Link>

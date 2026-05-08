@@ -41,8 +41,11 @@ export const setPasswordFormSchema = z
   });
 export const signupFormSchema = z
   .object({
-    username: z.string({ message: "Please enter your username" }).min(2, {
-      message: "Username must be at least 2 characters.",
+    fullName: z.string({ message: "Please enter your full name" }).min(2, {
+      message: "full name must be at least 2 characters.",
+    }),
+    phone: z.string({ message: "Please enter your phone number" }).min(11, {
+      message: "Phone number must be at least 11 characters.",
     }),
     // country: z.string({
     //   required_error: "Please select a country.",
