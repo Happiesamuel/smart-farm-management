@@ -1,4 +1,3 @@
-import AuthHeader from "@/components/auth/AuthHeader";
 import AuthImage from "@/components/auth/AuthImage";
 import React from "react";
 import "../globals.css";
