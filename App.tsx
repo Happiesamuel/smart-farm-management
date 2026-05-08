@@ -6,7 +6,6 @@ import { useCollaspe } from "./context/SidebarCollasibleContext";
 
 export default function App({ children }: { children: ReactNode }) {
   const { collaspe } = useCollaspe();
-  console.log(collaspe, "sds");
   return (
     <div className="flex max-w-480 mx-auto my-0">
       <div
