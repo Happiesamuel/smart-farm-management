@@ -101,7 +101,7 @@ export default function Page() {
         />
 
         <div className="z-20 p-6 flex flex-col justify-between absolute h-full w-full">
-          <div className="flex justify-center md:justify-start items-center w-full  gap-2">
+          <div className="flex justify-start items-center w-full  gap-2">
             <div className="bg-primary-green size-8 flex items-center justify-center rounded-full">
               <FaCanadianMapleLeaf className="text-white text-xl" />
             </div>
@@ -157,21 +157,25 @@ export default function Page() {
                       className={`text-lg ${a.color} absolute top-2 self-end`}
                     />
                   )}
-                  <div className="flex gap-2 items-center justify-center flex-col">
+                  <div className="grid grid-cols-[0.1fr_1fr] sm:flex  flex-col gap-4 sm:gap-2 items-start sm:items-center justify-between sm:justify-center ">
                     <div
-                      className={`${a.iconColor} size-16 text-2xl flex items-center justify-center rounded-full`}
+                      className={`${a.iconColor} size-10 sm:size-16 text-xl sm:text-2xl flex items-center justify-center rounded-full`}
                     >
                       <Icon />
                     </div>
-                    <h6 className={`${a.color} text-lg font-medium`}>
-                      {a.name}
-                    </h6>
-                    <p className="text-zinc-500 text-center text-sm font-normal">
-                      {a.desc}
-                    </p>
+                    <div className="flex flex-col gap-0.5 sm:gap-2">
+                      <h6
+                        className={`${a.color} sm:text-center text-lg font-medium`}
+                      >
+                        {a.name}
+                      </h6>
+                      <p className="text-zinc-500 sm:text-center text-sm font-normal">
+                        {a.desc}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="flex gap-2 justify-start flex-col">
+                  <div className="sm:flex gap-2 hidden justify-start flex-col">
                     {a.feats.map((f) => (
                       <div className="flex items-center gap-2" key={f}>
                         <IoMdCheckmark className={`${a.color}`} />
