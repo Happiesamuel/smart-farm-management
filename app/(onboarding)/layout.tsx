@@ -1,5 +1,6 @@
 import { Geist, Inter, Outfit } from "next/font/google";
 import "../globals.css";
+import NextTopLoader from "nextjs-toploader";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default function RootLayout({
       className={`${geistSans.className} ${inter.variable} ${outfit.className} h-full antialiased`}
     >
       <body className="min-h-sceen flex flex-col">
+        <NextTopLoader color="#66bb6a" height={4} showSpinner={false} />
         <div className="flex max-w-480 mx-auto my-0">{children}</div>
       </body>
     </html>

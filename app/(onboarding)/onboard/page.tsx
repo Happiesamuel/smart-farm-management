@@ -15,6 +15,7 @@ import { LuChartNoAxesCombined } from "react-icons/lu";
 import { GiChestnutLeaf } from "react-icons/gi";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { PiPottedPlantBold } from "react-icons/pi";
 
 export default function Page() {
   const arr = [
@@ -103,7 +104,7 @@ export default function Page() {
         <div className="z-20 p-6 flex flex-col justify-between absolute h-full w-full">
           <div className="flex justify-start items-center w-full  gap-2">
             <div className="bg-primary-green size-8 flex items-center justify-center rounded-full">
-              <FaCanadianMapleLeaf className="text-white text-xl" />
+              <PiPottedPlantBold className="text-white text-xl" />
             </div>
             <p className="text-sm font-medium text-white">
               Smart Farm Management System

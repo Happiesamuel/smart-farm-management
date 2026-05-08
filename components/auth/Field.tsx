@@ -10,12 +10,14 @@ import {
 import { Control, FieldPath } from "react-hook-form";
 import { loginFormSchema } from "@/lib/schemas";
 import z from "zod";
+import { IconType } from "react-icons";
 interface FieldType {
   type: string;
   control: Control<z.infer<typeof loginFormSchema>>;
   name: FieldPath<z.infer<typeof loginFormSchema>>;
   label: string;
   placeholder: string;
+  Icon: IconType;
 }
 export default function Field({
   name,
@@ -23,6 +25,7 @@ export default function Field({
   placeholder,
   type,
   control,
+  Icon,
 }: FieldType) {
   return (
     <FormField
@@ -30,18 +33,22 @@ export default function Field({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-sm font-semibold text-dark">
-            {label}
-          </FormLabel>
-          <FormControl>
-            <Input
-              className="text-sm"
-              type={type}
-              placeholder={placeholder}
-              {...field}
-            />
-          </FormControl>
-
+          <div className="flex items-center gap-4 border border-border rounded-md px-4 py-2">
+            <Icon className="text-xl text-dark/90" />
+            <div className="">
+              <FormLabel className="text-sm p-0 font-semibold text-dark/90">
+                {label}
+              </FormLabel>
+              <FormControl>
+                <Input
+                  className="text-sm h-4 rounded-none p-0 border-none"
+                  type={type}
+                  placeholder={placeholder}
+                  {...field}
+                />
+              </FormControl>
+            </div>
+          </div>
           <FormMessage />
         </FormItem>
       )}
