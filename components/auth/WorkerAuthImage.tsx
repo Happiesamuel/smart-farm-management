@@ -10,7 +10,7 @@ import { RiTimer2Line } from "react-icons/ri";
 const managements = [
   {
     icon: <RiTimer2Line />,
-    text: "View and mnage your tasks",
+    text: "View and manage your tasks",
   },
   {
     icon: <AiOutlineTeam />,
