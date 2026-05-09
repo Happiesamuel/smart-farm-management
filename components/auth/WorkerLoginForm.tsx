@@ -9,21 +9,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useState } from "react";
-import { loginFormSchema } from "@/lib/schemas";
-import Field from "./Field";
+import { workerLoginFormSchema } from "@/lib/schemas";
+import { BsPersonWorkspace } from "react-icons/bs";
 import { MdLockOutline, MdOutlineEmail } from "react-icons/md";
 import { Checkbox } from "../ui/checkbox";
-import { BsPersonWorkspace } from "react-icons/bs";
+import WorkerLoginField from "./WorkerLoginField";
 
-export function OwnerLoginFom() {
+export function WorkerLoginFom() {
   const [load, setLoad] = useState(false);
   //   const { login, status } = useLogin();
   const router = useRouter();
-  const form = useForm<z.infer<typeof loginFormSchema>>({
-    resolver: zodResolver(loginFormSchema),
+  const form = useForm<z.infer<typeof workerLoginFormSchema>>({
+    resolver: zodResolver(workerLoginFormSchema),
   });
 
-  async function onSubmit(values: z.infer<typeof loginFormSchema>) {
+  async function onSubmit(values: z.infer<typeof workerLoginFormSchema>) {
     // try {
     //   setLoad(true);
     //   const existingUser = await getGuestViaEmail(values.email);
@@ -72,7 +72,7 @@ export function OwnerLoginFom() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-3 md:space-y-4 pt-10 w-[98%] md:w-[80%] mx-auto"
       >
-        <Field
+        <WorkerLoginField
           name="email"
           type="email"
           placeholder="Enter your email"
@@ -81,7 +81,7 @@ export function OwnerLoginFom() {
           Icon={MdOutlineEmail}
         />
 
-        <Field
+        <WorkerLoginField
           name="password"
           onclick={handleClick}
           type={!show ? "password" : "text"}
@@ -90,7 +90,7 @@ export function OwnerLoginFom() {
           control={form.control}
           Icon={MdLockOutline}
         />
-        <Field
+        <WorkerLoginField
           name="workspaceId"
           type="text"
           placeholder="Enter workspace id"
@@ -100,7 +100,7 @@ export function OwnerLoginFom() {
         />
         <div className="flex items-end text-zinc-700 justify-between py-2">
           <div className="flex items-center gap-2">
-            <Checkbox className="border-primary-green" />
+            <Checkbox className="border-[#f0782d]" />
             <p className="md:text-sm text-xs text-zinc-500 font-medium">
               Remember me
             </p>
@@ -108,14 +108,14 @@ export function OwnerLoginFom() {
 
           <Link
             href="/forgot-password"
-            className="md:text-sm text-xs text-primary-green font-medium cursor-pointer"
+            className="md:text-sm text-xs text-[#f0782d] font-medium cursor-pointer"
           >
             Forgotten Password?
           </Link>
         </div>
         <Button
           type="submit"
-          className="text-white bg-primary-green h-10 rounded-md w-full cursor-pointer border-none"
+          className="text-white bg-[#f0782d] h-10 rounded-md w-full cursor-pointer border-none"
         >
           {" "}
           Sign in

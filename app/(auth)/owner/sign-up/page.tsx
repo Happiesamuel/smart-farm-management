@@ -42,7 +42,7 @@ export default function page() {
         <OwnerSignupForm />
         <div className="flex lg:hidden items-center pt-2 font-medium text-dark/90 gap-1 text-sm">
           <p>Already have an account?</p>
-          <Link className="text-primary-green" href={"/owner/signup"}>
+          <Link className="text-primary-green" href={"/owner/login"}>
             Sign in
           </Link>
         </div>

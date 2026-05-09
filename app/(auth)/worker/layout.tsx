@@ -1,6 +1,9 @@
-import type { Metadata } from "next";
+import React from "react";
+import "../../globals.css";
+
 import { Geist, Inter, Outfit } from "next/font/google";
-import "../globals.css";
+import NextTopLoader from "nextjs-toploader";
+import WorkerAuthImage from "@/components/auth/WorkerAuthImage";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -21,23 +24,6 @@ const inter = Inter({
   weight: "400",
   variable: "--font-inter",
 });
-export const metadata: Metadata = {
-  title: {
-    default: "Smart Farm Management System",
-    template: "%s | S.F.M.S",
-  },
-  description:
-    "A smart farm management system for monitoring crops, managing farm operations, tracking finances, and improving agricultural productivity.",
-  keywords: [
-    "Smart Farm",
-    "Agriculture",
-    "Farm Management System",
-    "Crop Monitoring",
-    "AgriTech",
-    "Nigeria Farming",
-  ],
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -48,7 +34,19 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.className} ${inter.variable} ${outfit.className} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body
+        className={`  bg-background max-w-480 mx-auto my-0 antialiased  flex flex-col `}
+      >
+        <NextTopLoader color="#66bb6a" height={4} showSpinner={false} />
+        <div className="grid grid-cols-1 lg:grid-cols-[0.7fr_1fr]">
+          <WorkerAuthImage />
+          <div className="mx-auto max-w-[90%] w-full">
+            {/* <AuthHeader /> */}
+            {children}
+          </div>
+          {/* <Toaster position="top-center" /> */}
+        </div>
+      </body>
     </html>
   );
 }
