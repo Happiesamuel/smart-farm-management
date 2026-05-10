@@ -9,7 +9,7 @@ export default function page() {
     <div className="pt-18 px-2 sm:px-4 ">
       <TaskIdHeader />
       <TaskCreation />
-      <div className="grid grid-cols-2 gap-4 mt-4 ">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 ">
         <TaskActivity />
         <TaskInfo />
       </div>

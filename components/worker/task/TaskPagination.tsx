@@ -9,7 +9,7 @@ import {
 export default function TaskPagination() {
   return (
     <div className="flex items-center justify-between px-2.5 py-3 text-sm text-dark/80 mt-4 rounded-xl border border-border/80 shadow-xs hover:shadow-sm transition bg-white gap-1">
-      <p className="w-full">Showing 1 to 5 of 24 tasks</p>
+      <p className="w-full text-xs">Showing 1 to 5 of 24 tasks</p>
       <Pagination className="w-full justify-end ">
         <PaginationContent className=" gap-1 sm:gap-3">
           <PaginationItem>

@@ -28,7 +28,7 @@ export default function TaskHeader() {
           View and manage all tasks assigned to you.
         </p>
       </div>
-      <div>
+      <div className="w-fit self-end  flex  sm:block sm:w-fit">
         <Select onValueChange={(e) => setVal(e)} defaultValue={val}>
           <SelectTrigger className="text-dark/90 w-full md:w-full border border-border bg-white rounded-lg">
             <LuListFilter /> <SelectValue placeholder="All Farms" />

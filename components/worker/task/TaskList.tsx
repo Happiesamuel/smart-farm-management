@@ -94,7 +94,7 @@ export default function TaskList({ filter }: { filter: string }) {
           <Link
             href={`/worker/tasks/${1}`}
             key={l.id}
-            className="grid grid-cols-[1fr_30rem] px-2.5 py-3 rounded-xl border border-border/80 shadow-xs hover:shadow-sm transition bg-white"
+            className="grid grid-cols-1 gap-2 md:grid-cols-[1fr_20rem] lg:grid-cols-[1fr_30rem] px-2.5 py-3 rounded-xl border border-border/80 shadow-xs hover:shadow-sm transition bg-white"
           >
             <div className="flex items-center gap-3">
               <div
@@ -125,7 +125,7 @@ export default function TaskList({ filter }: { filter: string }) {
                 <p>{l.date}</p>
                 <p>{l.time}</p>
               </div>
-              <MdOutlineKeyboardArrowRight className="text-zinc-500 text-xl" />
+              <MdOutlineKeyboardArrowRight className="hidden md:block text-zinc-500 text-xl" />
             </div>
           </Link>
         ))}

@@ -28,26 +28,27 @@ export default function TaskIdHeader() {
   ];
   return (
     <div className="space-y-4">
-      {" "}
       <div className="flex items-center text-sm text-zinc-500">
         <p>My Tasks </p>
         <MdOutlineKeyboardArrowRight />
         <p>taskID</p>
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start md:items-center justify-between">
         <div>
-          <div className="pb-3 flex items-center gap-3">
+          <div className="pb-3 flex flex-col md:flex-row md:items-center items-start gap-3">
             <p className="text-xl text-dark font-semibold ">Task Title</p>
-            <p className="text-[#1058d6] w-fit text-sm px-3 py-1 rounded-md bg-[#1058d6]/15">
-              In Progress
-            </p>
-            <p className="text-red-500 w-fit text-sm px-3 py-1 rounded-md bg-red-200/80">
-              High Prioity
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-[#1058d6] w-fit text-sm px-3 py-1 rounded-md bg-[#1058d6]/15">
+                In Progress
+              </p>
+              <p className="text-red-500 w-fit text-sm px-3 py-1 rounded-md bg-red-200/80">
+                High Prioity
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="">
+        <div className="w-fit self-end  flex  sm:block sm:w-fit">
           <Select onValueChange={(e) => setVal(e)} defaultValue={val}>
             <SelectTrigger className="text-dark/90 w-full md:w-full border border-border bg-white rounded-lg">
               <RxUpdate /> <SelectValue placeholder="In Progress" />

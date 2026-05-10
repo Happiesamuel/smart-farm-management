@@ -5,7 +5,7 @@ import { FaRegUser } from "react-icons/fa6";
 
 export default function TaskCreation() {
   return (
-    <div className="grid grid-cols-4 gap-4 mt-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-2 xl:gap-4 md:gap-4 mt-4">
       <div className="flex items-center gap-4 border border-border rounded-md  p-4 shadow-xs bg-white">
         <div className="relative size-12 aspect-video">
           <Image
@@ -24,9 +24,9 @@ export default function TaskCreation() {
         <div className="bg-zinc-200 size-12 flex items-center justify-center rounded-full">
           <MdOutlineCalendarToday className="text-dark/90" />
         </div>
-        <div className="space-y-2 w-[75%]">
+        <div className="space-y-2 lg:w-[90%] xl:w-[75%] w-[75%]">
           <p className="text-xs text-zinc-500 font-normal">Due Date</p>
-          <div className="flex w-full gap-1 items-center justify-between">
+          <div className="flex w-full gap-1 items-center justify-between lg:flex-col lg:items-start xl:flex-row xl:items-center">
             <p className="text-sm text-dark/80 font-medium">May 25, 2026</p>
             <p className="text-xs text-zinc-500 font-normal">10:00 AM</p>
           </div>
@@ -45,9 +45,9 @@ export default function TaskCreation() {
         <div className="bg-zinc-200 size-12 flex items-center justify-center rounded-full">
           <MdOutlineCalendarToday className="text-dark/90" />
         </div>
-        <div className="space-y-2 w-[75%]">
+        <div className="space-y-2  w-[75%]">
           <p className="text-xs text-zinc-500 font-normal">Created Date</p>
-          <div className="flex w-full gap-1 items-center justify-between">
+          <div className="flex w-full gap-1 items-center lg:flex-col lg:items-start xl:flex-row xl:items-center justify-between">
             <p className="text-sm text-dark/80 font-medium">May 20, 2026</p>
             <p className="text-xs text-zinc-500 font-normal">07:30 AM</p>
           </div>

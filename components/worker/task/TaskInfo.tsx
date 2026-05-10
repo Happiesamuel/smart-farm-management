@@ -10,30 +10,30 @@ export default function TaskInfo() {
       </div>
 
       <div className="space-y-2">
-        <div className="border-b border-border pb-2 grid grid-cols-[0.4fr_1fr]">
+        <div className="border-b border-border pb-2 grid grid-cols-[0.5fr_1fr] sm:grid-cols-[0.4fr_1fr]">
           <p className="text-dark/80 text-sm font-medium">Farm</p>
           <p className="text-dark/90 text-sm font-medium">Green Valley Farm</p>
         </div>
-        <div className="border-b border-border pb-2 grid grid-cols-[0.4fr_1fr]">
+        <div className="border-b border-border pb-2 grid grid-cols-[0.5fr_1fr] sm:grid-cols-[0.4fr_1fr]">
           <p className="text-dark/80 text-sm font-medium">Field</p>
           <p className="text-dark/90 text-sm font-medium">Field A</p>
         </div>
-        <div className="border-b border-border pb-2 grid grid-cols-[0.4fr_1fr]">
+        <div className="border-b border-border pb-2 grid grid-cols-[0.5fr_1fr] sm:grid-cols-[0.4fr_1fr]">
           <p className="text-dark/80 text-sm font-medium">Crop</p>
           <p className="text-dark/90 text-sm font-medium">Maize</p>
         </div>
-        <div className="border-b border-border pb-2 grid grid-cols-[0.4fr_1fr]">
+        <div className="border-b border-border pb-2 grid grid-cols-[0.5fr_1fr] sm:grid-cols-[0.4fr_1fr]">
           <p className="text-dark/80 text-sm font-medium">Task Type</p>
           <p className="text-dark/90 text-sm font-medium">Irrigation</p>
         </div>
-        <div className="border-b border-border pb-2 grid grid-cols-[0.4fr_1fr]">
+        <div className="border-b border-border pb-2 grid grid-cols-[0.5fr_1fr] sm:grid-cols-[0.4fr_1fr]">
           <p className="text-dark/80 text-sm font-medium">Priority</p>
           <div className="flex items-center gap-2">
             <p className="rounded-full size-2 bg-red-500" />
             <p className="text-dark/90 text-sm font-medium"> High</p>
           </div>
         </div>
-        <div className=" pb-2 grid grid-cols-[0.4fr_1fr]">
+        <div className=" pb-2 grid grid-cols-[0.5fr_1fr] sm:grid-cols-[0.4fr_1fr]">
           <p className="text-dark/80 text-sm font-medium">Status</p>
           <div className="flex items-center gap-2">
             <p className="rounded-full size-2 bg-green-500" />
