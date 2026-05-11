@@ -38,9 +38,12 @@ export default function DashoardRecentActivities() {
         </Link>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3 h-[300px] overflow-scroll no-scroll">
         {activities.map((act) => (
-          <div className="flex items-center justify-between" key={act.id}>
+          <div
+            className="flex flex-col md:flex-row md:items-center md:justify-between"
+            key={act.id}
+          >
             <div className="flex items-center gap-2">
               <div className=" rounded-md text-base bg-[#fee7e7] text-[#e82a2d] size-8 flex items-center justify-center">
                 <TfiWrite />
@@ -50,7 +53,9 @@ export default function DashoardRecentActivities() {
                 <p className="text-xs text-zinc-500 font-normal">{act.field}</p>
               </div>
             </div>
-            <p className="text-xs text-zinc-500 font-normal">{act.time}</p>
+            <p className="text-xs text-end text-zinc-500 font-normal">
+              {act.time}
+            </p>
           </div>
         ))}
       </div>

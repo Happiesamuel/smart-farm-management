@@ -84,7 +84,7 @@ export default function DashboardTodaysTask() {
           View all tasks
         </Link>
       </div>
-      <div className="space-y-2 h-[420px] overflow-scroll no-scroll">
+      <div className="space-y-2 h-[300px] lg:h-[460px] xl:h-[420px]  overflow-scroll no-scroll">
         {list.map((l) => (
           <Link
             href={`/worker/tasks/${1}`}

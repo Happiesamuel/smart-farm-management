@@ -10,7 +10,7 @@ export default function page() {
     <div className="pt-18 px-2 sm:px-4 pb-8">
       <DashboardHeader />
       <DashboardBoxes />
-      <div className="grid grid-cols-[1fr_0.7fr] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_0.7fr] gap-4">
         <DashboardTodaysTask />
         <div className="space-y-2">
           <DashoardRecentActivities />

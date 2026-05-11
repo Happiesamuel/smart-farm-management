@@ -5,7 +5,7 @@ export default function DashboardTips() {
   return (
     <div className="grid grid-cols-1 gap-2">
       <div className="flex items-center  gap-4 border border-border  rounded-md  p-4 shadow-xs bg-white">
-        <div className="bg-[#e7f5eb] text-[#056b36] flex items-center justify-center size-16 rounded-full text-xl">
+        <div className="bg-[#e7f5eb] text-[#056b36] flex items-center justify-center size-12 rounded-full text-xl">
           <BsHouseExclamation />{" "}
         </div>
         <div className="space-y-2">
