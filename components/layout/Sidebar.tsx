@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { FiActivity, FiSidebar } from "react-icons/fi";
 import User from "../../public/user.png";
 import { GrMoney } from "react-icons/gr";
-import { FaTasks } from "react-icons/fa";
+import { GoTasklist } from "react-icons/go";
 export function ManagerSidebar() {
   const pathname = usePathname();
 
@@ -243,7 +243,7 @@ export function WorkerSidebar() {
           name: "My Tasks",
           slug: "tasks",
           route: "/worker/tasks",
-          icon: FaTasks,
+          icon: GoTasklist,
         },
         {
           name: "Activity Log",
