@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { BiTask } from "react-icons/bi";
+import { CiBellOn } from "react-icons/ci";
 
 export default function DashboardTodaysTask() {
   const list = [
@@ -83,7 +84,7 @@ export default function DashboardTodaysTask() {
           View all tasks
         </Link>
       </div>
-      <div className="space-y-2 h-[222px] overflow-scroll no-scroll">
+      <div className="space-y-2 h-[420px] overflow-scroll no-scroll">
         {list.map((l) => (
           <Link
             href={`/worker/tasks/${1}`}
@@ -117,6 +118,10 @@ export default function DashboardTodaysTask() {
             </div>
           </Link>
         ))}
+      </div>
+      <div className="text-sm flex items-center gap-2 text-zinc-500 py-1 font-normal">
+        <CiBellOn className="text-xl" />
+        <p>Don&apos;t forget to update task status after completion</p>
       </div>
     </div>
   );
