@@ -12,7 +12,7 @@ export default function FarmHeader() {
         </p>
       </div>
       <Button className="bg-primary-green cursor-pointer text-white">
-        <Link href={"/farms/create"} className="flex items-center gap-1">
+        <Link href={"/user/farms/create"} className="flex items-center gap-1">
           <GoPlus />
           <p>Add Farm</p>
         </Link>

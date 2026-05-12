@@ -400,3 +400,12 @@ function comboSchema(message: string) {
     { message: message },
   );
 }
+export const infoFormSchema = z.object({
+  fullName: z.string({ message: "Please enter your full name" }).min(4, {
+    message: "Full Name must be at least 4 characters.",
+  }),
+  email: z
+    .string({ message: "Please enter your email" })
+    .email({ message: "Please enter a valid email address" }),
+  role: z.string({ message: "Please enter your role" }),
+});

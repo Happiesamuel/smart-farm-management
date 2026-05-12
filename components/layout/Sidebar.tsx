@@ -16,10 +16,7 @@ import { GrMoney } from "react-icons/gr";
 import { GoTasklist } from "react-icons/go";
 export function ManagerSidebar() {
   const pathname = usePathname();
-
-  const [fir, sec] = pathname.split("/");
-  const slug = [fir, sec].join("");
-
+  const slug = pathname.slice(6).split("/").at(0);
   const sidebarLinks = [
     {
       group: "Main",
@@ -27,7 +24,7 @@ export function ManagerSidebar() {
         {
           name: "Dashboard",
           slug: "dashboard",
-          route: "/dashboard",
+          route: "/user/dashboard",
           icon: TbLayoutDashboard,
         },
       ],
@@ -38,19 +35,19 @@ export function ManagerSidebar() {
         {
           name: "Farms",
           slug: "farms",
-          route: "/farms",
+          route: "/user/farms",
           icon: PiFarm,
         },
         {
           name: "Crops",
           slug: "crops",
-          route: "/crops",
+          route: "/user/crops",
           icon: PiPottedPlant,
         },
         {
           name: "Harvests",
           slug: "harvests",
-          route: "/harvests",
+          route: "/user/harvests",
           icon: GiDigDug,
         },
       ],
@@ -61,13 +58,13 @@ export function ManagerSidebar() {
         {
           name: "Sales",
           slug: "sales",
-          route: "/sales",
+          route: "/user/sales",
           icon: TbMoneybagMove,
         },
         {
           name: "Expenses",
           slug: "expenses",
-          route: "/expenses",
+          route: "/user/expenses",
           icon: GrMoney,
         },
       ],
@@ -78,13 +75,13 @@ export function ManagerSidebar() {
         {
           name: "Reports",
           slug: "reports",
-          route: "/reports",
+          route: "/user/reports",
           icon: RiFileList3Line,
         },
         {
           name: "Settings",
           slug: "settings",
-          route: "/settings",
+          route: "/user/settings",
           icon: IoSettingsOutline,
         },
       ],
@@ -226,9 +223,7 @@ export function ManagerSidebar() {
 export function WorkerSidebar() {
   const pathname = usePathname();
 
-  const [fir, sec] = pathname.split("/");
-  const slug = [fir, sec].join("");
-
+  const slug = pathname.slice(8).split("/").at(0);
   const sidebarLinks = [
     {
       group: "Main",
@@ -250,6 +245,17 @@ export function WorkerSidebar() {
           slug: "activity",
           route: "/worker/activity",
           icon: FiActivity,
+        },
+      ],
+    },
+    {
+      group: "Others",
+      items: [
+        {
+          name: "Settings",
+          slug: "settings",
+          route: "/worker/settings",
+          icon: IoSettingsOutline,
         },
       ],
     },

@@ -1,5 +1,3 @@
-import AuthBottom from "@/components/auth/AuthBottom";
-import { OwnerLoginFom } from "@/components/auth/OwnerLoginFom";
 import { WorkerLoginFom } from "@/components/auth/WorkerLoginForm";
 import Link from "next/link";
 import { BiArrowBack } from "react-icons/bi";

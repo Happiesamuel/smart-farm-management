@@ -52,7 +52,7 @@ export default function FarmIdHeader() {
           </Button>
           <Button className="bg-primary-green w-[48%] sm:w-fit cursor-pointer text-white">
             <Link
-              href={"/farms/1/create-field"}
+              href={"/user/farms/1/create-field"}
               className="flex items-center gap-1"
             >
               <GoPlus />

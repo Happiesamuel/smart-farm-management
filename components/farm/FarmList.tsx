@@ -136,7 +136,7 @@ export default function FarmList() {
               </div>
             </div>
             <Link
-              href={`/farms/1`}
+              href={`/user/farms/1`}
               className="flex items-center cursor-pointer px-3 justify-between border-t border-border py-4"
             >
               <p className="text-sm text-dark font-medium">View Details</p>

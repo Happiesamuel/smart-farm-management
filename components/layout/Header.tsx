@@ -12,53 +12,75 @@ import { MdArrowForwardIos } from "react-icons/md";
 import Image from "next/image";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { useCollaspe } from "@/context/SidebarCollasibleContext";
+import { GoTasklist } from "react-icons/go";
+import { FiActivity } from "react-icons/fi";
 
 export default function Header() {
   const links = [
     {
       name: "Dashboard",
-      route: "/dashboard",
+      route: "/user/dashboard",
       svg: <TbLayoutDashboard className="text-lg text-dark" />,
     },
     {
       name: "Farms",
-      route: "/farms",
+      route: "/user/farms",
       svg: <PiFarm className="text-lg text-dark" />,
     },
     {
       name: "Crops",
-      route: "/crops",
+      route: "/user/crops",
       svg: <PiPottedPlant className="text-lg text-dark" />,
     },
     {
       name: "Harvests",
-      route: "/harvests",
+      route: "/user/harvests",
       svg: <GiFarmTractor className="text-lg text-dark" />,
     },
     {
       name: "Sales",
-      route: "/sales",
+      route: "/user/sales",
       svg: <GiMoneyStack className="text-lg text-dark" />,
     },
     {
       name: "Expenses",
-      route: "/expenses",
+      route: "/user/expenses",
       svg: <FaRegMoneyBill1 className="text-lg text-dark" />,
     },
     {
       name: "Reports",
-      route: "/reports",
+      route: "/user/reports",
       svg: <RiFileList3Line className="text-lg text-dark" />,
     },
     {
       name: "Settings",
-      route: "/settings",
+      route: "/user/settings",
       svg: <IoSettingsOutline className="text-lg text-dark" />,
+    },
+
+    {
+      name: "Dashboard",
+      route: "/worker/dashboard",
+      icon: <TbLayoutDashboard className="text-lg text-dark" />,
+    },
+    {
+      name: "My Tasks",
+      route: "/worker/tasks",
+      icon: <GoTasklist className="text-lg text-dark" />,
+    },
+    {
+      name: "Activity Log",
+      route: "/worker/activity",
+      icon: <FiActivity className="text-lg text-dark" />,
+    },
+    {
+      name: "Settings",
+      route: "/worker/settings",
+      icon: <IoSettingsOutline className="text-lg text-dark" />,
     },
   ];
   const route = usePathname();
-  const [fir, sec] = route.split("/");
-  const newRou = [fir, sec].join("/");
+  const newRou = route.split("/").slice(0, 3).join("/");
   const active = links.find((x) => x.route === newRou);
   const { collaspe } = useCollaspe();
   return (
@@ -74,10 +96,10 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-5">
-        <Link href="/notifications" className="relative">
+        <Link href="/user/notifications" className="relative">
           <IoSettingsOutline className="text-lg text-dark" />
         </Link>
-        <Link href="/notifications" className="relative">
+        <Link href="/user/notifications" className="relative">
           <IoMdNotificationsOutline className="text-2xl text-dark" />
           {/* {notify.some((x) => !x.status) && ( */}
           <div className="size-1.5 bg-light-green rounded-full absolute bottom-[70%] left-[50%]" />

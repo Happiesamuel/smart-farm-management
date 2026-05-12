@@ -12,7 +12,7 @@ export default function page() {
       icon: FaRegUser,
       iconColor: "bg-[#e8f5ec] text-[#2d8952] ",
       bg: "bg-[#f8fdf9]",
-      route: "/settings/profile",
+      route: "/user/settings/profile",
     },
     {
       name: "Farm Information",
@@ -20,7 +20,7 @@ export default function page() {
       icon: PiRanking,
       iconColor: "bg-[#e8f5ec] text-[#2d8952] ",
       bg: "bg-[#f8fdf9]",
-      route: "/settings/farm-information",
+      route: "/user/settings/farm-information",
     },
     {
       name: "Users & Roles",
@@ -28,7 +28,7 @@ export default function page() {
       icon: LuUsers,
       iconColor: "bg-[#f1ecfd] text-[#5837e8] ",
       bg: "bg-[#f9f7fd]",
-      route: "/settings/user-and-roles",
+      route: "/user/settings/user-and-roles",
     },
     {
       name: "Notifications",
@@ -36,7 +36,7 @@ export default function page() {
       icon: FaRegBell,
       iconColor: "bg-[#fff1dd] text-[#de852c] ",
       bg: "bg-[#fefaf2]",
-      route: "/settings/notifications",
+      route: "/user/settings/notifications",
     },
     {
       name: "Units & Currency",
@@ -44,7 +44,7 @@ export default function page() {
       icon: MdCurrencyPound,
       iconColor: "bg-[#e1eefd] text-[#1058d6] ",
       bg: "bg-[#f7fafe]",
-      route: "/settings#",
+      route: "/user/settings#",
     },
 
     {
@@ -53,7 +53,7 @@ export default function page() {
       icon: MdSecurity,
       iconColor: "bg-[#fee7e7] text-[#e82a2d] ",
       bg: "bg-[#fef5f5]",
-      route: "/settings#",
+      route: "/user/settings#",
     },
   ];
 
