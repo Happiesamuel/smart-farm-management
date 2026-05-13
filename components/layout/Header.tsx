@@ -61,22 +61,22 @@ export default function Header() {
     {
       name: "Dashboard",
       route: "/worker/dashboard",
-      icon: <TbLayoutDashboard className="text-lg text-dark" />,
+      svg: <TbLayoutDashboard className="text-lg text-dark" />,
     },
     {
       name: "My Tasks",
       route: "/worker/tasks",
-      icon: <GoTasklist className="text-lg text-dark" />,
+      svg: <GoTasklist className="text-lg text-dark" />,
     },
     {
       name: "Activity Log",
       route: "/worker/activity",
-      icon: <FiActivity className="text-lg text-dark" />,
+      svg: <FiActivity className="text-lg text-dark" />,
     },
     {
       name: "Settings",
       route: "/worker/settings",
-      icon: <IoSettingsOutline className="text-lg text-dark" />,
+      svg: <IoSettingsOutline className="text-lg text-dark" />,
     },
   ];
   const route = usePathname();
