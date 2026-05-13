@@ -319,12 +319,12 @@ export function WorkerSidebar() {
                     <TooltipTrigger asChild>
                       <Link
                         href={link.route}
-                        className={`flex group items-center cursor-pointer text-dark/90 font-medium py-2 px-3 gap-3 ${
-                          slug === link.slug && "bg-white text-primary-green"
+                        className={`flex group items-center  cursor-pointer text-dark/90 font-medium py-2 px-3 gap-3 ${
+                          slug === link.slug && "bg-white text-primary-green "
                         } hover:text-primary-green text-sm rounded-md mx-2`}
                       >
                         <Icon
-                          className={`text-xl ${
+                          className={`text-xl  ${
                             slug === link.slug
                               ? "text-primary-green"
                               : "text-dark"
@@ -332,7 +332,7 @@ export function WorkerSidebar() {
                         />
 
                         <p
-                          className={`transition-all duration-200 ${
+                          className={`transition-all  duration-200 ${
                             collaspe
                               ? "opacity-0 w-0 overflow-hidden"
                               : "opacity-100 w-auto delay-200"
