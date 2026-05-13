@@ -358,6 +358,28 @@ export const createTaskSchema = z.object({
     .string({ message: " Date is required" })
     .min(1, "Date is required"),
 });
+export const activitySchema = z.object({
+  taskName: z.string({ message: "Task name is required" }).min(4, {
+    message: "Task name must be at least 4 characters.",
+  }),
+  farm: z
+    .string({ message: "Please select farm" })
+    .min(1, "Please select a farm"),
+  field: z
+    .string({ message: "Please select farm field" })
+    .min(1, "Please select farm field"),
+  activityType: z
+    .string({ message: "Please select activty type" })
+    .min(1, "Please select activity type"),
+
+  notes: z
+    .string({ message: "descripton is required" })
+    .min(10, { message: "description must be at least 10 characters." }),
+
+  activityDate: z
+    .string({ message: " Date is required" })
+    .min(1, "Date is required"),
+});
 export const financeExpenseSchema = z.object({
   category: z
     .string({ message: "Please select a category" })
