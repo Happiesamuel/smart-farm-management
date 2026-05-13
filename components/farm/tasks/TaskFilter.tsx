@@ -97,7 +97,10 @@ export default function TaskFilter() {
         </div>
       </div>
       <Button className="bg-primary-green w-full sm:w-fit cursor-pointer text-white">
-        <Link href={"/farms/1/create-task"} className="flex items-center gap-1">
+        <Link
+          href={"/user/farms/1/create-task"}
+          className="flex items-center gap-1"
+        >
           <GoPlus />
           <p>Add Task</p>
         </Link>

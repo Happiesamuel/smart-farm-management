@@ -74,7 +74,10 @@ export default function FarmCropsFilter() {
       </div>
 
       <Button className="bg-primary-green w-full sm:w-fit cursor-pointer text-white">
-        <Link href={"/farms/1/add-crop"} className="flex items-center gap-1">
+        <Link
+          href={"/user/farms/1/add-crop"}
+          className="flex items-center gap-1"
+        >
           <GoPlus />
           <p>Add Crop</p>
         </Link>

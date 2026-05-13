@@ -11,7 +11,7 @@ export default function FarmHarvest() {
       <div className="flex items-center justify-end">
         <Button className="bg-primary-green w-full sm:w-fit cursor-pointer text-white">
           <Link
-            href={"/farms/1/add-harvest"}
+            href={"/user/farms/1/add-harvest"}
             className="flex items-center gap-1"
           >
             <GoPlus />
