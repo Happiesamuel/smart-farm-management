@@ -63,7 +63,7 @@ export default function FarmList() {
       {farms.map((box) => {
         return (
           <Link
-            href={`/settings/farm-information/${box.id}`}
+            href={`/user/settings/farm-information/${box.id}`}
             key={box.name}
             className="w-full p-4 cursor-pointer h-[100px] max-w-sm gap-4 bg-white items-start justify-cente relative rounded-md border border-border/80 hover:shadow-sm transition flex shrink-0"
           >
