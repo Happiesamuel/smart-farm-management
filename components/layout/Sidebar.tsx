@@ -251,7 +251,7 @@ export function ManagerSidebar() {
           </div>
         </div>
       </div>
-      <div className="lg:hidden block fixed bottom-0 left-1/2 -translate-x-1/2 z-50">
+      <div className="lg:hidden block fixed bottom-1.5 left-1/2 -translate-x-1/2 z-50">
         <div className="relative w-[340px] h-[50px] bg-white backdrop-blur-md  border border-border rounded-xl shadow-xl flex items-center justify-between px-8">
           <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-12 bg-transparent mb-4 rounded-b-full" />
 
@@ -504,7 +504,7 @@ export function WorkerSidebar() {
           </div>
         </div>
       </div>
-      <div className="lg:hidden block fixed bottom-0 left-1/2 -translate-x-1/2 z-50">
+      <div className="lg:hidden block fixed bottom-1.5 left-1/2 -translate-x-1/2 z-50">
         <div className="relative w-[340px] h-[50px] bg-white backdrop-blur-md  border border-border rounded-xl shadow-xl flex items-center justify-between px-8">
           <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-24 h-12 bg-transparent mb-4 rounded-b-full" />
 
