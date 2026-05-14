@@ -86,7 +86,7 @@ export default function Header() {
   const { collaspe } = useCollaspe();
   return (
     <div
-      className={`flex border-b border-border fixed max-w-424 py-3 bg-white px-4  min-w-0 z-100 w-full  ${collaspe ? "lg:w-[calc(100%-4.8rem)]" : "lg:w-[calc(100%-14rem)]"} items-center justify-between`}
+      className={`flex border-b border-border fixed max-w-424 py-3 bg-white px-2 md:px-4  min-w-0 z-100 w-full  ${collaspe ? "lg:w-[calc(100%-4.8rem)]" : "lg:w-[calc(100%-14rem)]"} items-center justify-between`}
     >
       <div className="flex items-center gap-2">
         <div>{active?.svg}</div>
