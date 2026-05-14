@@ -14,6 +14,7 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { useCollaspe } from "@/context/SidebarCollasibleContext";
 import { GoTasklist } from "react-icons/go";
 import { FiActivity } from "react-icons/fi";
+import DashboardSheet from "./DashboardSheet";
 
 export default function Header() {
   const links = [
@@ -105,7 +106,7 @@ export default function Header() {
           <div className="size-1.5 bg-light-green rounded-full absolute bottom-[70%] left-[50%]" />
           {/* )} */}
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 lg:gap-2">
           <Image
             src={User}
             width={35}
@@ -113,6 +114,9 @@ export default function Header() {
             alt="user"
             className="rounded-full object-center object-cover border-2 border-light-green"
           />
+          <div className="lg:hidden">
+            <DashboardSheet />
+          </div>
           <div className="hidden lg:block">
             <p className="text-dark text-xs font-semibold">John Doe</p>
             <p className="text-zinc-500 text-[10px] font-semibold">
