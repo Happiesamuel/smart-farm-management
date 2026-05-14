@@ -96,10 +96,10 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-5">
-        <Link href="/user/notifications" className="relative">
+        <Link href="/user/notifications" className="relative hidden lg:block">
           <IoSettingsOutline className="text-lg text-dark" />
         </Link>
-        <Link href="/user/notifications" className="relative">
+        <Link href="/user/notifications" className="relative hidden lg:block">
           <IoMdNotificationsOutline className="text-2xl text-dark" />
           {/* {notify.some((x) => !x.status) && ( */}
           <div className="size-1.5 bg-light-green rounded-full absolute bottom-[70%] left-[50%]" />
@@ -113,7 +113,7 @@ export default function Header() {
             alt="user"
             className="rounded-full object-center object-cover border-2 border-light-green"
           />
-          <div>
+          <div className="hidden lg:block">
             <p className="text-dark text-xs font-semibold">John Doe</p>
             <p className="text-zinc-500 text-[10px] font-semibold">
               johndoe@gmail.com
