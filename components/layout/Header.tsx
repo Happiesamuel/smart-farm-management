@@ -14,7 +14,7 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { useCollaspe } from "@/context/SidebarCollasibleContext";
 import { GoTasklist } from "react-icons/go";
 import { FiActivity } from "react-icons/fi";
-import DashboardSheet from "./DashboardSheet";
+import { DashboardSheet, WorkerDashboardSheet } from "./DashboardSheet";
 
 export default function Header() {
   const links = [
@@ -102,9 +102,7 @@ export default function Header() {
         </Link>
         <Link href="/user/notifications" className="relative hidden lg:block">
           <IoMdNotificationsOutline className="text-2xl text-dark" />
-          {/* {notify.some((x) => !x.status) && ( */}
           <div className="size-1.5 bg-light-green rounded-full absolute bottom-[70%] left-[50%]" />
-          {/* )} */}
         </Link>
         <div className="flex items-center gap-3 lg:gap-2">
           <Image
@@ -116,6 +114,7 @@ export default function Header() {
           />
           <div className="lg:hidden">
             <DashboardSheet />
+            {/* <WorkerDashboardSheet /> */}
           </div>
           <div className="hidden lg:block">
             <p className="text-dark text-xs font-semibold">John Doe</p>
