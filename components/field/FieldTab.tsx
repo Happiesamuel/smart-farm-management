@@ -13,6 +13,10 @@ export default function FieldTab() {
       name: "Tasks",
       slug: "tasks",
     },
+    {
+      name: "Activites",
+      slug: "activity",
+    },
   ];
   const router = useRouter();
   const searchparams = useSearchParams();

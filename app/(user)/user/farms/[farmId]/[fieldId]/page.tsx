@@ -1,15 +1,18 @@
 "use client";
 import FarmCrops from "@/components/farm/crops/FarmCrops";
 import FarmTasks from "@/components/farm/tasks/FarmTasks";
+import FieldActivity from "@/components/field/activity/FieldActivity";
+import FieldCrops from "@/components/field/FieldCrops";
 import FieldHeader from "@/components/field/FieldHeader";
 import FieldTab from "@/components/field/FieldTab";
 import { useSearchParams } from "next/navigation";
 import { ReactNode } from "react";
 
-type Tab = "crops" | "tasks";
+type Tab = "crops" | "activity" | "tasks";
 export default function Page() {
   const tabs: Record<Tab, ReactNode> = {
-    crops: <FarmCrops />,
+    crops: <FieldCrops />,
+    activity: <FieldActivity />,
     tasks: <FarmTasks />,
   };
   const searchParmas = useSearchParams();
