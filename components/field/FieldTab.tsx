@@ -20,7 +20,7 @@ export default function FieldTab() {
   ];
   const router = useRouter();
   const searchparams = useSearchParams();
-  const [active, setActive] = useState(searchparams.get("tab") || "overview");
+  const [active, setActive] = useState(searchparams.get("tab") || "crops");
   const pathname = usePathname();
   function handleClick(slug: string) {
     const params = new URLSearchParams(searchparams);
