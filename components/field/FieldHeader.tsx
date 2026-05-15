@@ -1,10 +1,11 @@
+import Link from "next/link";
+import { IoLocationOutline } from "react-icons/io5";
+import { MdArrowForwardIos } from "react-icons/md";
 import { Button } from "../ui/button";
 import { GoPlus } from "react-icons/go";
-import { IoLocationOutline } from "react-icons/io5";
-import Link from "next/link";
+import { LuMountain } from "react-icons/lu";
 
-import { MdArrowForwardIos } from "react-icons/md";
-export default function FarmIdHeader() {
+export default function FieldHeader() {
   return (
     <div className="space-y-4">
       <div className=" flex items-center gap-3 text-sm text-zinc-500 font-normal">
@@ -21,13 +22,18 @@ export default function FarmIdHeader() {
         >
           Green Valley Farm
         </Link>
+        <MdArrowForwardIos />
+        <Link
+          className="duration-500 transition-all cursor-pointer hover:text-green-500"
+          href={"/user/farms/1/fieldA"}
+        >
+          Field A
+        </Link>
       </div>
       <div className="flex gap-4 sm:flex-row flex-col sm:items-center justify-between">
         <div className="space-y-3.5">
           <div className="flex items-center gap-2">
-            <h5 className="text-xl text-dark font-semibold">
-              Green Valley Farm
-            </h5>
+            <h5 className="text-xl text-dark font-semibold">Field A</h5>
             <p
               className={`rounded-full bg-green-50 text-green-600 p-0.5 px-2 text-xs border-green-200 border`}
               // className={`rounded-full ${farm.status === "Active" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"} p-1 px-2 text-xs absolute left-2 top-2`}
@@ -39,11 +45,23 @@ export default function FarmIdHeader() {
             <div className="flex items-center gap-0.5">
               <IoLocationOutline className="text-zinc-500" />
               <p className="text-sm text-zinc-500 font-medium">
-                Abuja, Nigeria
+                Green Valley Farm
               </p>
             </div>
             <span className={`size-1 rounded-full shrink-0 bg-zinc-500`} />
-            <p className="text-sm text-zinc-500 font-medium">120 acres</p>
+            <p className="text-sm text-zinc-500 font-medium">2.5 acres</p>
+            <span className={`size-1 rounded-full shrink-0 bg-zinc-500`} />
+            <div className="flex items-center gap-0.5">
+              <LuMountain className="text-zinc-500" />
+              <p className="text-sm text-zinc-500 font-medium">Loamy Soil</p>
+            </div>
+            <span className={`size-1 rounded-full shrink-0 bg-zinc-500`} />
+            <div className="flex items-center gap-0.5">
+              <IoLocationOutline className="text-zinc-500" />
+              <p className="text-sm text-zinc-500 font-medium">
+                Abuja, Nigeria
+              </p>
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -51,12 +69,9 @@ export default function FarmIdHeader() {
             <p>Edit Field</p>
           </Button>
           <Button className="bg-primary-green w-[48%] sm:w-fit cursor-pointer text-white">
-            <Link
-              href={"/user/farms/1/create-field"}
-              className="flex items-center gap-1"
-            >
+            <Link href={"#"} className="flex items-center gap-1">
               <GoPlus />
-              <p>Add Field</p>
+              <p>Record Activity</p>
             </Link>
           </Button>
         </div>

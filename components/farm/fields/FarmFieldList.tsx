@@ -112,7 +112,10 @@ export default function FarmFieldList() {
               <div className="flex items-center gap-2 py-2.5">
                 <div className="flex gap-2 items-center flex-1">
                   <Button className="bg-transparent w-[48%] font-medium  border border-primary-green cursor-pointer rounded-md text-primary-green">
-                    View Details
+                    <Link href={`/user/farms/1/fieldId`} className="w-full">
+                      {" "}
+                      View Details
+                    </Link>
                   </Button>
                   <Button className="bg-transparent w-[48%] rounded-md  border border-dark/60 cursor-pointer text-dark">
                     Edit
