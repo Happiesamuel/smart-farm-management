@@ -31,7 +31,7 @@ export default function FieldHeader() {
         </Link>
       </div>
       <div className="flex gap-4 sm:flex-row flex-col sm:items-center justify-between">
-        <div className="space-y-3.5">
+        <div className="space-y-3.5 ">
           <div className="flex items-center gap-2">
             <h5 className="text-xl text-dark font-semibold">Field A</h5>
             <p
@@ -41,22 +41,24 @@ export default function FieldHeader() {
               Active
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-4 no-scroll">
+            <div className="flex items-center truncate gap-0.5">
               <IoLocationOutline className="text-zinc-500" />
               <p className="text-sm text-zinc-500 font-medium">
                 Green Valley Farm
               </p>
             </div>
             <span className={`size-1 rounded-full shrink-0 bg-zinc-500`} />
-            <p className="text-sm text-zinc-500 font-medium">2.5 acres</p>
+            <p className="text-sm text-zinc-500 truncate font-medium">
+              2.5 acres
+            </p>
             <span className={`size-1 rounded-full shrink-0 bg-zinc-500`} />
-            <div className="flex items-center gap-0.5">
+            <div className="flex truncate items-center gap-0.5">
               <LuMountain className="text-zinc-500" />
               <p className="text-sm text-zinc-500 font-medium">Loamy Soil</p>
             </div>
             <span className={`size-1 rounded-full shrink-0 bg-zinc-500`} />
-            <div className="flex items-center gap-0.5">
+            <div className="flex items-center truncate gap-0.5">
               <IoLocationOutline className="text-zinc-500" />
               <p className="text-sm text-zinc-500 font-medium">
                 Abuja, Nigeria
@@ -69,7 +71,10 @@ export default function FieldHeader() {
             <p>Edit Field</p>
           </Button>
           <Button className="bg-primary-green w-[48%] sm:w-fit cursor-pointer text-white">
-            <Link href={"#"} className="flex items-center gap-1">
+            <Link
+              href={`/user/farms/1/fieldId/create-activity`}
+              className="flex items-center gap-1"
+            >
               <GoPlus />
               <p>Record Activity</p>
             </Link>

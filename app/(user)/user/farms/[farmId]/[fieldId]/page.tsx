@@ -3,14 +3,16 @@ import FieldActivity from "@/components/field/activity/FieldActivity";
 import FieldCrops from "@/components/field/FieldCrops";
 import FieldHeader from "@/components/field/FieldHeader";
 import FieldTab from "@/components/field/FieldTab";
+import FieldNotes from "@/components/field/notes/FieldNotes";
 import FieldTasks from "@/components/field/tasks/FieldTasks";
 import { useSearchParams } from "next/navigation";
 import { ReactNode } from "react";
 
-type Tab = "crops" | "activity" | "tasks";
+type Tab = "crops" | "notes" | "activity" | "tasks";
 export default function Page() {
   const tabs: Record<Tab, ReactNode> = {
     crops: <FieldCrops />,
+    notes: <FieldNotes />,
     activity: <FieldActivity />,
     tasks: <FieldTasks />,
   };

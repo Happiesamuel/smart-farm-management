@@ -380,6 +380,17 @@ export const activitySchema = z.object({
     .string({ message: " Date is required" })
     .min(1, "Date is required"),
 });
+export const noteSchema = z.object({
+  farm: z
+    .string({ message: "Please select farm" })
+    .min(1, "Please select a farm"),
+  field: z
+    .string({ message: "Please select farm field" })
+    .min(1, "Please select farm field"),
+  notes: z
+    .string({ message: "descripton is required" })
+    .min(10, { message: "description must be at least 10 characters." }),
+});
 export const financeExpenseSchema = z.object({
   category: z
     .string({ message: "Please select a category" })

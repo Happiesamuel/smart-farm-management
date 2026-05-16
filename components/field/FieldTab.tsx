@@ -10,6 +10,10 @@ export default function FieldTab() {
       slug: "crops",
     },
     {
+      name: "Notes",
+      slug: "notes",
+    },
+    {
       name: "Tasks",
       slug: "tasks",
     },
