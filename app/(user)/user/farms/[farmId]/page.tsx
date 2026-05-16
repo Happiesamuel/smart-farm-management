@@ -23,7 +23,7 @@ export default function Page() {
   const searchParmas = useSearchParams();
   const tab = (searchParmas.get("tab") || "overview") as Tab;
   return (
-    <div className="pt-18 px-2 sm:px-4">
+    <div className="pt-18 px-2 sm:px-4  pb-16 lg:pb-4">
       <FarmIdHeader />
       <FarmTab />
       <main>{tabs[tab]}</main>
