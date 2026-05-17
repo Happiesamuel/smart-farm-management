@@ -45,7 +45,20 @@ export default function FinanceExpenseFom() {
       value: "transport",
     },
   ];
-
+  const farm = [
+    {
+      value: "greenValley",
+      name: "Green Valley Farm",
+    },
+    {
+      value: "sunrise",
+      name: "Sunrise Farm",
+    },
+    {
+      value: "hilltop",
+      name: "Hilltop Farm ",
+    },
+  ];
   const arrPayment = [
     {
       name: "Cash",
@@ -76,7 +89,14 @@ export default function FinanceExpenseFom() {
               array={category}
               Icon={AiOutlineTag}
             />
-            <FinanceDate label="Date" name="date" control={form.control} />
+            <FinanceSelect
+              name="farm"
+              control={form.control}
+              label="Farm"
+              placeholder="Select farm"
+              array={category}
+              Icon={AiOutlineTag}
+            />
           </div>
 
           <div className="flex item justify-between flex-col md:flex-row gap-4 md:gap-6">
@@ -105,12 +125,15 @@ export default function FinanceExpenseFom() {
             />
             <FinanceUpload control={form.control} />
           </div>
-          <FinanceInput
-            label="Notes (Optional)"
-            placeholder="Add any additonal notes..."
-            name="notes"
-            control={form.control}
-          />
+          <div className="flex items-start justify-between flex-col md:flex-row gap-4 md:gap-6">
+            <FinanceDate label="Date" name="date" control={form.control} />
+            <FinanceInput
+              label="Notes (Optional)"
+              placeholder="Add any additonal notes..."
+              name="notes"
+              control={form.control}
+            />
+          </div>
           <div className="flex items-center gap-4 relative justify-end">
             <Button
               type="reset"

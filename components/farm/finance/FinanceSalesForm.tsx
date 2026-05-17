@@ -27,6 +27,20 @@ export default function FinanceSalesForm() {
   });
 
   async function onSubmit(values: z.infer<typeof financeSaleSchema>) {}
+  const farm = [
+    {
+      value: "greenValley",
+      name: "Green Valley Farm",
+    },
+    {
+      value: "sunrise",
+      name: "Sunrise Farm",
+    },
+    {
+      value: "hilltop",
+      name: "Hilltop Farm ",
+    },
+  ];
   const arrCrop = [
     {
       name: "Maize",
@@ -137,10 +151,13 @@ export default function FinanceSalesForm() {
               name="totalAmount"
               control={form.control}
             />
-            <FinanceDate
-              label="Sale Date"
-              name="saleDate"
+            <FinanceSelect
+              name="farm"
               control={form.control}
+              label="Farm"
+              placeholder="Select farm"
+              array={farm}
+              Icon={IoMdGrid}
             />
           </div>
           <div className="flex item flex-col md:flex-row justify-between gap-4 md:gap-6">
@@ -159,12 +176,19 @@ export default function FinanceSalesForm() {
               Icon={MdOutlinePayment}
             />
           </div>
-          <FinanceInput
-            label="Notes (Optional)"
-            placeholder="Add any additonal notes..."
-            name="notes"
-            control={form.control}
-          />
+          <div className="flex item flex-col md:flex-row justify-between gap-4 md:gap-6">
+            <FinanceDate
+              label="Sale Date"
+              name="saleDate"
+              control={form.control}
+            />
+            <FinanceInput
+              label="Notes (Optional)"
+              placeholder="Add any additonal notes..."
+              name="notes"
+              control={form.control}
+            />
+          </div>
           <div className="flex items-center gap-4 relative justify-end">
             <Button
               type="reset"

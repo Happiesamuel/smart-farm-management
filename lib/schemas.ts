@@ -106,6 +106,7 @@ export const financeSaleSchema = z.object({
     .string({ message: "Please select a crop" })
     .min(1, "Please select a crop"),
   field: z.string({ message: "Field is required" }).min(1, "Field is required"),
+  farm: z.string({ message: "Farm is required" }).min(1, "Farm is required"),
   quantity: z.string({ message: "Quantity is required" }).min(1, {
     message: "Quantity must be at least a characters.",
   }),
@@ -395,6 +396,9 @@ export const financeExpenseSchema = z.object({
   category: z
     .string({ message: "Please select a category" })
     .min(1, "Please select a category"),
+  farm: z
+    .string({ message: "Please select a farm" })
+    .min(1, "Please select a farm"),
 
   amount: z.string({ message: "Please enter total amount" }).min(2, {
     message: "Total amountt must be at least 2 characters.",
