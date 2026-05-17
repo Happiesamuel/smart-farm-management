@@ -1,16 +1,12 @@
-import React from "react";
-
 import Farm4 from "@/public/farm-4.jpg";
 import Farm5 from "@/public/farm-5.jpg";
 import Farm6 from "@/public/farm-6.jpg";
 import Image from "next/image";
-import { PiFarm, PiPlantDuotone } from "react-icons/pi";
-import { GiMoneyStack } from "react-icons/gi";
-import { MdArrowForwardIos } from "react-icons/md";
 import Paginate from "../../layout/Pagination";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FaRegTrashCan } from "react-icons/fa6";
+import { Dispatch, SetStateAction } from "react";
 const farms = [
   {
     id: 1,
@@ -43,7 +39,11 @@ const farms = [
     lastIrrigation: "3 days ago",
   },
 ];
-export default function FarmFieldList() {
+export default function FarmFieldList({
+  setOpenId,
+}: {
+  setOpenId: Dispatch<SetStateAction<number | null>>;
+}) {
   return (
     <div className="py-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
@@ -121,7 +121,10 @@ export default function FarmFieldList() {
                     Edit
                   </Button>
                 </div>
-                <Button className="bg-transparent rounded-md  border border-red-500 cursor-pointer text-red-500">
+                <Button
+                  onClick={() => setOpenId(farm.id)}
+                  className="bg-transparent rounded-md  border border-red-500 cursor-pointer text-red-500"
+                >
                   <FaRegTrashCan />
                 </Button>
               </div>
