@@ -39,7 +39,7 @@ export function FinanceModal({
     <div className="fixed inset-0 z-150 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40 " />
 
-      <div className="relative bg-white w-full max-w-3xl md:rounded-xl shadow-lg p-2.5 md:p-5 animate-fadeIn">
+      <div className="relative bg-white w-full max-w-[95%] md:max-w-2xl lg:max-w-3xl xl:max-w-4xl rounded-xl shadow-lg p-2.5 md:p-5 animate-fadeIn">
         <div>
           <div className="pb-3 flex items-center justify-between">
             <div className="text-xl text-dark font-semibold ">Add {type}</div>
@@ -54,7 +54,7 @@ export function FinanceModal({
             <p className="text-sm text-dark/80 font-medium">{text}</p>
           </div>
         </div>
-        {children}
+        <div className="max-h-[78vh] no-scroll overflow-scroll">{children}</div>
       </div>
     </div>
   );

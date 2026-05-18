@@ -8,11 +8,10 @@ import { Form } from "@/components/ui/form";
 
 import { useState } from "react";
 import { createCropSchema } from "@/lib/schemas";
-import { PiFarm, PiPlant, PiPlantDuotone } from "react-icons/pi";
+import { PiFarm, PiPlant } from "react-icons/pi";
 import { ImDroplet } from "react-icons/im";
-import { FiUser } from "react-icons/fi";
 import { FaRegSave } from "react-icons/fa";
-import CreateCropInput, {
+import {
   CreateCropCombo,
   CreateCropDate,
   CreateCropInputSelect,

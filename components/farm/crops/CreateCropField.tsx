@@ -300,7 +300,7 @@ export function CreateCropDate({
                 </FormControl>
               </PopoverTrigger>
 
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto z-[200] p-0">
                 <Calendar
                   mode="range"
                   selected={
