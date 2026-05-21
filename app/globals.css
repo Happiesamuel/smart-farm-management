@@ -104,6 +104,9 @@
   --background: #fffdf5;
   /* --background: #f5f7fa; */
 }
+html {
+  scroll-behavior: smooth;
+}
 
 .no-scroll {
   /* For Firefox */

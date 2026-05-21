@@ -446,3 +446,17 @@ export const infoFormSchema = z.object({
     .email({ message: "Please enter a valid email address" }),
   role: z.string({ message: "Please enter your role" }),
 });
+export const contactFormSchema = z.object({
+  name: z.string({ message: "Please enter your full name" }).min(4, {
+    message: "Full Name must be at least 4 characters.",
+  }),
+  email: z
+    .string({ message: "Please enter your email" })
+    .email({ message: "Please enter a valid email address" }),
+  subject: z.string({ message: "Please enter your subject" }).min(4, {
+    message: "Subject must be at least 4 characters.",
+  }),
+  message: z
+    .string({ message: "descripton is required" })
+    .min(10, { message: "description must be at least 10 characters." }),
+});
