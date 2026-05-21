@@ -37,13 +37,18 @@ export default function WorkerAuthImage() {
         />
         <div className="bg-black/15 absolute z-20 size-full " />
         <div className="z-20 p-6 flex flex-col justify-between absolute h-full w-full">
-          <div className="flex justify-start items-center w-full  gap-2">
-            <div className="bg-primary-green size-8 flex items-center justify-center rounded-full">
-              <PiPottedPlantBold className="text-white text-xl" />
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-xl btn-primary flex items-center justify-center text-white text-lg">
+              🌿
             </div>
-            <p className="text-sm font-medium text-white">
-              Smart Farm Management System
-            </p>
+            <div>
+              <div className="font-bold text-white leading-tight text-sm">
+                SmartFarm
+              </div>
+              <div className="text-xs text-gray-200 leading-tight">
+                Management System
+              </div>
+            </div>
           </div>
           <div className="space-y-4">
             <p className=" bg-[#a66a21] text-white w-fit text-xs px-3 rounded-full p-1">

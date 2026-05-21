@@ -26,8 +26,8 @@ export default function page() {
 
       <div className="flex flex-1 overflow-scroll no-scroll  lg:max-h-[91vh] lg:pt-52 relative items-center justify-center  flex-col">
         <div className="flex items-center justify-center flex-col gap-2">
-          <div className="bg-primary-green/10 size-16 flex items-center justify-center rounded-full">
-            <PiPottedPlantBold className="text-primary-green text-3xl" />
+          <div className="bg-primary-green/10 size-16 text-2xl flex items-center justify-center rounded-full">
+            🌿
           </div>
           <div className="text-center space-y-1">
             <h3 className="font-semibold text-xl lg:text-3xl text-dark/90">

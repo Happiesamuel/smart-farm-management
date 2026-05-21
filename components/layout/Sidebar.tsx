@@ -139,24 +139,29 @@ export function ManagerSidebar() {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="aspect-video hidden lg:block rounded-full  relative size-12">
-              <Image
-                src={Logo}
-                className="rounded-full p-1 object-cover"
-                fill
-                alt="logo"
-              />
+            <div className="size-9 text-3xl rounded-xl btn-primary flex items-center justify-center text-white ">
+              🌿
             </div>
-
-            <h6
-              className={`transition-opacity text-primary-green text-sm font-semibold duration-200 ${
-                collaspe
-                  ? "opacity-0 w-0 overflow-hidden"
-                  : "opacity-100 w-auto delay-300"
-              }`}
-            >
-              S. F. M. S
-            </h6>
+            <div>
+              <div
+                className={`font-bold text-gray-900 leading-tight text-sm ${
+                  collaspe
+                    ? "opacity-0 w-0 overflow-hidden"
+                    : "opacity-100 w-auto delay-300"
+                } `}
+              >
+                SmartFarm
+              </div>
+              <div
+                className={` ${
+                  collaspe
+                    ? "opacity-0 w-0 overflow-hidden"
+                    : "opacity-100 w-auto delay-300"
+                } text-xs text-gray-500 leading-tight`}
+              >
+                Management System
+              </div>
+            </div>
           </div>
         </div>
 
@@ -388,24 +393,29 @@ export function WorkerSidebar() {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="aspect-video hidden lg:block rounded-full  relative size-12">
-              <Image
-                src={Logo}
-                className="rounded-full p-1 object-cover"
-                fill
-                alt="logo"
-              />
+            <div className="size-9 text-3xl rounded-xl btn-primary flex items-center justify-center text-white ">
+              🌿
             </div>
-
-            <h6
-              className={`transition-opacity text-primary-green text-sm font-semibold duration-200 ${
-                collaspe
-                  ? "opacity-0 w-0 overflow-hidden"
-                  : "opacity-100 w-auto delay-300"
-              }`}
-            >
-              S. F. M. S
-            </h6>
+            <div>
+              <div
+                className={`font-bold text-gray-900 leading-tight text-sm ${
+                  collaspe
+                    ? "opacity-0 w-0 overflow-hidden"
+                    : "opacity-100 w-auto delay-300"
+                } `}
+              >
+                SmartFarm
+              </div>
+              <div
+                className={` ${
+                  collaspe
+                    ? "opacity-0 w-0 overflow-hidden"
+                    : "opacity-100 w-auto delay-300"
+                } text-xs text-gray-500 leading-tight`}
+              >
+                Management System
+              </div>
+            </div>
           </div>
         </div>
 
