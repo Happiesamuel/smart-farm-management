@@ -67,7 +67,11 @@ function FooterColumn({ title, links }: FooterColumnProps) {
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-white ">
+    <footer
+      data-aos="fade-up"
+      data-aos-delay="100"
+      className="w-full bg-white "
+    >
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="grid grid-cols-2 md:grid-cols-[1fr_0.5fr_0.5fr_0.5fr_0.5fr] gap-8">
           {/* Brand */}

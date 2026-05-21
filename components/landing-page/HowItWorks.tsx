@@ -49,7 +49,12 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="howitworks" className="w-full py-2 px-4 bg-white pt-16">
+    <section
+      data-aos="fade-up"
+      data-aos-delay="100"
+      id="howitworks"
+      className="w-full py-2 px-4 bg-white pt-16"
+    >
       <div className="max-w-6xl mx-auto bg-[#fbfbfb] py-4 border border-border/80 rounded-xl">
         <div className="text-center mb-4">
           <p className="text-primary-green text-[13px] pb-2 font-semibold">
@@ -75,7 +80,11 @@ export default function HowItWorks() {
 
 function StepCard({ step, isLast }: { step: Step; isLast: boolean }) {
   return (
-    <div className="flex items-start gap-4">
+    <div
+      data-aos="fade-up"
+      data-aos-delay="100"
+      className="flex items-start gap-4"
+    >
       <div className="flex flex-col gap-3 bg-white w-[200px] rounded-2xl border border-gray-100 shadow-sm p-5 flex-1 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
         <div
           className={`text-2xl px-3 text-primary-green bg-[#f2f8f3] justify-center rounded-xl flex items-center p-2 `}

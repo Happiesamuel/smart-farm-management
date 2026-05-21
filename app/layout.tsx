@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import NavbarProvider from "@/context/NavbarContext";
-
+import "aos/dist/aos.css";
+import AOSProvider from "@/context/AOSProvider";
 const geistSans = Geist({
   subsets: ["latin"],
   display: "swap",
@@ -50,7 +51,9 @@ export default function RootLayout({
       className={`${geistSans.className} ${inter.variable} ${outfit.className} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <NavbarProvider>{children}</NavbarProvider>
+        <NavbarProvider>
+          <AOSProvider>{children}</AOSProvider>
+        </NavbarProvider>
       </body>
     </html>
   );

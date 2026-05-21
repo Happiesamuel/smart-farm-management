@@ -93,7 +93,12 @@ const modules = [
 
 export default function Features() {
   return (
-    <section id="features" className="w-full py-16 px-4 bg-white">
+    <section
+      id="features"
+      data-aos="fade-up"
+      data-aos-delay="100"
+      className="w-full py-16 px-4 bg-white"
+    >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-6">
           <p className="text-primary-green pb-2 text-[13px] font-semibold">
@@ -107,6 +112,8 @@ export default function Features() {
           {modules.map((mod) => (
             <div
               key={mod.id}
+              data-aos="fade-up"
+              data-aos-delay="100"
               className="group flex w-full gap-3 p-3 bg-white rounded-2xl border border-border/80  hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
             >
               <div

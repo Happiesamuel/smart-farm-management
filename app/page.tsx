@@ -26,7 +26,12 @@ export default function Page() {
           <TestimonialsSection />
         </div>
       </section>
-      <section id="faq" className="w-full pt-16 px-4 bg-white">
+      <section
+        data-aos="fade-up"
+        data-aos-delay="500"
+        id="faq"
+        className="w-full pt-16 px-4 bg-white"
+      >
         <div className="max-w-6xl mx-auto">
           <div className="bg-[#fbfbfb] rounded-lg border border-border shadow-sm p-5 md:p-8 grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-12 items-start">
             <FaqSection />

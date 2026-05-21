@@ -45,7 +45,7 @@ export default function HeroSection() {
     >
       <div className="absolute inset-0 bg-gradient-to-r from-white/30 via-white/10 to-white/80" />
 
-      <div className="relative z-10">
+      <div data-aos="fade-up" data-aos-delay="100" className="relative z-10">
         <div className=" grid grid-cols-1 lg:grid-cols-[0.75fr_1fr] xl:grid-cols-[0.6fr_1fr] gap-5 lg:gap-10 ">
           <div className="space-y-3.5 pl-4 lg:pl-20">
             <div className="gap-3 flex items-center lg:items-start justify-center flex-col pr-4">

@@ -14,6 +14,8 @@ export default function AboutSecction() {
   return (
     <section
       id="about"
+      data-aos="fade-up"
+      data-aos-delay="100"
       className="max-w-6xl mx-auto py-10 grid grid-cols-1 lg:grid-cols-2 px-4 lg:px-20 pt-20 bg-white"
     >
       <div className="space-y-3">

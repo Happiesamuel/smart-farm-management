@@ -31,7 +31,11 @@ const benefits = [
 
 export default function WhyChooseSection() {
   return (
-    <div className="flex flex-col gap-8">
+    <div
+      data-aos="fade-up"
+      data-aos-delay="500"
+      className="flex flex-col gap-8"
+    >
       {/* Label */}
       <div>
         <p className="text-primary-green text-[13px] pb-2 font-semibold">
@@ -51,6 +55,8 @@ export default function WhyChooseSection() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:flex flex-wrap ">
         {benefits.map((benefit) => (
           <div
+            data-aos="fade-up"
+            data-aos-delay="500"
             className="flex flex-col items-center text-center gap-2 w-24"
             key={benefit.id}
           >

@@ -30,7 +30,11 @@ const testimonials = [
 ];
 export default function TestimonialsSection() {
   return (
-    <section className="flex flex-col gap-2">
+    <section
+      data-aos="fade-up"
+      data-aos-delay="100"
+      className="flex flex-col gap-2"
+    >
       <div>
         <p className="text-primary-green text-[13px] pb-2 font-semibold">
           Testimonials
@@ -43,6 +47,8 @@ export default function TestimonialsSection() {
       <div className="grid grid-cols-1  sm:grid-cols-3 gap-4">
         {testimonials.map((t) => (
           <div
+            data-aos="fade-up"
+            data-aos-delay="100"
             className="flex flex-col gap-2 group  hover:bg-primary-green bg-white rounded-lg border border-border/80  p-5 shadow hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
             key={t.id}
           >

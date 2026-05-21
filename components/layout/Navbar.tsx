@@ -22,7 +22,11 @@ const NAV_LINKS = [
 export default function Navbar() {
   const { activeSection } = useNav();
   return (
-    <nav className="fixed max-w-480 mx-auto top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm  ">
+    <nav
+      data-aos="fade-down"
+      data-aos-delay="100"
+      className="fixed max-w-480 mx-auto top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm  "
+    >
       <div className=" mx-auto px-2 sm:px-4 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-2">

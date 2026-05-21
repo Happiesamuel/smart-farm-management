@@ -5,7 +5,11 @@ import { Button } from "../ui/button";
 
 export default function CTASection() {
   return (
-    <section className="w-full px-4 pb-6 bg-white pt-6">
+    <section
+      data-aos="fade-up"
+      data-aos-delay="100"
+      className="w-full px-4 pb-6 bg-white pt-6"
+    >
       <div className="max-w-6xl mx-auto">
         <div className="bg-[#135534] rounded-2xl px-8 py-5 flex flex-col md:flex-row items-center justify-evenly gap-6">
           <div className="flex flex-col md:flex-row items-center gap-4">
