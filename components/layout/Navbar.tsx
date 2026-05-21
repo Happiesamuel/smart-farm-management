@@ -58,7 +58,9 @@ export default function Navbar() {
               Login
             </Button>
             <Button className="bg-primary-green w-[48%] text-xs px-6 h-9 sm:w-fit cursor-pointer text-white rounded-sm">
-              Get Started
+              <Link href={"/onboard"} className="w-full">
+                Get Started
+              </Link>
             </Button>
           </div>
 

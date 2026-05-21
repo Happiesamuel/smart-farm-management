@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { MdOutlineArrowRightAlt } from "react-icons/md";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { Users, Leaf, Map, CheckCircle, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 const arr = ["Easy to Use", "Secure & Reliable", "All-in-One Solution"];
 const stats = [
   {
@@ -75,8 +76,13 @@ export default function HeroSection() {
             <div>
               <div className="flex lg:justify-start justify-center items-center gap-2">
                 <Button className="bg-primary-green w-[48%] h-9 sm:w-fit cursor-pointer text-white rounded-sm">
-                  <p>Get Started Free</p>
-                  <MdOutlineArrowRightAlt />
+                  <Link
+                    href={"/onboard"}
+                    className="flex items-center w-full gap-2"
+                  >
+                    <p>Get Started Free</p>
+                    <MdOutlineArrowRightAlt />
+                  </Link>
                 </Button>
               </div>
             </div>
