@@ -1,3 +1,7 @@
+import { createAdminClient } from "@/servers/appwrite";
+import { appwriteConfig } from "@/servers/appwrite-client";
+import { ID } from "appwrite";
+
 export const fetchWeather = async () => {
   try {
     const res = await fetch(
@@ -10,3 +14,18 @@ export const fetchWeather = async () => {
     console.error("Error fetching weather:", err);
   }
 };
+
+export async function uploadImage(file: File) {
+  try {
+    const { storage } = await createAdminClient();
+    const uploaded = await storage.createFile(
+      appwriteConfig.bucketId,
+      ID.unique(),
+      file,
+    );
+    return uploaded;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}

@@ -33,13 +33,14 @@ export function WorkspaceForm({ id }: { id: string }) {
       create(
         { obj: newObj, slug: values.workspaceId },
         {
-          onSuccess: async () => {
+          onSuccess: async (data) => {
             toast("Workspace created successfully", {
               description: "You can now proceed to creating your first farm",
               duration: 4000,
               closeButton: true,
             });
-            // router.push(`/owner/create-farm`);
+            localStorage.setItem("workspaceId", data.id);
+            router.push(`/owner/create-farm`);
           },
           onError: (err) =>
             toast("Error creating workspace", {

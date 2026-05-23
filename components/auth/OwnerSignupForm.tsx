@@ -5,7 +5,6 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { signupFormSchema } from "@/lib/schemas";
-import Link from "next/link";
 import SignupField from "./SignupField";
 
 import { toast } from "sonner";

@@ -123,6 +123,7 @@ export function CreateFarmInputSelect({
             <FormItem className="flex-1">
               <FormControl>
                 <Input
+                  type="number"
                   className="text-sm h-9 rounded-r-none border-r-0"
                   placeholder={placeholder}
                   {...field}

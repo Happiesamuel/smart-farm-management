@@ -1,14 +1,15 @@
 "use client";
-import { WorkspaceForm } from "@/components/auth/WorkpaceForm";
+import CreateFarmForm from "@/components/auth/CreateFarmForm";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BiArrowBack } from "react-icons/bi";
 
 export default function Page() {
   const id = localStorage.getItem("manager-id") || "";
+  const workspaceId = localStorage.getItem("workspaceId") || "";
   const router = useRouter();
 
-  if (!id) router.push("/owner/sign-up");
+  if (!id || !workspaceId) router.push("/owner/sign-up");
   return (
     <div className="flex flex-col h-full py-4 gap-2">
       <div className="flex items-center justify-between">
@@ -28,22 +29,22 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-scroll no-scroll   lg:max-h-[91vh] lg:pt-20 relative items-center justify-start  flex-col">
+      <div className="flex flex-1 overflow-scroll no-scroll   lg:max-h-[91vh] lg:pt-16 relative items-center justify-start  flex-col">
         <div className="flex items-center justify-center flex-col gap-2">
           <div className="bg-primary-green/10 size-16 text-2xl flex items-center justify-center rounded-full">
             🌿
           </div>
           <div className="text-center space-y-1">
             <h3 className="font-semibold text-xl lg:text-3xl text-dark/90">
-              Create your workspace
+              Create your first farm
             </h3>
             <p className="text-sm lg:text-base text-zinc-500 font-normal">
-              Create your workspace to manage your farms and workers
+              Create and manage your farm
             </p>
           </div>
         </div>
 
-        <WorkspaceForm id={id} />
+        <CreateFarmForm workspaceId={workspaceId} id={id} />
       </div>
     </div>
   );

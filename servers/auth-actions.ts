@@ -61,14 +61,14 @@ export async function createWorkspace(slug: string, obj: WorkspaceObj) {
       throw new Error("Workspace ID already taken");
     }
 
-    await database.createDocument(
+    const data = await database.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.workspaceCollectionId,
       ID.unique(),
       obj,
     );
 
-    return { success: true, message: "workspace created" };
+    return { id: data.$id };
   } catch (err) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");
   }

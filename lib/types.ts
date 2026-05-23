@@ -17,3 +17,18 @@ export interface WorkspaceObj {
   inviteCode: string;
   workspaceId: string;
 }
+
+export interface FarmObj {
+  description: string;
+  farmName: string;
+  farmImage: string | File;
+  address: string;
+  lat: number;
+  lng: number;
+  size: number;
+  unit: string;
+  soilType: string;
+  status: string;
+  users: string;
+  workspaces: string;
+}
