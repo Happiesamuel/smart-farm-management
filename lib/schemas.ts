@@ -7,9 +7,21 @@ export const loginFormSchema = z.object({
   password: z.string({ message: "Please enter your password" }).min(8, {
     message: "Password must be at least 8 characters.",
   }),
-  workspaceId: z.string({ message: "Please enter workspace ID" }).min(2, {
-    message: "Workspace ID must be at least 2 characters.",
+  workspaceId: z.string({ message: "Please enter workspace ID" }).min(4, {
+    message: "Workspace ID must be at least 4 characters.",
   }),
+});
+export const workspaceFormSchema = z.object({
+  name: z
+    .string({ message: "Please enter name" })
+    .min(4, { message: "Workspace name must be at least 4 characters." }),
+  workspaceId: z
+    .string({ message: "Please enter workspace ID" })
+    .min(4, { message: "Workspace ID must be at least 4 characters." })
+    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, {
+      message:
+        "Use lowercase letters and numbers only and separate words with hyphens (e.g. green-valley)",
+    }),
 });
 export const workerLoginFormSchema = z.object({
   email: z

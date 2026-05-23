@@ -12,4 +12,6 @@ export const appwriteConfig = {
   databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
   userCollectionId: process.env.NEXT_PUBLIC_APPWRITE_USERCOLLECTION_ID!,
   otpCollectionId: process.env.NEXT_PUBLIC_APPWRITE_OTPCOLLECTION_ID!,
+  workspaceCollectionId:
+    process.env.NEXT_PUBLIC_APPWRITE_WORKSPACECOLLECTION_ID!,
 };

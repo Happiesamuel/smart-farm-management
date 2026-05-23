@@ -1,15 +1,14 @@
 "use client";
-import OTPForm from "@/components/auth/OTPForm";
+import { WorkspaceForm } from "@/components/auth/WorkpaceForm";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BiArrowBack } from "react-icons/bi";
 
 export default function Page() {
-  const email = localStorage.getItem("manager-email") || "";
   const id = localStorage.getItem("manager-id") || "";
   const router = useRouter();
 
-  if (!email || !id) router.push("/owner/sign-up");
+  if (!id) router.push("/owner/sign-up");
   return (
     <div className="flex flex-col h-full py-4 gap-2">
       <div className="flex items-center justify-between">
@@ -36,16 +35,15 @@ export default function Page() {
           </div>
           <div className="text-center space-y-1">
             <h3 className="font-semibold text-xl lg:text-3xl text-dark/90">
-              Verify your email
+              Create your workspace
             </h3>
             <p className="text-sm lg:text-base text-zinc-500 font-normal">
-              Enter 6-digit code sent to{" "}
-              <span className="text-dark">{email}</span>
+              Creaye your workspace to manage your farms and workers
             </p>
           </div>
         </div>
 
-        <OTPForm email={email} id={id} />
+        <WorkspaceForm id={id} />
       </div>
     </div>
   );

@@ -10,3 +10,10 @@ export interface User extends UserObj {
   isVerified: boolean;
   userId: string;
 }
+
+export interface WorkspaceObj {
+  name: string;
+  users: string;
+  inviteCode: string;
+  workspaceId: string;
+}

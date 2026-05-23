@@ -14,9 +14,11 @@ import { Button } from "../ui/button";
 import ButtonLoader from "../layout/ButtonLoader";
 import { useResendOtp, useValidateOtp } from "@/hooks/auth/useSignUp";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function OTPForm({ email, id }: { email: string; id: string }) {
-  const { resend, status: resendStat, error: resendErr } = useResendOtp();
+  const { resend, error: resendErr } = useResendOtp();
+  const router = useRouter();
   const {
     validate,
     status: validateStat,
@@ -109,6 +111,7 @@ export default function OTPForm({ email, id }: { email: string; id: string }) {
             duration: 4000,
             closeButton: true,
           });
+          router.push("/owner/create-workspace");
         },
         onError: () => {
           setOtpError(true);

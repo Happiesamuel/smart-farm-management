@@ -2,7 +2,7 @@
 
 import { ID, Query } from "appwrite";
 import { createAdminClient } from "./appwrite";
-import { UserObj } from "@/lib/types";
+import { UserObj, WorkspaceObj } from "@/lib/types";
 import { createUser } from "./user-action";
 import { sendOtp } from "@/lib/otp";
 import { createOtp } from "./email-actions";
@@ -48,6 +48,31 @@ export async function createManagerUser(obj: UserObj) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");
   }
 }
+export async function createWorkspace(slug: string, obj: WorkspaceObj) {
+  try {
+    const { database } = await createAdminClient();
+    const existing = await database.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.workspaceCollectionId,
+      [Query.equal("workspaceId", slug)],
+    );
+
+    if (existing.documents.length > 0) {
+      throw new Error("Workspace ID already taken");
+    }
+
+    await database.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.workspaceCollectionId,
+      ID.unique(),
+      obj,
+    );
+
+    return { success: true, message: "workspace created" };
+  } catch (err) {
+    throw new Error(err instanceof Error ? err.message : "Unknown error");
+  }
+}
 
 export async function validateOTP(userId: string, otp: string) {
   const { database } = await createAdminClient();
@@ -60,7 +85,6 @@ export async function validateOTP(userId: string, otp: string) {
       Query.equal("isUsed", false),
     ],
   );
-  console.log(result.documents.length, "sfsfsfsfs");
   if (result.documents.length === 0) {
     throw new Error("OTP may be invalid or expired");
   }
@@ -101,16 +125,3 @@ export const recreateOtp = async (email: string, userId: string) => {
     );
   }
 };
-
-// export const signup = async (data: SignupProps) => {
-//   const { email, password, firstName, lastName } = data;
-//   try {
-
-//     const otp = await plunk(guest.email);
-
-//     return guest;
-//   } catch (error: any) {
-//     console.error("Signup Error:", error);
-//     throw error.message || "Sign up failed";
-//   }
-// };

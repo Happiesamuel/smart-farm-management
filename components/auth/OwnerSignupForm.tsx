@@ -17,7 +17,6 @@ import { LuPhone } from "react-icons/lu";
 import { Checkbox } from "../ui/checkbox";
 import { useCreateManager } from "@/hooks/auth/useSignUp";
 import ButtonLoader from "../layout/ButtonLoader";
-import { sendOtp } from "@/lib/otp";
 
 export function OwnerSignupForm() {
   const { create: createManager, status } = useCreateManager();
