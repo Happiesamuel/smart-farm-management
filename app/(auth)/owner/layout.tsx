@@ -4,6 +4,7 @@ import "../../globals.css";
 
 import { Geist, Inter, Outfit } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -40,11 +41,8 @@ export default function RootLayout({
         <NextTopLoader color="#66bb6a" height={4} showSpinner={false} />
         <div className="grid grid-cols-1 lg:grid-cols-[0.7fr_1fr]">
           <AuthImage />
-          <div className="mx-auto max-w-[90%] w-full">
-            {/* <AuthHeader /> */}
-            {children}
-          </div>
-          {/* <Toaster position="top-center" /> */}
+          <div className="mx-auto max-w-[90%] w-full">{children}</div>
+          <Toaster position="top-center" />
         </div>
       </body>
     </html>

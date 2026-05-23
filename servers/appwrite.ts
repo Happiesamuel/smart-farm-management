@@ -1,12 +1,7 @@
-// src/lib/server/appwrite.js
 "use server";
-import { Client, Account, Databases, Users, Storage } from "node-appwrite";
+import { Client, Account, Databases, Storage, Avatars } from "appwrite";
 import { cookies } from "next/headers";
-
-export const appwriteConfig = {
-  endpoint: process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!,
-  projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!,
-};
+import { appwriteConfig } from "./appwrite-client";
 
 export async function createSessionClient() {
   const client = new Client()
@@ -35,15 +30,16 @@ export async function createAdminClient() {
   // .setKey(process.env.APPWRITE_API_KEY!);
 
   return {
+    get avatar() {
+      return new Avatars(client);
+    },
     get account() {
       return new Account(client);
     },
     get database() {
       return new Databases(client);
     },
-    get users() {
-      return new Users(client);
-    },
+
     get storage() {
       return new Storage(client);
     },

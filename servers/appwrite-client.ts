@@ -6,3 +6,10 @@
 //   .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT!);
 
 // export const account = new Account(client);
+export const appwriteConfig = {
+  endpoint: process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!,
+  projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!,
+  databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
+  userCollectionId: process.env.NEXT_PUBLIC_APPWRITE_USERCOLLECTION_ID!,
+  otpCollectionId: process.env.NEXT_PUBLIC_APPWRITE_OTPCOLLECTION_ID!,
+};
