@@ -1,5 +1,6 @@
+"use client";
 import Link from "next/link";
-import React from "react";
+import { useParams } from "next/navigation";
 import { PiFarm } from "react-icons/pi";
 
 export default function FarmList() {
@@ -57,13 +58,14 @@ export default function FarmList() {
     Active: "bg-green-100 text-green-700",
     Inactive: "bg-red-100 text-red-700",
   };
+  const { workspaceId } = useParams();
 
   return (
     <div className="grid grid-cols-1 place-items-center sm:grid-cols-2 lg:grid-cols-3 mx-auto w-full sm:w-[90%] lg:w-full xl:w-[90%] gap-4 mt-6">
       {farms.map((box) => {
         return (
           <Link
-            href={`/user/settings/farm-information/${box.id}`}
+            href={`/user/${workspaceId}/settings/farm-information/${box.id}`}
             key={box.name}
             className="w-full p-4 cursor-pointer h-[100px] max-w-sm gap-4 bg-white items-start justify-cente relative rounded-md border border-border/80 hover:shadow-sm transition flex shrink-0"
           >

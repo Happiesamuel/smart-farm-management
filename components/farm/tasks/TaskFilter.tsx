@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -8,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import React, { useState } from "react";
 import { GoPlus } from "react-icons/go";
 import { IoSearch } from "react-icons/io5";
@@ -16,7 +18,7 @@ export default function TaskFilter() {
   const [assig, setAssig] = useState("all");
   const [stat, setStat] = useState("all");
   const [priority, setPriority] = useState("all");
-
+  const { workspaceId } = useParams();
   const assignes = [
     { id: 4, name: "All Assigniees", value: "all" },
     { id: 1, name: "John Farmer", value: "john-farmer" },
@@ -98,7 +100,7 @@ export default function TaskFilter() {
       </div>
       <Button className="bg-primary-green w-full sm:w-fit cursor-pointer text-white">
         <Link
-          href={"/user/farms/1/create-task"}
+          href={`/user/${workspaceId}/farms/1/create-task`}
           className="flex items-center gap-1"
         >
           <GoPlus />

@@ -1,10 +1,12 @@
+"use client";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { FaRegBell, FaRegUser } from "react-icons/fa6";
 import { LuUsers } from "react-icons/lu";
 import { MdCurrencyPound, MdSecurity } from "react-icons/md";
 import { PiRanking } from "react-icons/pi";
 
-export default function page() {
+export default function Page() {
   const boxes = [
     {
       name: "Profile",
@@ -12,7 +14,7 @@ export default function page() {
       icon: FaRegUser,
       iconColor: "bg-[#e8f5ec] text-[#2d8952] ",
       bg: "bg-[#f8fdf9]",
-      route: "/user/settings/profile",
+      slug: "profile",
     },
     {
       name: "Farm Information",
@@ -20,7 +22,7 @@ export default function page() {
       icon: PiRanking,
       iconColor: "bg-[#e8f5ec] text-[#2d8952] ",
       bg: "bg-[#f8fdf9]",
-      route: "/user/settings/farm-information",
+      slug: "farm-information",
     },
     {
       name: "Users & Roles",
@@ -28,7 +30,7 @@ export default function page() {
       icon: LuUsers,
       iconColor: "bg-[#f1ecfd] text-[#5837e8] ",
       bg: "bg-[#f9f7fd]",
-      route: "/user/settings/user-and-roles",
+      slug: "user-and-roles",
     },
     {
       name: "Notifications",
@@ -36,7 +38,7 @@ export default function page() {
       icon: FaRegBell,
       iconColor: "bg-[#fff1dd] text-[#de852c] ",
       bg: "bg-[#fefaf2]",
-      route: "/user/settings/notifications",
+      slug: "notifications",
     },
     {
       name: "Units & Currency",
@@ -44,7 +46,7 @@ export default function page() {
       icon: MdCurrencyPound,
       iconColor: "bg-[#e1eefd] text-[#1058d6] ",
       bg: "bg-[#f7fafe]",
-      route: "/user/settings#",
+      slug: "#",
     },
 
     {
@@ -53,10 +55,10 @@ export default function page() {
       icon: MdSecurity,
       iconColor: "bg-[#fee7e7] text-[#e82a2d] ",
       bg: "bg-[#fef5f5]",
-      route: "/user/settings#",
+      slug: "#",
     },
   ];
-
+  const { workspaceId } = useParams();
   return (
     <div className="pt-18 px-2 sm:px-4 pb-8">
       <div className="pb-5 flex gap-3 sm:flex-row flex-col md:items-center justify-between">
@@ -73,9 +75,10 @@ export default function page() {
       <div className="grid grid-cols-1 place-items-center sm:grid-cols-2 lg:grid-cols-3 mx-auto w-full sm:w-[90%] lg:w-full xl:w-[90%] gap-4 mt-6">
         {boxes.map((box) => {
           const Icon = box.icon;
+          const href = `/user/${workspaceId}/settings/${box.slug}`;
           return (
             <Link
-              href={box.route}
+              href={href}
               key={box.name}
               className="w-full p-4 cursor-pointer h-[125px] max-w-sm gap-4 bg-white items-start justify-center relative rounded-md border border-border/80 hover:shadow-sm transition flex shrink-0"
             >

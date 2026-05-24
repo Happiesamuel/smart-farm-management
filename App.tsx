@@ -1,5 +1,5 @@
 "use client";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import Header from "./components/layout/Header";
 import { useCollaspe } from "./context/SidebarCollasibleContext";
 import { ManagerSidebar, WorkerSidebar } from "./components/layout/Sidebar";

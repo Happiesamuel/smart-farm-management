@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -8,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import React, { useState } from "react";
 import { GoPlus } from "react-icons/go";
 import { IoSearch } from "react-icons/io5";
@@ -15,6 +17,7 @@ import { IoSearch } from "react-icons/io5";
 export default function FarmCropsFilter() {
   const [field, setField] = useState("all");
   const [stat, setStat] = useState("all");
+  const { workspaceId } = useParams();
 
   const fields = [
     { id: 1, name: "All Fields", value: "all" },
@@ -75,7 +78,7 @@ export default function FarmCropsFilter() {
 
       <Button className="bg-primary-green w-full sm:w-fit cursor-pointer text-white">
         <Link
-          href={"/user/farms/1/add-crop"}
+          href={`/user/${workspaceId}/farms/1/add-crop`}
           className="flex items-center gap-1"
         >
           <GoPlus />

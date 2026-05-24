@@ -20,69 +20,88 @@ export default function Header() {
   const links = [
     {
       name: "Dashboard",
-      route: "/user/dashboard",
+      base: "user",
+      slug: "dashboard",
       svg: <TbLayoutDashboard className="text-lg text-dark" />,
     },
     {
       name: "Farms",
-      route: "/user/farms",
+      base: "user",
+      slug: "farms",
       svg: <PiFarm className="text-lg text-dark" />,
     },
     {
       name: "Crops",
-      route: "/user/crops",
+      base: "user",
+      slug: "crops",
       svg: <PiPottedPlant className="text-lg text-dark" />,
     },
     {
       name: "Harvests",
-      route: "/user/harvests",
+      base: "user",
+      slug: "harvests",
       svg: <GiFarmTractor className="text-lg text-dark" />,
     },
     {
       name: "Sales",
-      route: "/user/sales",
+      base: "user",
+      slug: "sales",
       svg: <GiMoneyStack className="text-lg text-dark" />,
     },
     {
       name: "Expenses",
-      route: "/user/expenses",
+      base: "user",
+      slug: "expenses",
       svg: <FaRegMoneyBill1 className="text-lg text-dark" />,
     },
     {
       name: "Reports",
-      route: "/user/reports",
+      base: "user",
+      slug: "reports",
       svg: <RiFileList3Line className="text-lg text-dark" />,
     },
     {
       name: "Settings",
-      route: "/user/settings",
+      base: "user",
+      slug: "settings",
       svg: <IoSettingsOutline className="text-lg text-dark" />,
     },
 
     {
       name: "Dashboard",
-      route: "/worker/dashboard",
+      base: "worker",
+      slug: "dashboard",
       svg: <TbLayoutDashboard className="text-lg text-dark" />,
     },
     {
       name: "My Tasks",
-      route: "/worker/tasks",
+      base: "worker",
+      slug: "tasks",
       svg: <GoTasklist className="text-lg text-dark" />,
     },
     {
       name: "Activity Log",
-      route: "/worker/activity",
+      base: "worker",
+      slug: "activity",
       svg: <FiActivity className="text-lg text-dark" />,
     },
     {
       name: "Settings",
-      route: "/worker/settings",
+      base: "worker",
+      slug: "settings",
       svg: <IoSettingsOutline className="text-lg text-dark" />,
     },
   ];
   const route = usePathname();
-  const newRou = route.split("/").slice(0, 3).join("/");
-  const active = links.find((x) => x.route === newRou);
+  const segments = route.split("/");
+
+  const base = segments[1];
+  const workspaceId = segments[2];
+  const slug = segments[3];
+
+  const newRou = `/${base}/${workspaceId}/${slug}`;
+
+  const active = links.find((x) => x.base === base && x.slug === slug);
   const { collaspe } = useCollaspe();
   return (
     <div
@@ -97,10 +116,16 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-5">
-        <Link href="/user/notifications" className="relative hidden lg:block">
+        <Link
+          href={`/user/${workspaceId}/settings`}
+          className="relative hidden lg:block"
+        >
           <IoSettingsOutline className="text-lg text-dark" />
         </Link>
-        <Link href="/user/notifications" className="relative hidden lg:block">
+        <Link
+          href={`/user/${workspaceId}/notifications`}
+          className="relative hidden lg:block"
+        >
           <IoMdNotificationsOutline className="text-2xl text-dark" />
           <div className="size-1.5 bg-light-green rounded-full absolute bottom-[70%] left-[50%]" />
         </Link>

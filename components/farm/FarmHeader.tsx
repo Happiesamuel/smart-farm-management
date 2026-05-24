@@ -1,8 +1,11 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { GoPlus } from "react-icons/go";
 
 export default function FarmHeader() {
+  const { workspaceId } = useParams();
   return (
     <div className="flex gap-2 sm:flex-row flex-col sm:items-center justify-between">
       <div className="space-y-2">
@@ -12,7 +15,10 @@ export default function FarmHeader() {
         </p>
       </div>
       <Button className="bg-primary-green cursor-pointer text-white">
-        <Link href={"/user/farms/create"} className="flex items-center gap-1">
+        <Link
+          href={`/user/${workspaceId}/farms/create`}
+          className="flex items-center gap-1"
+        >
           <GoPlus />
           <p>Add Farm</p>
         </Link>

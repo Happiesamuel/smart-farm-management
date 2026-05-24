@@ -1,23 +1,26 @@
+"use client";
 import { Button } from "../ui/button";
 import { GoPlus } from "react-icons/go";
 import { IoLocationOutline } from "react-icons/io5";
 import Link from "next/link";
 
 import { MdArrowForwardIos } from "react-icons/md";
+import { useParams } from "next/navigation";
 export default function FarmIdHeader() {
+  const { workspaceId } = useParams();
   return (
     <div className="space-y-4">
       <div className=" flex items-center gap-3 text-sm text-zinc-500 font-normal">
         <Link
           className="duration-500 transition-all cursor-pointer hover:text-green-500"
-          href={"/user/farms"}
+          href={`/user/${workspaceId}/farms`}
         >
           Farms
         </Link>
         <MdArrowForwardIos />
         <Link
           className="duration-500 transition-all cursor-pointer hover:text-green-500"
-          href={"/user/farms/1"}
+          href={`/user/${workspaceId}/farms/1`}
         >
           Green Valley Farm
         </Link>
@@ -52,7 +55,7 @@ export default function FarmIdHeader() {
           </Button>
           <Button className="bg-primary-green w-[48%] sm:w-fit cursor-pointer text-white">
             <Link
-              href={"/user/farms/1/create-field"}
+              href={`/user/${workspaceId}/farms/1/create-field`}
               className="flex items-center gap-1"
             >
               <GoPlus />

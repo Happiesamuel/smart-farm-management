@@ -1,3 +1,4 @@
+"use client";
 import Farm4 from "@/public/farm-4.jpg";
 import Farm5 from "@/public/farm-5.jpg";
 import Farm6 from "@/public/farm-6.jpg";
@@ -7,6 +8,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { Dispatch, SetStateAction } from "react";
+import { useParams } from "next/navigation";
 const farms = [
   {
     id: 1,
@@ -44,6 +46,7 @@ export default function FarmFieldList({
 }: {
   setOpenId: Dispatch<SetStateAction<number | null>>;
 }) {
+  const { workspaceId } = useParams();
   return (
     <div className="py-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
@@ -112,7 +115,10 @@ export default function FarmFieldList({
               <div className="flex items-center gap-2 py-2.5">
                 <div className="flex gap-2 items-center flex-1">
                   <Button className="bg-transparent w-[48%] font-medium  border border-primary-green cursor-pointer rounded-md text-primary-green">
-                    <Link href={`/user/farms/1/fieldId`} className="w-full">
+                    <Link
+                      href={`/user/${workspaceId}/farms/1/fieldId`}
+                      className="w-full"
+                    >
                       {" "}
                       View Details
                     </Link>

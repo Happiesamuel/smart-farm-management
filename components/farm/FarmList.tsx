@@ -1,4 +1,4 @@
-import React from "react";
+"use client";
 import Farm1 from "@/public/farm-1.jpg";
 import Farm2 from "@/public/farm-2.jpg";
 import Farm3 from "@/public/farm-3.png";
@@ -11,6 +11,7 @@ import { GiMoneyStack } from "react-icons/gi";
 import { MdArrowForwardIos } from "react-icons/md";
 import Paginate from "../layout/Pagination";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 const farms = [
   {
     id: 1,
@@ -74,6 +75,7 @@ const farms = [
   },
 ];
 export default function FarmList() {
+  const { workspaceId } = useParams();
   return (
     <div className="py-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
@@ -136,7 +138,7 @@ export default function FarmList() {
               </div>
             </div>
             <Link
-              href={`/user/farms/1`}
+              href={`/user/${workspaceId}/farms/1`}
               className="flex items-center cursor-pointer px-3 justify-between border-t border-border py-4"
             >
               <p className="text-sm text-dark font-medium">View Details</p>

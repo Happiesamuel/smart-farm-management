@@ -1,6 +1,6 @@
 import NextTopLoader from "nextjs-toploader";
 import React from "react";
-import "../globals.css";
+import "../../../globals.css";
 import App from "@/App";
 import SidebarCollasibleProvider from "@/context/SidebarCollasibleContext";
 import { TooltipProvider } from "@/components/ui/tooltip";

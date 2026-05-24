@@ -1,31 +1,34 @@
+"use client";
 import Link from "next/link";
 import { IoLocationOutline } from "react-icons/io5";
 import { MdArrowForwardIos } from "react-icons/md";
 import { Button } from "../ui/button";
 import { GoPlus } from "react-icons/go";
 import { LuMountain } from "react-icons/lu";
+import { useParams } from "next/navigation";
 
 export default function FieldHeader() {
+  const { workspaceId } = useParams();
   return (
     <div className="space-y-4">
       <div className=" flex items-center gap-3 text-sm text-zinc-500 font-normal">
         <Link
           className="duration-500 transition-all cursor-pointer hover:text-green-500"
-          href={"/user/farms"}
+          href={`/user/${workspaceId}/farms`}
         >
           Farms
         </Link>
         <MdArrowForwardIos />
         <Link
           className="duration-500 transition-all cursor-pointer hover:text-green-500"
-          href={"/user/farms/1"}
+          href={`/user/${workspaceId}/farms/1`}
         >
           Green Valley Farm
         </Link>
         <MdArrowForwardIos />
         <Link
           className="duration-500 transition-all cursor-pointer hover:text-green-500"
-          href={"/user/farms/1/fieldA"}
+          href={`/user/${workspaceId}/farms/1/fieldA`}
         >
           Field A
         </Link>
@@ -72,7 +75,7 @@ export default function FieldHeader() {
           </Button>
           <Button className="bg-primary-green w-[48%] sm:w-fit cursor-pointer text-white">
             <Link
-              href={`/user/farms/1/fieldId/create-activity`}
+              href={`/user/${workspaceId}/farms/1/fieldId/create-activity`}
               className="flex items-center gap-1"
             >
               <GoPlus />
