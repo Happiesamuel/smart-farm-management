@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { BiArrowBack } from "react-icons/bi";
 
 export default function Page() {
-  const id = localStorage.getItem("manager-id") || "";
+  const id =
+    typeof window !== "undefined"
+      ? localStorage.getItem("manager-id") || ""
+      : "";
   const router = useRouter();
 
   if (!id) router.push("/owner/sign-up");

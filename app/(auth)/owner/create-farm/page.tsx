@@ -5,8 +5,14 @@ import { useRouter } from "next/navigation";
 import { BiArrowBack } from "react-icons/bi";
 
 export default function Page() {
-  const id = localStorage.getItem("manager-id") || "";
-  const workspaceId = localStorage.getItem("workspaceId") || "";
+  const id =
+    typeof window !== "undefined"
+      ? localStorage.getItem("manager-id") || ""
+      : "";
+  const workspaceId =
+    typeof window !== "undefined"
+      ? localStorage.getItem("workspaceId") || ""
+      : "";
   const router = useRouter();
 
   if (!id || !workspaceId) router.push("/owner/sign-up");

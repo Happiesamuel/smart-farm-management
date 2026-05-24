@@ -10,6 +10,23 @@ import { appwriteConfig } from "./appwrite-client";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!;
 
+// export const login = async (email: string, password: string) => {
+//   try {
+//     await account.createEmailPasswordSession(email, password);
+//     return await getCurrentUser();
+//   } catch (error) {
+//     throw new Error(error as string);
+//   }
+// };
+// export async function getCurrentUser() {
+//   try {
+//     const user = await account.get();
+//     return user;
+//   } catch (err: any) {
+//     throw err;
+//   }
+// }
+
 export async function createManagerUser(obj: UserObj) {
   try {
     const { account, avatar } = await createAdminClient();
