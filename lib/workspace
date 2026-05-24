@@ -1,0 +1,102 @@
+// 🧠 STEP 1: Store ACTIVE WORKSPACE
+
+// After login, store:
+
+// localStorage.setItem("activeWorkspace", "green-valley");
+
+// OR better:
+
+// sessionStorage.setItem("activeWorkspace", "green-valley");
+// 🔥 STEP 2: NEVER TRUST THE URL
+
+// 👉 The URL is just UI
+// 👉 Your DB is the source of truth
+
+// 🛡️ STEP 3: VERIFY USER BELONGS TO WORKSPACE
+// Query workspaceMembers
+// const membership = await databases.listDocuments(
+//   DATABASE_ID,
+//   "workspaceMembers",
+//   [
+//     Query.equal("userId", userId),
+//     Query.equal("workspaceId", workspaceIdFromRoute),
+//   ]
+// );
+// Check:
+// if (membership.total === 0) {
+//   // 🚫 User is trying to access чуж workspace
+//   redirect("/unauthorized");
+// }
+// 🚀 STEP 4: NEXT.JS MIDDLEWARE (BEST PRACTICE)
+
+// Create:
+
+// // middleware.ts
+// import { NextResponse } from "next/server";
+
+// export function middleware(req) {
+//   const url = req.nextUrl;
+//   const workspaceFromRoute = url.pathname.split("/")[2];
+
+//   const activeWorkspace = req.cookies.get("activeWorkspace");
+
+//   // Block manual switching
+//   if (activeWorkspace && activeWorkspace !== workspaceFromRoute) {
+//     return NextResponse.redirect(
+//       new URL(`/user/${activeWorkspace}/dashboard`, req.url)
+//     );
+//   }
+
+//   return NextResponse.next();
+// }
+// 🔥 EVEN BETTER (SECURE VERSION)
+
+// 👉 Don’t rely only on cookies/localStorage
+
+// Always:
+
+// ✔ Validate workspace membership from DB
+// ✔ Then allow access
+
+// 💡 BEST FLOW (REAL WORLD)
+// On login:
+// Get all user workspaces
+// Set one as active
+// Store it (cookie/session)
+// On route access:
+// Get workspace from URL
+// Check DB → does user belong?
+// If NO → block
+// If YES → allow
+// ❌ WHAT NOT TO DO
+
+// ❌ Trust URL blindly
+// ❌ Only use localStorage
+// ❌ Skip backend validation
+
+// 👉 That leads to security issues
+
+// 💯 FINAL ARCHITECTURE
+// Route → Extract workspace slug
+//       → Validate in DB (workspaceMembers)
+//       → Allow or block
+// 🔥 DEFENSE ANSWER
+
+// If asked:
+
+// “How do you prevent unauthorized workspace access?”
+
+// Say:
+
+// “The system validates workspace access by checking user membership against the database. Even if a user manipulates the URL, access is restricted unless they belong to that workspace.”
+
+// 💥 That’s a top-tier answer
+
+// 🚀 BONUS (SUPER CLEAN UX)
+
+// Instead of blocking:
+
+// 👉 Show workspace switcher:
+
+// You don’t have access to this workspace.
+// Switch to: [Green Valley]

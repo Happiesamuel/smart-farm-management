@@ -22,14 +22,22 @@ import ButtonLoader from "../layout/ButtonLoader";
 import { useCreateFarm } from "@/hooks/farms/useCreateFarm";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useLogin } from "@/hooks/auth/useLogin";
 export default function CreateFarmForm({
   id,
   workspaceId,
+  email,
+  password,
+  activeWorkspace,
 }: {
   id: string;
   workspaceId: string;
+  email: string;
+  password: string;
+  activeWorkspace: string;
 }) {
   const { create, status, error } = useCreateFarm();
+  const { loginUser, status: loginStat } = useLogin();
   const form = useForm<z.infer<typeof createFarmSchema>>({
     resolver: zodResolver(createFarmSchema),
   });
@@ -49,12 +57,19 @@ export default function CreateFarmForm({
     try {
       create(newObj, {
         onSuccess: async () => {
-          toast("Farm created successfully", {
-            description: "You can now manage your farm",
-            duration: 4000,
-            closeButton: true,
-          });
-          // router.push(`/owner/create-farm`);
+          loginUser(
+            { email: email, password: password },
+            {
+              onSuccess: () => {
+                toast("Farm created successfully", {
+                  description: "You can now manage your farm",
+                  duration: 4000,
+                  closeButton: true,
+                });
+                router.push(`/user/${activeWorkspace}/dashboard`);
+              },
+            },
+          );
         },
         onError: (err) =>
           toast("Error creating farm", {
@@ -182,7 +197,7 @@ export default function CreateFarmForm({
           disabled={status === "pending"}
           className="disabled:opacity-70 text-white transition-all duration-200 bg-primary-green h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2"
         >
-          {status === "pending" ? (
+          {status === "pending" || loginStat == "pending" ? (
             <>
               <ButtonLoader />
               Creating...

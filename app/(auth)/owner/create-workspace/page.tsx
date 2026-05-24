@@ -9,9 +9,13 @@ export default function Page() {
     typeof window !== "undefined"
       ? localStorage.getItem("manager-id") || ""
       : "";
+  const password =
+    typeof window !== "undefined"
+      ? localStorage.getItem("manager-password") || ""
+      : "";
   const router = useRouter();
 
-  if (!id) router.push("/owner/sign-up");
+  if (!id || !password) router.push("/owner/sign-up");
   return (
     <div className="flex flex-col h-full py-4 gap-2">
       <div className="flex items-center justify-between">

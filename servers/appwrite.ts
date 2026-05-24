@@ -4,25 +4,23 @@ import { cookies } from "next/headers";
 import { appwriteConfig } from "./appwrite-client";
 
 export async function createSessionClient() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("appwrite-session");
+
   const client = new Client()
     .setEndpoint(appwriteConfig.endpoint)
     .setProject(appwriteConfig.projectId);
 
-  const cookieStore = await cookies();
-  const session = cookieStore.get("appwrite-session");
-  if (!session || !session.value) {
-    throw new Error("No session");
+  if (!session?.value) {
+    throw new Error("No session found");
   }
 
   client.setSession(session.value);
 
   return {
-    get account() {
-      return new Account(client);
-    },
+    account: new Account(client),
   };
 }
-
 export async function createAdminClient() {
   const client = new Client()
     .setEndpoint(appwriteConfig.endpoint)

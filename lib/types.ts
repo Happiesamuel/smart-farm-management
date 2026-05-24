@@ -17,6 +17,12 @@ export interface WorkspaceObj {
   inviteCode: string;
   workspaceId: string;
 }
+export interface WorkspaceMemberObj {
+  users: string;
+  workspaces: string;
+  joinedAt: string;
+  role: "worker" | "owner" | "manager";
+}
 
 export interface FarmObj {
   description: string;

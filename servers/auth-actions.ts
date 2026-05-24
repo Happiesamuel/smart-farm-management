@@ -1,31 +1,45 @@
 "use server";
 
 import { ID, Query } from "appwrite";
-import { createAdminClient } from "./appwrite";
-import { UserObj, WorkspaceObj } from "@/lib/types";
+import { createAdminClient, createSessionClient } from "./appwrite";
+import { UserObj, WorkspaceMemberObj, WorkspaceObj } from "@/lib/types";
 import { createUser } from "./user-action";
 import { sendOtp } from "@/lib/otp";
 import { createOtp } from "./email-actions";
 import { appwriteConfig } from "./appwrite-client";
+import { cookies } from "next/headers";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!;
+export const login = async (email: string, password: string) => {
+  const { account } = await createAdminClient();
 
-// export const login = async (email: string, password: string) => {
-//   try {
-//     await account.createEmailPasswordSession(email, password);
-//     return await getCurrentUser();
-//   } catch (error) {
-//     throw new Error(error as string);
-//   }
-// };
-// export async function getCurrentUser() {
-//   try {
-//     const user = await account.get();
-//     return user;
-//   } catch (err: any) {
-//     throw err;
-//   }
-// }
+  const session = await account.createEmailPasswordSession(email, password);
+
+  const cookieStore = await cookies();
+
+  cookieStore.set("appwrite-session", session.secret, {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: true,
+    path: "/",
+  });
+
+  return {
+    id: session.$id,
+    userId: session.userId,
+  };
+};
+export async function getCurrentUser() {
+  try {
+    const { account } = await createSessionClient();
+    const user = await account.get();
+    return {
+      id: user.$id,
+      email: user.email,
+    };
+  } catch (err) {
+    throw new Error(err instanceof Error ? err.message : "Unknown error");
+  }
+}
 
 export async function createManagerUser(obj: UserObj) {
   try {
@@ -81,6 +95,21 @@ export async function createWorkspace(slug: string, obj: WorkspaceObj) {
     const data = await database.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.workspaceCollectionId,
+      ID.unique(),
+      obj,
+    );
+
+    return { id: data.$id };
+  } catch (err) {
+    throw new Error(err instanceof Error ? err.message : "Unknown error");
+  }
+}
+export async function createWorkspaceMember(obj: WorkspaceMemberObj) {
+  try {
+    const { database } = await createAdminClient();
+    const data = await database.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.workspaceMembersCollectionId,
       ID.unique(),
       obj,
     );

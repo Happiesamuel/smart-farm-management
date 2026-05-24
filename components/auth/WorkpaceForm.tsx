@@ -12,11 +12,19 @@ import { BsPersonWorkspace } from "react-icons/bs";
 import WorkspaceField from "./WorkspaceField";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { toast } from "sonner";
-import { useCreateWorkspace } from "@/hooks/auth/useSignUp";
 import ButtonLoader from "../layout/ButtonLoader";
+import {
+  useCreateWorkspace,
+  useCreateWorkspaceMember,
+} from "@/hooks/workspace/useWorkspace";
 
 export function WorkspaceForm({ id }: { id: string }) {
   const { create, status, error } = useCreateWorkspace();
+  const {
+    create: createMember,
+    status: memStat,
+    error: memErr,
+  } = useCreateWorkspaceMember();
   const router = useRouter();
   const form = useForm<z.infer<typeof workspaceFormSchema>>({
     resolver: zodResolver(workspaceFormSchema),
@@ -34,17 +42,24 @@ export function WorkspaceForm({ id }: { id: string }) {
         { obj: newObj, slug: values.workspaceId },
         {
           onSuccess: async (data) => {
+            createMember({
+              users: id,
+              workspaces: data.id,
+              role: "owner",
+              joinedAt: new Date().toISOString(),
+            });
             toast("Workspace created successfully", {
               description: "You can now proceed to creating your first farm",
               duration: 4000,
               closeButton: true,
             });
             localStorage.setItem("workspaceId", data.id);
+            sessionStorage.setItem("activeWorkspace", values.workspaceId);
             router.push(`/owner/create-farm`);
           },
           onError: (err) =>
             toast("Error creating workspace", {
-              description: error?.message || err.message,
+              description: error?.message || err.message || memErr?.message,
               duration: 4000,
               closeButton: true,
             }),
@@ -87,7 +102,7 @@ export function WorkspaceForm({ id }: { id: string }) {
           disabled={status === "pending"}
           className="disabled:opacity-70 text-white transition-all duration-200 bg-primary-green h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2"
         >
-          {status === "pending" ? (
+          {status === "pending" || memStat === "pending" ? (
             <>
               <ButtonLoader />
               Creating...

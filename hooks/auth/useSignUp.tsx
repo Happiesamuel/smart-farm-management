@@ -1,9 +1,8 @@
 "use client";
 
-import { UserObj, WorkspaceObj } from "@/lib/types";
+import { UserObj } from "@/lib/types";
 import {
   createManagerUser,
-  createWorkspace,
   recreateOtp,
   validateOTP,
 } from "@/servers/auth-actions";
@@ -16,18 +15,7 @@ export function useCreateManager() {
 
   return { create, status };
 }
-export function useCreateWorkspace() {
-  const {
-    mutate: create,
-    status,
-    error,
-  } = useMutation({
-    mutationFn: async ({ obj, slug }: { obj: WorkspaceObj; slug: string }) =>
-      await createWorkspace(slug, obj),
-  });
 
-  return { create, status, error };
-}
 export function useResendOtp() {
   const {
     mutate: resend,

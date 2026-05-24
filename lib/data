@@ -1,0 +1,106 @@
+📦 1. users (Profile table)
+
+⚠️ No roles here anymore
+
+users {
+  $id
+  userId (string)        // Appwrite Auth ID
+  name (string)
+  email (string)
+  avatar (string, optional)
+  createdAt (datetime)
+}
+🏢 2. workspaces (Top-level system)
+workspaces {
+  $id
+  name (string)
+  ownerId (string)       // userId
+  inviteCode (string)
+  createdAt (datetime)
+}
+👥 3. workspaceMembers ⭐ (MOST IMPORTANT)
+
+👉 This is your core table
+
+workspaceMembers {
+  $id
+  userId (string)
+  workspaceId (string)
+  role (enum: owner, manager, worker)
+  joinedAt (datetime)
+}
+🌾 4. farms
+farms {
+  $id
+  name (string)
+  location (string)
+  workspaceId (string)
+  createdBy (string)
+  createdAt (datetime)
+}
+🌱 5. fields
+fields {
+  $id
+  farmId (string)
+  name (string)
+  size (number)
+  soilType (string)
+  createdAt (datetime)
+}
+🌿 6. crops
+crops {
+  $id
+  fieldId (string)
+  name (string)
+  variety (string)
+  plantingDate (datetime)
+  expectedHarvestDate (datetime)
+  actualHarvestDate (datetime)
+  status (enum: growing, harvested, failed)
+}
+✅ 7. tasks
+tasks {
+  $id
+  farmId (string)
+  title (string)
+  description (string)
+  assignedTo (string)     // userId
+  status (enum: pending, in-progress, completed)
+  priority (enum: low, medium, high)
+  dueDate (datetime)
+  progress (number)
+  createdBy (string)
+  createdAt (datetime)
+}
+💰 8. finance
+finance {
+  $id
+  farmId (string)
+  type (enum: income, expense)
+  category (string)
+  amount (number)
+  date (datetime)
+  note (string)
+  createdBy (string)
+}
+📊 9. activities (logs)
+activities {
+  $id
+  workspaceId (string)
+  farmId (string, optional)
+  userId (string)
+  message (string)
+  type (enum: info, success, warning)
+  createdAt (datetime)
+}
+🚨 10. alerts
+alerts {
+  $id
+  workspaceId (string)
+  farmId (string, optional)
+  userId (string, optional)
+  message (string)
+  type (enum: info, warning, critical)
+  isRead (boolean)
+  createdAt (datetime)
+}

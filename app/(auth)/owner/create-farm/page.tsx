@@ -13,9 +13,21 @@ export default function Page() {
     typeof window !== "undefined"
       ? localStorage.getItem("workspaceId") || ""
       : "";
+  const email =
+    typeof window !== "undefined"
+      ? localStorage.getItem("manager-email") || ""
+      : "";
+  const password =
+    typeof window !== "undefined"
+      ? localStorage.getItem("manager-password") || ""
+      : "";
+  const activeWorkspace =
+    typeof window !== "undefined"
+      ? sessionStorage.getItem("activeWorkspace") || ""
+      : "";
   const router = useRouter();
 
-  if (!id || !workspaceId) router.push("/owner/sign-up");
+  if (!id || !workspaceId || !email || !password) router.push("/owner/sign-up");
   return (
     <div className="flex flex-col h-full py-4 gap-2">
       <div className="flex items-center justify-between">
@@ -50,7 +62,13 @@ export default function Page() {
           </div>
         </div>
 
-        <CreateFarmForm workspaceId={workspaceId} id={id} />
+        <CreateFarmForm
+          workspaceId={workspaceId}
+          id={id}
+          email={email}
+          password={password}
+          activeWorkspace={activeWorkspace}
+        />
       </div>
     </div>
   );

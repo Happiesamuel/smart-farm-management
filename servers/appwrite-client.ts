@@ -15,5 +15,7 @@ export const appwriteConfig = {
   otpCollectionId: process.env.NEXT_PUBLIC_APPWRITE_OTPCOLLECTION_ID!,
   workspaceCollectionId:
     process.env.NEXT_PUBLIC_APPWRITE_WORKSPACECOLLECTION_ID!,
+  workspaceMembersCollectionId:
+    process.env.NEXT_PUBLIC_APPWRITE_WORKSPACEMEMBERSCOLLECTION_ID!,
   farmCollectionId: process.env.NEXT_PUBLIC_APPWRITE_FARMCOLLECTION_ID!,
 };
