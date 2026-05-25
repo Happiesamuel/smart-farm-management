@@ -4,6 +4,7 @@ import "../globals.css";
 import LayoutApp from "@/LayoutApp";
 import NextTopLoader from "nextjs-toploader";
 
+import AuthLayoutImage from "@/components/auth/AuthLayoutImage";
 const geistSans = Geist({
   subsets: ["latin"],
   display: "swap",
@@ -52,7 +53,12 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <NextTopLoader color="#66bb6a" height={4} showSpinner={false} />
-        <LayoutApp>{children}</LayoutApp>
+        <LayoutApp>
+          <div className="grid grid-cols-1 lg:grid-cols-[0.4fr_1fr]">
+            <AuthLayoutImage />
+            {children}
+          </div>
+        </LayoutApp>
       </body>
     </html>
   );

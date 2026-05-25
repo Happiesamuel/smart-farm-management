@@ -39,13 +39,13 @@ export default function Field({
           <div className="flex items-center gap-4 border border-border rounded-md px-4 py-2">
             {Icon && <Icon className="text-xl text-primary-green" />}
             <div className="flex items-center w-full justify-between">
-              <div className="">
+              <div className="w-full">
                 <FormLabel className="text-sm p-0 font-semibold text-dark/90">
                   {label}
                 </FormLabel>
                 <FormControl>
                   <Input
-                    className="text-sm h-4 rounded-none p-0 border-none"
+                    className="text-sm h-4 w-full rounded-none p-0 border-none"
                     type={type}
                     placeholder={placeholder}
                     {...field}

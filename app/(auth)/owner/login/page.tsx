@@ -1,10 +1,9 @@
+"use client";
 import AuthBottom from "@/components/auth/AuthBottom";
 import { OwnerLoginFom } from "@/components/auth/OwnerLoginFom";
 import Link from "next/link";
 import { BiArrowBack } from "react-icons/bi";
-import { PiPottedPlantBold } from "react-icons/pi";
-
-export default function page() {
+export default function Page() {
   return (
     <div className="flex flex-col h-full py-4 gap-2">
       <div className="flex items-center justify-between">

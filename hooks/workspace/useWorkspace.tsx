@@ -1,7 +1,11 @@
 "use client";
 import { WorkspaceMemberObj, WorkspaceObj } from "@/lib/types";
 import { createWorkspace, createWorkspaceMember } from "@/servers/auth-actions";
-import { useMutation } from "@tanstack/react-query";
+import {
+  getWorkspace,
+  getWorkspaceMembersWithWorkspaceId,
+} from "@/servers/workspace-action";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function useCreateWorkspace() {
   const {
@@ -15,6 +19,40 @@ export function useCreateWorkspace() {
 
   return { create, status, error };
 }
+
+export function useGetWorkspace(userId: string) {
+  const {
+    data: workspace,
+    status,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["workspace"],
+    queryFn: async () => await getWorkspace(userId),
+    enabled: !!userId,
+  });
+
+  return { workspace, status, error, refetch };
+}
+export function useGetWorkspaceMembersWithWorkspaceId(
+  workspaceId: string,
+  userId: string,
+) {
+  const {
+    data: workspaceMember,
+    status,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["workspaceMembers"],
+    queryFn: async () =>
+      await getWorkspaceMembersWithWorkspaceId(workspaceId, userId),
+    enabled: !!workspaceId && !!userId,
+  });
+
+  return { workspaceMember, status, error, refetch };
+}
+
 export function useCreateWorkspaceMember() {
   const {
     mutate: create,

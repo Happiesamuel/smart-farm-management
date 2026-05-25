@@ -12,7 +12,7 @@ import DashboardTopPerforming from "@/components/dashboard/DashboardTopPerformin
 export const metadata = {
   title: "Dashboard",
 };
-export default function page() {
+export default async function page() {
   return (
     <div className="pt-18 px-2 sm:px-4 pb-8">
       <div className="pb-5 space-y-1">

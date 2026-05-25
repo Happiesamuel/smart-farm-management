@@ -1,8 +1,6 @@
 "use client";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import AuthImg from "../../public/owner.png";
-import { PiPottedPlantBold } from "react-icons/pi";
 import { AiOutlineTeam } from "react-icons/ai";
 import { CgInsights } from "react-icons/cg";
 import { RiTimer2Line } from "react-icons/ri";
@@ -22,8 +20,6 @@ const managements = [
   },
 ];
 export default function AuthImage() {
-  const pathname = usePathname();
-  const slug = pathname.slice(1);
   return (
     <div className="h-screen items-center  justify-center hidden lg:flex">
       <div className="relative aspect-auto w-full h-full flex items-center justify-center ">

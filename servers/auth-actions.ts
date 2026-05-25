@@ -18,29 +18,32 @@ export const login = async (email: string, password: string) => {
 
   cookieStore.set("appwrite-session", session.secret, {
     httpOnly: true,
-    sameSite: "strict",
     secure: true,
+    sameSite: "lax",
     path: "/",
   });
 
   return {
     id: session.$id,
-    userId: session.userId,
+    secret: session.secret,
   };
 };
-export async function getCurrentUser() {
-  try {
-    const { account } = await createSessionClient();
-    const user = await account.get();
-    return {
-      id: user.$id,
-      email: user.email,
-    };
-  } catch (err) {
-    throw new Error(err instanceof Error ? err.message : "Unknown error");
-  }
-}
 
+export const logout = async () => {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("appwrite-session")?.value;
+
+  if (session) {
+    const { account } = await createSessionClient();
+
+    await account.deleteSession("current");
+  }
+
+  cookieStore.delete("appwrite-session");
+  cookieStore.delete("activeWorkspace");
+
+  return { success: true };
+};
 export async function createManagerUser(obj: UserObj) {
   try {
     const { account, avatar } = await createAdminClient();

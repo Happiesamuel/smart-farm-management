@@ -13,54 +13,43 @@ import { loginFormSchema } from "@/lib/schemas";
 import Field from "./Field";
 import { MdLockOutline, MdOutlineEmail } from "react-icons/md";
 import { Checkbox } from "../ui/checkbox";
-import { BsPersonWorkspace } from "react-icons/bs";
+import { useLogin } from "@/hooks/auth/useLogin";
+import { toast } from "sonner";
+import ButtonLoader from "../layout/ButtonLoader";
 
 export function OwnerLoginFom() {
-  const [load, setLoad] = useState(false);
-  //   const { login, status } = useLogin();
+  const { loginUser, status } = useLogin();
   const router = useRouter();
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
   });
 
   async function onSubmit(values: z.infer<typeof loginFormSchema>) {
-    // try {
-    //   setLoad(true);
-    //   const existingUser = await getGuestViaEmail(values.email);
-    //   setLoad(false);
-    //   if (!existingUser) {
-    //     return toast("Error logging in", {
-    //       description: "User not found",
-    //       duration: 4000,
-    //       closeButton: true,
-    //     });
-    //   } else if (existingUser.password !== values.password) {
-    //     return toast("Error logging in", {
-    //       description: "User Password is incorrect!",
-    //       duration: 4000,
-    //       closeButton: true,
-    //     });
-    //   } else
-    //     login(values, {
-    //       onSuccess: () => {
-    //         toast("Signed in successfully", {
-    //           description: "User is signed in!",
-    //           duration: 4000,
-    //           closeButton: true,
-    //         });
-    //         router.push("/");
-    //       },
-    //       onError: (err) =>
-    //         toast("Error logging in", {
-    //           description: err.message,
-    //           duration: 4000,
-    //           closeButton: true,
-    //         }),
-    //     });
-    // } catch (error) {
-    //   setLoad(false);
-    //   console.log(error);
-    // }
+    try {
+      loginUser(values, {
+        onSuccess: async (user) => {
+          toast("Logged in successfully", {
+            description: "Select a workspace to continue managing your farm.",
+            duration: 4000,
+            closeButton: true,
+          });
+
+          router.push(`/select-workspace`);
+        },
+        onError: (err) =>
+          toast("Error logging in", {
+            description: err.message,
+            duration: 4000,
+            closeButton: true,
+          }),
+      });
+    } catch (error) {
+      toast("Error logging in", {
+        description: (error as Error).message,
+        duration: 4000,
+        closeButton: true,
+      });
+    }
   }
   const [show, setShow] = useState(false);
   function handleClick() {
@@ -90,14 +79,7 @@ export function OwnerLoginFom() {
           control={form.control}
           Icon={MdLockOutline}
         />
-        <Field
-          name="workspaceId"
-          type="text"
-          placeholder="Enter workspace id"
-          label="Workspace ID"
-          control={form.control}
-          Icon={BsPersonWorkspace}
-        />
+
         <div className="flex items-end text-zinc-700 justify-between py-2">
           <div className="flex items-center gap-2">
             <Checkbox className="border-primary-green" />
@@ -115,11 +97,17 @@ export function OwnerLoginFom() {
         </div>
         <Button
           type="submit"
-          className="text-white bg-primary-green h-10 rounded-md w-full cursor-pointer border-none"
+          disabled={status === "pending"}
+          className="disabled:opacity-70 text-white transition-all duration-200 bg-primary-green h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2"
         >
-          {" "}
-          Sign in
-          {/* {status === "pending" || load ? <ButtonLoader /> : "Submit"} */}
+          {status === "pending" ? (
+            <>
+              <ButtonLoader />
+              Signing in...
+            </>
+          ) : (
+            "Sign in"
+          )}
         </Button>
       </form>
     </Form>

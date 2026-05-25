@@ -1,12 +1,7 @@
 "use client";
 import Image from "next/image";
 import Onboard from "../../../public/onboard.png";
-import {
-  FaCanadianMapleLeaf,
-  FaCircleCheck,
-  FaUserGear,
-  FaUserTie,
-} from "react-icons/fa6";
+import { FaCircleCheck, FaUserGear, FaUserTie } from "react-icons/fa6";
 import { MdEngineering, MdOutlineSecurity } from "react-icons/md";
 import { IoIosArrowRoundForward, IoMdCheckmark } from "react-icons/io";
 import { useState } from "react";
@@ -15,7 +10,7 @@ import { LuChartNoAxesCombined } from "react-icons/lu";
 import { GiChestnutLeaf } from "react-icons/gi";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { PiPottedPlantBold } from "react-icons/pi";
+import Cookies from "js-cookie";
 
 export default function Page() {
   const arr = [
@@ -89,6 +84,18 @@ export default function Page() {
   ];
   const [select, setSelect] = useState<string | null>(null);
   const router = useRouter();
+
+  const handleSelectRole = () => {
+    if (!select) return;
+    Cookies.set("role", select, { path: "/" });
+
+    if (select === "owner") {
+      router.push("/owner/login");
+    } else {
+      router.push("/user/login");
+    }
+  };
+
   return (
     <div className="size-full gap-6 grid grid-cols-1 xl:grid-cols-[0.65fr_1fr] bg-white relative  md:h-screen   items-center">
       <div className="relative h-[600px] sm:h-[500px] xl:h-full aspect-auto">
@@ -200,14 +207,12 @@ export default function Page() {
           <div className="w-full items-center mt-8 gap-2.5 flex flex-col">
             <Button
               disabled={!select}
+              onClick={handleSelectRole}
               className="bg-primary-green w-full h-10 cursor-pointer "
             >
-              <Link
-                className="w-full flex justify-center items-center gap-4"
-                href={`/${select}/login`}
-              >
+              <div className="w-full flex justify-center items-center gap-4">
                 Continue <IoIosArrowRoundForward />
-              </Link>
+              </div>
             </Button>
             <p className="text-zinc-500 text-center pb-5 text-sm">
               By continuing you agree to our{" "}

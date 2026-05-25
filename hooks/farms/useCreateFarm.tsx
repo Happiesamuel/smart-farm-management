@@ -1,8 +1,12 @@
 "use client";
 
 import { FarmObj } from "@/lib/types";
-import { createFarm } from "@/servers/farm-actions";
-import { useMutation } from "@tanstack/react-query";
+import {
+  createFarm,
+  getFarm,
+  getFarmInWorkspace,
+} from "@/servers/farm-actions";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function useCreateFarm() {
   const {
@@ -14,4 +18,32 @@ export function useCreateFarm() {
   });
 
   return { create, status, error };
+}
+export function useGetFarm(userId: string) {
+  const {
+    data: farms,
+    status,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["farm"],
+    queryFn: async () => await getFarm(userId),
+    enabled: !!userId,
+  });
+
+  return { farms, status, error, refetch };
+}
+export function useGetFarmInWorkspace(userId: string, workspaceId: string) {
+  const {
+    data: farms,
+    status,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["farm"],
+    queryFn: async () => await getFarmInWorkspace(userId, workspaceId),
+    enabled: !!userId && !!workspaceId,
+  });
+
+  return { farms, status, error, refetch };
 }

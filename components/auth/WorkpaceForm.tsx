@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { nanoid } from "nanoid";
 import { workspaceFormSchema } from "@/lib/schemas";
 import { BsPersonWorkspace } from "react-icons/bs";
@@ -13,22 +13,25 @@ import WorkspaceField from "./WorkspaceField";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { toast } from "sonner";
 import ButtonLoader from "../layout/ButtonLoader";
-import {
-  useCreateWorkspace,
-  useCreateWorkspaceMember,
-} from "@/hooks/workspace/useWorkspace";
+import { useCreateWorkspace } from "@/hooks/workspace/useWorkspace";
+import { createWorkspaceMember } from "@/servers/auth-actions";
 
 export function WorkspaceForm({ id }: { id: string }) {
   const { create, status, error } = useCreateWorkspace();
-  const {
-    create: createMember,
-    status: memStat,
-    error: memErr,
-  } = useCreateWorkspaceMember();
+  const pathname = usePathname();
   const router = useRouter();
   const form = useForm<z.infer<typeof workspaceFormSchema>>({
     resolver: zodResolver(workspaceFormSchema),
   });
+
+  const push =
+    pathname === "/create-workspace" ? "/create-farm" : "/owner/create-farm";
+
+  function callFunc(workspace: string) {
+    if (pathname !== "/create-workspace") {
+      sessionStorage.setItem("activeWorkspace", workspace);
+    } else return;
+  }
 
   async function onSubmit(values: z.infer<typeof workspaceFormSchema>) {
     try {
@@ -42,24 +45,27 @@ export function WorkspaceForm({ id }: { id: string }) {
         { obj: newObj, slug: values.workspaceId },
         {
           onSuccess: async (data) => {
-            createMember({
+            console.log(data);
+            await createWorkspaceMember({
               users: id,
               workspaces: data.id,
               role: "owner",
               joinedAt: new Date().toISOString(),
             });
+
             toast("Workspace created successfully", {
               description: "You can now proceed to creating your first farm",
-              duration: 4000,
-              closeButton: true,
             });
             localStorage.setItem("workspaceId", data.id);
-            sessionStorage.setItem("activeWorkspace", values.workspaceId);
-            router.push(`/owner/create-farm`);
+            callFunc(values.workspaceId);
+
+            setTimeout(() => {
+              router.push(push);
+            }, 100);
           },
           onError: (err) =>
             toast("Error creating workspace", {
-              description: error?.message || err.message || memErr?.message,
+              description: error?.message || err.message,
               duration: 4000,
               closeButton: true,
             }),
@@ -102,7 +108,7 @@ export function WorkspaceForm({ id }: { id: string }) {
           disabled={status === "pending"}
           className="disabled:opacity-70 text-white transition-all duration-200 bg-primary-green h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2"
         >
-          {status === "pending" || memStat === "pending" ? (
+          {status === "pending" ? (
             <>
               <ButtonLoader />
               Creating...

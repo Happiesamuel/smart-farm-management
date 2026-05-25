@@ -7,9 +7,6 @@ export const loginFormSchema = z.object({
   password: z.string({ message: "Please enter your password" }).min(8, {
     message: "Password must be at least 8 characters.",
   }),
-  workspaceId: z.string({ message: "Please enter workspace ID" }).min(4, {
-    message: "Workspace ID must be at least 4 characters.",
-  }),
 });
 export const workspaceFormSchema = z.object({
   name: z

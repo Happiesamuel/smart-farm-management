@@ -13,9 +13,12 @@ export interface User extends UserObj {
 
 export interface WorkspaceObj {
   name: string;
-  users: string;
+  users?: string;
   inviteCode: string;
   workspaceId: string;
+}
+export interface WorkspaceObjId extends WorkspaceObj {
+  id: string;
 }
 export interface WorkspaceMemberObj {
   users: string;

@@ -15,6 +15,7 @@ import { useCollaspe } from "@/context/SidebarCollasibleContext";
 import { GoTasklist } from "react-icons/go";
 import { FiActivity } from "react-icons/fi";
 import { DashboardSheet, WorkerDashboardSheet } from "./DashboardSheet";
+import { useLogout } from "@/hooks/auth/useLogout";
 
 export default function Header() {
   const links = [
@@ -103,6 +104,7 @@ export default function Header() {
 
   const active = links.find((x) => x.base === base && x.slug === slug);
   const { collaspe } = useCollaspe();
+  const { logoutUser } = useLogout();
   return (
     <div
       className={`flex border-b border-border fixed max-w-424 py-3 bg-white px-2 md:px-4  min-w-0 z-100 w-full  ${collaspe ? "lg:w-[calc(100%-4.8rem)]" : "lg:w-[calc(100%-14rem)]"} items-center justify-between`}
@@ -123,7 +125,8 @@ export default function Header() {
           <IoSettingsOutline className="text-lg text-dark" />
         </Link>
         <Link
-          href={`/user/${workspaceId}/notifications`}
+          onClick={() => logoutUser()}
+          href={`#`}
           className="relative hidden lg:block"
         >
           <IoMdNotificationsOutline className="text-2xl text-dark" />

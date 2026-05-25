@@ -7,15 +7,12 @@ export async function createSessionClient() {
   const cookieStore = await cookies();
   const session = cookieStore.get("appwrite-session");
 
+  if (!session) throw new Error("No session found");
+
   const client = new Client()
     .setEndpoint(appwriteConfig.endpoint)
-    .setProject(appwriteConfig.projectId);
-
-  if (!session?.value) {
-    throw new Error("No session found");
-  }
-
-  client.setSession(session.value);
+    .setProject(appwriteConfig.projectId)
+    .setSession(session.value);
 
   return {
     account: new Account(client),
@@ -24,8 +21,8 @@ export async function createSessionClient() {
 export async function createAdminClient() {
   const client = new Client()
     .setEndpoint(appwriteConfig.endpoint)
-    .setProject(appwriteConfig.projectId);
-  // .setKey(process.env.APPWRITE_API_KEY!);
+    .setProject(appwriteConfig.projectId)
+    .setKey(appwriteConfig.appwriteApiKey);
 
   return {
     get avatar() {
