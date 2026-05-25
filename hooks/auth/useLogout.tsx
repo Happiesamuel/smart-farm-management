@@ -8,7 +8,6 @@ export function useLogout() {
   const { mutate: logoutUser, status } = useMutation({
     mutationFn: async () => await logout(),
     onSuccess: () => {
-      sessionStorage.clear();
       router.push("/");
     },
   });
