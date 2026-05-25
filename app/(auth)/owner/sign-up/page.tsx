@@ -2,7 +2,6 @@ import AuthBottom from "@/components/auth/AuthBottom";
 import { OwnerSignupForm } from "@/components/auth/OwnerSignupForm";
 import Link from "next/link";
 import { BiArrowBack } from "react-icons/bi";
-import { PiPottedPlantBold } from "react-icons/pi";
 
 export default function page() {
   return (

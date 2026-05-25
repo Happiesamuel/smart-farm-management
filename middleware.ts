@@ -15,7 +15,13 @@ export function middleware(req: NextRequest) {
   }
 
   // 🚫 Logged in → block onboard & login
-  if (session && (path === "/onboard" || path.includes("/login"))) {
+  if (
+    session &&
+    (path === "/onboard" ||
+      path.includes("/login") ||
+      path.includes("/sign-up") ||
+      path.includes("/owner"))
+  ) {
     if (activeWorkspace) {
       return NextResponse.redirect(
         new URL(`/user/${activeWorkspace}/dashboard`, req.url),
@@ -49,7 +55,9 @@ export const config = {
   matcher: [
     "/onboard",
     "/owner/login",
-    "/user/login",
+    "/worker/login",
+    "/owner/:path*",
+    "/owner/sign-up",
     "/select-workspace",
     "/user/:path*",
   ],

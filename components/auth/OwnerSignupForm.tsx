@@ -23,6 +23,7 @@ export function OwnerSignupForm() {
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
   });
+  const [checked, setChecked] = useState(false);
 
   async function onSubmit(values: z.infer<typeof signupFormSchema>) {
     try {
@@ -124,7 +125,10 @@ export function OwnerSignupForm() {
         <div>
           <div className="flex items-end text-zinc-700 justify-between py-2">
             <div className="flex items-center gap-2">
-              <Checkbox className="border-primary-green" />
+              <Checkbox
+                onCheckedChange={() => setChecked(!checked)}
+                className="border-primary-green"
+              />
               <p className="text-zinc-500 text-center text-xs">
                 I agree to the
                 <span className="text-primary-green font-medium">
@@ -142,7 +146,7 @@ export function OwnerSignupForm() {
 
         <Button
           type="submit"
-          disabled={status === "pending"}
+          disabled={status === "pending" || checked === false}
           className="disabled:opacity-70 text-white transition-all duration-200 bg-primary-green h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2"
         >
           {status === "pending" ? (
