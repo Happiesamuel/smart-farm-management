@@ -9,6 +9,7 @@ import {
 import { useGetFarmInWorkspace } from "@/hooks/farms/useCreateFarm";
 import { WorkspaceObjId } from "@/lib/types";
 import Cookies from "js-cookie";
+import { Skeleton } from "../ui/skeleton";
 export default function WorkspaceList({ userId }: { userId: string }) {
   const [active, setActive] = useState<string | null>(null);
 
@@ -18,10 +19,14 @@ export default function WorkspaceList({ userId }: { userId: string }) {
     setActive(id);
   }
   function handleClick(cli: string) {
-    sessionStorage.setItem("activeWorkspace", cli);
     Cookies.set("activeWorkspace", cli);
   }
-  if (status === "pending") return <div>loading</div>;
+  if (status === "pending")
+    return (
+      <div className="flex items-center h-[300px] justify-center">
+        <div className="size-6 border-2 border-light-green/30 border-t-primary-green rounded-full animate-spin"></div>
+      </div>
+    );
   return (
     <div className="space-y-4 pt-10">
       {workspace!.map((work) => (
@@ -56,7 +61,7 @@ function WorkItem({
   );
   const { farms, status: farmStat } = useGetFarmInWorkspace(userId, work.id);
   if (status === "pending" || farmStat === "pending")
-    return <div>Loading...</div>;
+    return <Skeleton className="h-28 w-full" />;
 
   return (
     <div
