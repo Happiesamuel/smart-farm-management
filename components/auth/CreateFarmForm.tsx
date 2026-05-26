@@ -52,7 +52,8 @@ export default function CreateFarmForm({
         closeButton: true,
       });
       localStorage.clear();
-      return router.push(`/user/${activeWorkspace}/dashboard`);
+      router.push(`/user/${activeWorkspace}/dashboard`);
+      return router.refresh();
     } else {
       toast("Farm created successfully", {
         description: "You can now manage your farm",
@@ -60,7 +61,8 @@ export default function CreateFarmForm({
         closeButton: true,
       });
       localStorage.clear();
-      return router.push(`/select-workspace`);
+      router.push(`/select-workspace`);
+      return router.refresh();
     }
   }
 

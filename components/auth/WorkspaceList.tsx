@@ -10,9 +10,10 @@ import { useGetFarmInWorkspace } from "@/hooks/farms/useCreateFarm";
 import { WorkspaceObjId } from "@/lib/types";
 import Cookies from "js-cookie";
 import { Skeleton } from "../ui/skeleton";
+import { useRouter } from "next/navigation";
 export default function WorkspaceList({ userId }: { userId: string }) {
   const [active, setActive] = useState<string | null>(null);
-
+  const router = useRouter();
   const { workspace, status } = useGetWorkspace(userId);
 
   function handleActive(id: string) {
@@ -20,6 +21,7 @@ export default function WorkspaceList({ userId }: { userId: string }) {
   }
   function handleClick(cli: string) {
     Cookies.set("activeWorkspace", cli);
+    router.refresh();
   }
   if (status === "pending")
     return (

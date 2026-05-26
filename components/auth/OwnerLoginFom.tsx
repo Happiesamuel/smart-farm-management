@@ -35,6 +35,7 @@ export function OwnerLoginFom() {
           });
 
           router.push(`/select-workspace`);
+          router.refresh();
         },
         onError: (err) =>
           toast("Error logging in", {
@@ -89,7 +90,7 @@ export function OwnerLoginFom() {
           </div>
 
           <Link
-            href="/forgot-password"
+            href="/owner/enter-email"
             className="md:text-sm text-xs text-primary-green font-medium cursor-pointer"
           >
             Forgotten Password?

@@ -17,6 +17,9 @@ export interface WorkspaceObj {
   inviteCode: string;
   workspaceId: string;
 }
+export interface UserObjId extends UserObj {
+  id: string;
+}
 export interface WorkspaceObjId extends WorkspaceObj {
   id: string;
 }

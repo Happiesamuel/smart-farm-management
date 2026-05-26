@@ -8,6 +8,11 @@ export const loginFormSchema = z.object({
     message: "Password must be at least 8 characters.",
   }),
 });
+export const emailFormSchema = z.object({
+  email: z
+    .string({ message: "Please enter your email" })
+    .email({ message: "Please enter a valid email address" }),
+});
 export const workspaceFormSchema = z.object({
   name: z
     .string({ message: "Please enter name" })
@@ -88,6 +93,21 @@ export const signupFormSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"], // Set error on confirmPassword field
+  });
+export const resetPasswordFormSchema = z
+  .object({
+    password: z.string({ message: "Please enter your password" }).min(8, {
+      message: "Password must be at least 8 characters.",
+    }),
+    confirmPassword: z
+      .string({ message: "Please enter your password" })
+      .min(8, {
+        message: "Password must be at least 8 characters.",
+      }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Password don't match",
+    path: ["confirmPassword"],
   });
 export const profileFormSchema = z
   .object({

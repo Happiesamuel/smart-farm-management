@@ -1,7 +1,11 @@
 "use client";
 
-import { getCurrentUser, getGuestById } from "@/servers/user-action";
-import { useQuery } from "@tanstack/react-query";
+import {
+  getCurrentUser,
+  getGuestByEmail,
+  getGuestById,
+} from "@/servers/user-action";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export default function useGetSession() {
   const {
@@ -38,4 +42,12 @@ export function useGetUser() {
   });
 
   return { data, userStat, error };
+}
+export function useGetUserByEmail() {
+  const { mutate: getUser, status } = useMutation({
+    mutationFn: async ({ email }: { email: string }) =>
+      await getGuestByEmail(email),
+  });
+
+  return { getUser, status };
 }

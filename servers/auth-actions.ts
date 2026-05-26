@@ -44,6 +44,21 @@ export const logout = async () => {
 
   return { success: true };
 };
+
+export const changePassword = async (
+  oldPassword: string,
+  newPassword: string,
+) => {
+  try {
+    const { account } = await createSessionClient();
+    await account.updatePassword(newPassword, oldPassword);
+    return { success: true };
+  } catch (error) {
+    console.error("Password change error:", error);
+    throw error;
+  }
+};
+
 export async function createManagerUser(obj: UserObj) {
   try {
     const { account, avatar } = await createAdminClient();

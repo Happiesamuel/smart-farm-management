@@ -14,10 +14,11 @@ import { Button } from "../ui/button";
 import ButtonLoader from "../layout/ButtonLoader";
 import { useResendOtp, useValidateOtp } from "@/hooks/auth/useSignUp";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function OTPForm({ email, id }: { email: string; id: string }) {
   const { resend, error: resendErr } = useResendOtp();
+  const pathname = usePathname();
   const router = useRouter();
   const {
     validate,
@@ -107,11 +108,16 @@ export default function OTPForm({ email, id }: { email: string; id: string }) {
       {
         onSuccess: () => {
           toast("OTP verified", {
-            description: "Create your workspace to continue",
+            description:
+              pathname === "/owner/verify-email"
+                ? "Set your new password"
+                : "Create your workspace to continue",
             duration: 4000,
             closeButton: true,
           });
-          router.push("/owner/create-workspace");
+          return pathname === "/owner/verify-email"
+            ? router.push("/owner/change-password")
+            : router.push("/owner/create-workspace");
         },
         onError: () => {
           setOtpError(true);

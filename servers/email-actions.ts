@@ -8,7 +8,7 @@ export async function createOtp(code: string, userId: string) {
   const expirationTime = new Date(Date.now() + 5 * 60 * 1000);
   const { database } = await createAdminClient();
 
-  const response = await database.createDocument(
+  await database.createDocument(
     appwriteConfig.databaseId,
     appwriteConfig.otpCollectionId,
     ID.unique(),
@@ -23,6 +23,5 @@ export async function createOtp(code: string, userId: string) {
     message: "OTP sent",
     otp: code,
     success: true,
-    document: response,
   };
 }
