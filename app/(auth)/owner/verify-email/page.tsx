@@ -14,7 +14,7 @@ export default function Page() {
 
   const router = useRouter();
 
-  if (!user.id) router.push("/owner/login");
+  if (!user) router.push("/owner/login");
   return (
     <div className="flex flex-col h-full py-4 gap-2">
       <div className="flex items-center justify-between">
