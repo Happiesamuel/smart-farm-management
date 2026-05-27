@@ -1,14 +1,31 @@
 "use server";
 
-import { ID, Query } from "appwrite";
+import { ID, OAuthProvider, Query } from "appwrite";
 import { createAdminClient, createSessionClient } from "./appwrite";
-import { UserObj, WorkspaceMemberObj, WorkspaceObj } from "@/lib/types";
+import {
+  UserObj,
+  UserObjId,
+  WorkspaceMemberObj,
+  WorkspaceObj,
+} from "@/lib/types";
 import { createUser } from "./user-action";
 import { sendOtp } from "@/lib/otp";
 import { createOtp } from "./email-actions";
 import { appwriteConfig } from "./appwrite-client";
 import { cookies } from "next/headers";
 
+export const loginWithGoogle = async () => {
+  const { account } = await createAdminClient();
+
+  // ✅ createOAuth2Token works server-side and gives you userId + secret on callback
+  const redirectUrl = await account.createOAuth2Token(
+    OAuthProvider.Google,
+    `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+    `${process.env.NEXT_PUBLIC_APP_URL}/owner/login`,
+  );
+
+  return { url: redirectUrl };
+};
 export const login = async (email: string, password: string) => {
   const { account } = await createAdminClient();
 
@@ -16,7 +33,7 @@ export const login = async (email: string, password: string) => {
 
   const cookieStore = await cookies();
 
-  cookieStore.set("appwrite-session", session.secret, {
+  cookieStore.set("a_session", session.secret, {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
@@ -31,20 +48,26 @@ export const login = async (email: string, password: string) => {
 
 export const logout = async () => {
   const cookieStore = await cookies();
-  const session = cookieStore.get("appwrite-session")?.value;
 
-  if (session) {
+  try {
     const { account } = await createSessionClient();
-
     await account.deleteSession("current");
+  } catch (err) {
+    console.log(err);
+    throw new Error(err instanceof Error ? err.message : "Unknown error");
   }
 
-  cookieStore.delete("appwrite-session");
+  cookieStore
+    .getAll()
+    .filter((c) => c.name.startsWith("a_session"))
+    .forEach((c) => cookieStore.delete(c.name));
+
+  cookieStore.delete("session");
   cookieStore.delete("activeWorkspace");
+  cookieStore.delete("role");
 
   return { success: true };
 };
-
 export const changePassword = async (
   oldPassword: string,
   newPassword: string,
@@ -83,15 +106,15 @@ export async function createManagerUser(obj: UserObj) {
       isVerified: false,
     };
 
-    const guest = await createUser(userObj);
+    const guest = (await createUser(userObj)) as UserObjId;
 
     const otp = await sendOtp(guest.email);
-    await createOtp(otp, guest.$id);
+    await createOtp(otp, guest.id);
 
     return {
-      id: guest.$id,
+      id: guest.id,
       email: guest.email,
-      name: guest.name,
+      name: guest.fullName,
     };
   } catch (err) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");

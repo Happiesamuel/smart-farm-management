@@ -1,7 +1,13 @@
+"use client";
 import Image from "next/image";
 import { Button } from "../ui/button";
+import { loginWithGoogle } from "@/servers/auth-actions";
 
 function AuthBottom() {
+  const handleGoogleLogin = async () => {
+    const { url } = await loginWithGoogle();
+    window.location.href = url as string;
+  };
   return (
     <div className="w-full relative flex items-center flex-col gap-4 mt-3">
       <div className="relative w-full flex items-center justify-center">
@@ -15,7 +21,9 @@ function AuthBottom() {
         </p>
       </div>
       <Button
-        className={`flex gap-2 items-center py-5! bg-transparent  text-dark/90 border border-border w-[98%] lg:w-[80%] font-medium`}
+        type="reset"
+        onClick={handleGoogleLogin}
+        className={`flex gap-2 cursor-pointer items-center py-5! bg-transparent  text-dark/90 border border-border w-[98%] lg:w-[80%] font-medium`}
       >
         <Image
           width={20}

@@ -14,7 +14,16 @@ export const createUser = async (obj: User) => {
       ID.unique(),
       obj,
     );
-    return document;
+    return {
+      userId: document.$id,
+      email: document.email,
+      fullName: document.name,
+      avatar: document.avatarUrl,
+      isVerified: true,
+      phone: document.phone,
+      password: document.password,
+      id: document.$id,
+    };
   } catch (err) {
     throw new Error(
       err instanceof Error ? err.message : "Failed to create user",
@@ -51,7 +60,8 @@ export async function getCurrentUser() {
       name: session.name,
     };
   } catch (err) {
-    throw new Error(err instanceof Error ? err.message : "Unknown error");
+    console.log(err);
+    return null; // ✅ don't throw, return null
   }
 }
 
@@ -64,7 +74,7 @@ export async function getGuestById(userId: string | undefined) {
       [Query.equal("userId", userId!)],
     );
     if (result.documents.length === 0) {
-      throw new Error("User not found");
+      return null;
     }
     const doc = result.documents[0];
     return {

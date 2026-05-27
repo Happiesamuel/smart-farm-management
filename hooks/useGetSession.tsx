@@ -15,14 +15,8 @@ export default function useGetSession() {
     refetch,
   } = useQuery({
     queryKey: ["user"],
-    queryFn: async () => {
-      try {
-        return await getCurrentUser();
-      } catch (error) {
-        throw error;
-      }
-    },
-    enabled: true,
+    queryFn: async () => await getCurrentUser(),
+    retry: false,
   });
 
   return { user, status, error, refetch };
@@ -30,19 +24,21 @@ export default function useGetSession() {
 
 export function useGetUser() {
   const { user, status } = useGetSession();
+
   const {
     data,
     status: userStat,
     error,
   } = useQuery({
-    queryKey: ["guest"],
-    queryFn: async () => await getGuestById(user?.id),
+    queryKey: ["guest", user?.id],
+    queryFn: async () => await getGuestById(user!.id),
     staleTime: 1000 * 60 * 10,
-    enabled: status !== "pending",
+    enabled: status === "success" && !!user?.id,
   });
 
   return { data, userStat, error };
 }
+
 export function useGetUserByEmail() {
   const { mutate: getUser, status } = useMutation({
     mutationFn: async ({ email }: { email: string }) =>

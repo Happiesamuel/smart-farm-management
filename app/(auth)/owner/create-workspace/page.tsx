@@ -3,19 +3,17 @@ import { WorkspaceForm } from "@/components/auth/WorkpaceForm";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BiArrowBack } from "react-icons/bi";
-
+// import Cookies from "js-cookie";
 export default function Page() {
   const id =
     typeof window !== "undefined"
       ? localStorage.getItem("manager-id") || ""
       : "";
-  const password =
-    typeof window !== "undefined"
-      ? localStorage.getItem("manager-password") || ""
-      : "";
+  // const a = Cookies.get("guestId");
+  // console.log(a);
   const router = useRouter();
 
-  if (!id || !password) router.push("/owner/sign-up");
+  // if (!id) router.push("/owner/sign-up");
   return (
     <div className="flex flex-col h-full py-4 gap-2">
       <div className="flex items-center justify-between">
