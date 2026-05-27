@@ -38,9 +38,9 @@ export async function getFarmInWorkspace(
     );
 
     if (result.documents.length === 0) {
-      throw new Error("No workspace found");
+      return null;
     }
-
+    console.log(result.documents);
     return result.documents.map((doc) => {
       return {
         id: doc.$id,
@@ -72,7 +72,7 @@ export async function getFarm(userId: string | undefined) {
     );
 
     if (result.documents.length === 0) {
-      throw new Error("No workspace found");
+      return null;
     }
 
     return result.documents.map((doc) => {

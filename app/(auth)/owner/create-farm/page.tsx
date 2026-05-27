@@ -3,12 +3,12 @@ import CreateFarmForm from "@/components/auth/CreateFarmForm";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BiArrowBack } from "react-icons/bi";
-
+import Cookies from "js-cookie";
 export default function Page() {
+  const guestId = Cookies.get("guestId");
   const id =
-    typeof window !== "undefined"
-      ? localStorage.getItem("manager-id") || ""
-      : "";
+    guestId ||
+    (typeof window !== "undefined" ? localStorage.getItem("manager-id") : null);
   const workspaceId =
     typeof window !== "undefined"
       ? localStorage.getItem("workspaceId") || ""
@@ -27,7 +27,11 @@ export default function Page() {
       : "";
   const router = useRouter();
 
-  if (!id || !workspaceId || !email || !password) router.push("/owner/sign-up");
+  if (!guestId) {
+    if (!id || !workspaceId || !email || !password)
+      router.push("/owner/sign-up");
+  }
+
   return (
     <div className="flex flex-col h-full py-4 gap-2">
       <div className="flex items-center justify-between">
@@ -64,7 +68,8 @@ export default function Page() {
 
         <CreateFarmForm
           workspaceId={workspaceId}
-          id={id}
+          id={id!}
+          guestId={guestId || null}
           email={email}
           password={password}
           activeWorkspace={activeWorkspace}

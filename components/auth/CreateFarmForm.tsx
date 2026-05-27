@@ -8,7 +8,7 @@ import { Form } from "@/components/ui/form";
 
 import { createFarmSchema } from "@/lib/schemas";
 import { PiPlant } from "react-icons/pi";
-
+import Cookies from "js-cookie";
 import { FiUser } from "react-icons/fi";
 import { MdOutlineSignalWifiStatusbar4Bar } from "react-icons/md";
 import CreateFarmInput, {
@@ -29,8 +29,10 @@ export default function CreateFarmForm({
   email,
   password,
   activeWorkspace,
+  guestId,
 }: {
   id: string;
+  guestId: string | null;
   workspaceId: string;
   email?: string;
   password?: string;
@@ -45,13 +47,14 @@ export default function CreateFarmForm({
 
   async function callFunc() {
     if (pathname !== "/create-farm") {
-      await login(email!, password!);
+      if (!guestId) await login(email!, password!);
       toast("Farm created successfully", {
         description: "You can now manage your farm",
         duration: 4000,
         closeButton: true,
       });
       localStorage.clear();
+      if (guestId) Cookies.remove("guestId");
       router.push(`/user/${activeWorkspace}/dashboard`);
       return router.refresh();
     } else {

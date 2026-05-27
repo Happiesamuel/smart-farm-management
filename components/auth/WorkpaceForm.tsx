@@ -45,7 +45,6 @@ export function WorkspaceForm({ id }: { id: string }) {
         { obj: newObj, slug: values.workspaceId },
         {
           onSuccess: async (data) => {
-            console.log(data);
             await createWorkspaceMember({
               users: id,
               workspaces: data.id,

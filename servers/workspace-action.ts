@@ -14,7 +14,7 @@ export async function getWorkspace(userId: string | undefined) {
     );
 
     if (result.documents.length === 0) {
-      throw new Error("No workspace found");
+      return null;
     }
 
     return result.documents.map((doc) => {
@@ -42,7 +42,7 @@ export async function getWorkspaceMembersWithWorkspaceId(
     );
 
     if (result.documents.length === 0) {
-      throw new Error("No workspace found");
+      return null;
     }
 
     return result.documents.map((doc) => {

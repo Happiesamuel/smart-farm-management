@@ -64,7 +64,7 @@ function WorkItem({
   const { farms, status: farmStat } = useGetFarmInWorkspace(userId, work.id);
   if (status === "pending" || farmStat === "pending")
     return <Skeleton className="h-28 w-full" />;
-
+  console.log(farms, work.id);
   return (
     <div
       key={work.id}

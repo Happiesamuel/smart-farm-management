@@ -54,19 +54,19 @@ export async function GET(req: Request) {
         avatar: avatarUrl,
         isVerified: true,
         phone: "",
-        password: "",
-      });
-      cookieStore.set("guestId", guest.id, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "lax",
-        path: "/",
+        password: "hs_password",
       });
     }
 
     const workspace = await getWorkspace(guest.id);
 
-    if (workspace.length === 0) {
+    if (!workspace || workspace.length === 0) {
+      cookieStore.set("guestId", guest.id, {
+        httpOnly: false,
+        secure: true,
+        sameSite: "lax",
+        path: "/",
+      });
       return NextResponse.redirect(new URL("/owner/create-workspace", req.url));
     }
 
