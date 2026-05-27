@@ -32,7 +32,7 @@ export default function CreateFarmForm({
   guestId,
 }: {
   id: string;
-  guestId: string | null;
+  guestId?: string | null;
   workspaceId: string;
   email?: string;
   password?: string;

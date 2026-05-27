@@ -30,7 +30,7 @@ export default function Page() {
         </div>
       </div>
       <div className=" mx-auto max-w-[96%] md:max-w-[70%] w-full">
-        <CreateFarmForm workspaceId={workspaceId} id={id} />
+        <CreateFarmForm guestId={null} workspaceId={workspaceId} id={id} />
       </div>
     </div>
   );
