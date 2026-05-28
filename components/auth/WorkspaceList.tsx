@@ -11,6 +11,7 @@ import { WorkspaceObjId } from "@/lib/types";
 import Cookies from "js-cookie";
 import { Skeleton } from "../ui/skeleton";
 import { useRouter } from "next/navigation";
+import { GoPlus } from "react-icons/go";
 export default function WorkspaceList({ userId }: { userId: string }) {
   const [active, setActive] = useState<string | null>(null);
   const router = useRouter();
@@ -25,10 +26,32 @@ export default function WorkspaceList({ userId }: { userId: string }) {
   }
   if (status === "pending")
     return (
-      <div className="flex items-center h-[300px] justify-center">
+      <div className="flex items-center h-[400px] justify-center">
         <div className="size-6 border-2 border-light-green/30 border-t-primary-green rounded-full animate-spin"></div>
       </div>
     );
+  if (!workspace?.length)
+    return (
+      <div className="flex items-center flex-col h-[300px] gap-2 justify-center">
+        <p className="text-zinc-500 text-sm font-medium">
+          You don&apos;t have any workspace
+        </p>
+        <Button
+          onClick={() => localStorage.setItem("manager-id", userId)}
+          className="bg-primary-green text-white h-10 px-6  cursor-pointer"
+        >
+          <Link
+            onClick={() => localStorage.setItem("manager-id", userId)}
+            href={`/create-workspace`}
+            className="flex items-center gap-1"
+          >
+            <GoPlus />
+            <p>Create New Workspace</p>
+          </Link>
+        </Button>
+      </div>
+    );
+
   return (
     <div className="space-y-4 pt-10">
       {workspace!.map((work) => (
@@ -64,7 +87,23 @@ function WorkItem({
   const { farms, status: farmStat } = useGetFarmInWorkspace(userId, work.id);
   if (status === "pending" || farmStat === "pending")
     return <Skeleton className="h-28 w-full" />;
-  console.log(farms, work.id);
+  const slice = 3;
+  const farmSplit = farms
+    ?.map((f) => f.farmName)
+    .slice(0, slice)
+    .join(", ");
+  const lengthMore =
+    farms?.length && farms?.length > slice
+      ? `and ${farms?.length - slice} more...`
+      : "";
+  function addHandleClick(id: string) {
+    if (!farms?.length) {
+      localStorage.setItem("workspaceId", work.id);
+      localStorage.setItem("manager-id", userId);
+      // handleClick(id);
+    } else handleClick(id);
+  }
+
   return (
     <div
       key={work.id}
@@ -88,18 +127,22 @@ function WorkItem({
               <p>{workspaceMember?.length} Members</p>
             </div>
             <p className="text-zinc-500 text-sm font-normal">
-              {farms?.map((f) => f.farmName).join(", ")}
+              {farmSplit} {lengthMore}
             </p>
           </div>
         </div>
         <Button
           disabled={active !== work.workspaceId}
-          onClick={() => handleClick(work.workspaceId)}
+          onClick={() => addHandleClick(work.workspaceId)}
           className={`h-10 text-sm px-5 w-full sm:w-fit ${active === work.workspaceId ? "bg-primary-green text-white" : "bg-transparent border border-dark/15 text-dark!"}  `}
         >
           <Link
-            onClick={() => handleClick(work.workspaceId)}
-            href={`/user/${work.workspaceId}/dashboard`}
+            onClick={() => addHandleClick(work.workspaceId)}
+            href={
+              farms?.length
+                ? `/user/${work.workspaceId}/dashboard`
+                : "/create-farm"
+            }
             className="w-full"
           >
             Enter Workspace

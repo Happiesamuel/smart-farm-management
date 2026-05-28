@@ -89,7 +89,6 @@ export async function createManagerUser(obj: UserObj) {
       name: obj.fullName,
       width: 200,
       height: 200,
-      background: "2e7d32",
     });
 
     const user = await account.create(

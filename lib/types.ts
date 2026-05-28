@@ -33,7 +33,7 @@ export interface WorkspaceMemberObj {
 export interface FarmObj {
   description: string;
   farmName: string;
-  farmImage: string | File;
+  farmImage?: string | File;
   address: string;
   lat: number;
   lng: number;

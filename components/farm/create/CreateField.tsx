@@ -488,7 +488,9 @@ export function CreateFarmUpload({
       name="farmImage"
       render={({ field }) => (
         <FormItem className="w-full">
-          <FormLabel className="text-sm text-dark">Farm Image</FormLabel>
+          <FormLabel className="text-sm text-dark">
+            Farm Image (optional)
+          </FormLabel>
 
           <FormControl>
             <div

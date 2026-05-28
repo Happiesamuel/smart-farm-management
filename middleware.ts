@@ -35,21 +35,21 @@ export function middleware(req: NextRequest) {
   }
 
   // 🚨 3. Logged in → block auth pages
-  // const isAuthPage =
-  //   path === "/owner/login" ||
-  //   path === "/owner/sign-up" ||
-  //   path.startsWith("/login") ||
-  //   path === "/onboard";
+  const isAuthPage =
+    path === "/owner/login" ||
+    path === "/owner/sign-up" ||
+    path.startsWith("/login") ||
+    path === "/onboard";
 
-  // if (hasSession && isAuthPage) {
-  //   if (activeWorkspace) {
-  //     return NextResponse.redirect(
-  //       new URL(`/user/${activeWorkspace}/dashboard`, req.url),
-  //     );
-  //   }
+  if (hasSession && isAuthPage) {
+    if (activeWorkspace) {
+      return NextResponse.redirect(
+        new URL(`/user/${activeWorkspace}/dashboard`, req.url),
+      );
+    }
 
-  //   return NextResponse.redirect(new URL("/select-workspace", req.url));
-  // }
+    return NextResponse.redirect(new URL("/select-workspace", req.url));
+  }
 
   // 🚨 4. Logged in but NO workspace
   if (hasSession && !activeWorkspace && path.startsWith("/user")) {

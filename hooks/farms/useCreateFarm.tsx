@@ -40,8 +40,8 @@ export function useGetFarmInWorkspace(userId: string, workspaceId: string) {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["farm"],
-    queryFn: async () => await getFarmInWorkspace(userId, workspaceId),
+    queryKey: ["farms", workspaceId],
+    queryFn: async () => await getFarmInWorkspace({ userId, workspaceId }),
     enabled: !!userId && !!workspaceId,
   });
 

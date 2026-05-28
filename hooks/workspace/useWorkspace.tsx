@@ -44,7 +44,7 @@ export function useGetWorkspaceMembersWithWorkspaceId(
     error,
     refetch,
   } = useQuery({
-    queryKey: ["workspaceMembers"],
+    queryKey: ["workspaceMembers", workspaceId],
     queryFn: async () =>
       await getWorkspaceMembersWithWorkspaceId(workspaceId, userId),
     enabled: !!workspaceId && !!userId,

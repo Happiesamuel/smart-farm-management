@@ -162,7 +162,7 @@ export const createFarmSchema = z.object({
     message: "Farm name must be at least 4 characters.",
   }),
   size: z.string({ message: "Total size is required" }).min(1, {
-    message: "Total size must be at least a ",
+    message: "Total size must be at least a characyer",
   }),
   unit: z.string({ message: "Unit is required" }).min(1, "Please select  unit"),
   location: z.object(
@@ -187,7 +187,8 @@ export const createFarmSchema = z.object({
     .instanceof(File, { message: "Please upload farm image." })
     .refine((file) => file.size < 3 * 1024 * 1024, {
       message: "image must be smaller than 3MB.",
-    }),
+    })
+    .optional(),
 });
 export const createFieldSchema = z.object({
   fieldName: z.string({ message: "Field name is required" }).min(4, {
