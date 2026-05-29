@@ -2,13 +2,18 @@
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { loginWithGoogle } from "@/servers/auth-actions";
+import { usePathname } from "next/navigation";
 
 function AuthBottom() {
   const handleGoogleLogin = async () => {
     const { url } = await loginWithGoogle();
     window.location.href = url as string;
   };
-  return (
+  const pathname = usePathname();
+  const path =
+    pathname.startsWith("/owner/sign-up") ||
+    pathname.startsWith("/owner/login");
+  return path ? (
     <div className="w-full relative flex items-center flex-col gap-4 mt-3">
       <div className="relative w-full flex items-center justify-center">
         <p
@@ -39,6 +44,8 @@ function AuthBottom() {
         <span className="text-primary-green font-medium">Privacy Policy</span>
       </p>
     </div>
+  ) : (
+    ""
   );
 }
 

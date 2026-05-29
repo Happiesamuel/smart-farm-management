@@ -11,7 +11,6 @@ export async function createSessionClient() {
     .find(
       (c) => c.name.startsWith("a_session") || c.name.startsWith("a_session_"),
     );
-  console.log(session);
   if (!session) throw new Error("No session found");
 
   const client = new Client()
@@ -23,21 +22,6 @@ export async function createSessionClient() {
     account: new Account(client),
   };
 }
-// export async function createSessionClient() {
-//   const cookieStore = await cookies();
-//   const session = cookieStore.get("a_session");
-
-//   if (!session) throw new Error("No session found");
-
-//   const client = new Client()
-//     .setEndpoint(appwriteConfig.endpoint)
-//     .setProject(appwriteConfig.projectId)
-//     .setSession(session.value);
-
-//   return {
-//     account: new Account(client),
-//   };
-// }
 export async function createAdminClient() {
   const client = new Client()
     .setEndpoint(appwriteConfig.endpoint)

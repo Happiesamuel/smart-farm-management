@@ -3,6 +3,7 @@
 import { UserObj } from "@/lib/types";
 import {
   createManagerUser,
+  createWorkerUser,
   recreateOtp,
   validateOTP,
 } from "@/servers/auth-actions";
@@ -11,6 +12,13 @@ import { useMutation } from "@tanstack/react-query";
 export function useCreateManager() {
   const { mutate: create, status } = useMutation({
     mutationFn: async (obj: UserObj) => await createManagerUser(obj),
+  });
+
+  return { create, status };
+}
+export function useCreateWorker() {
+  const { mutate: create, status } = useMutation({
+    mutationFn: async (obj: UserObj) => await createWorkerUser(obj),
   });
 
   return { create, status };

@@ -119,6 +119,35 @@ export async function createManagerUser(obj: UserObj) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");
   }
 }
+export async function createWorkerUser(obj: UserObj) {
+  try {
+    const { account } = await createAdminClient();
+
+    const user = await account.create(
+      ID.unique(),
+      obj.email,
+      obj.password,
+      obj.fullName,
+    );
+
+    const userObj = {
+      ...obj,
+      userId: user.$id,
+      avatar: "",
+      isVerified: true,
+    };
+
+    const guest = (await createUser(userObj)) as UserObjId;
+
+    return {
+      id: guest.id,
+      email: guest.email,
+      name: guest.fullName,
+    };
+  } catch (err) {
+    throw new Error(err instanceof Error ? err.message : "Unknown error");
+  }
+}
 export async function createWorkspace(slug: string, obj: WorkspaceObj) {
   try {
     const { database } = await createAdminClient();

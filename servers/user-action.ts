@@ -98,7 +98,7 @@ export async function getGuestByEmail(email: string | undefined) {
       [Query.equal("email", email!)],
     );
     if (result.documents.length === 0) {
-      throw new Error("User not found");
+      return null;
     }
     const doc = result.documents[0];
     return {

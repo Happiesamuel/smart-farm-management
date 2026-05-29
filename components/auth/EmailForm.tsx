@@ -34,6 +34,13 @@ export function EmailForm() {
     try {
       getUser(values, {
         onSuccess: async (user) => {
+          if (!user) {
+            return toast("User not found!", {
+              description: "The email entered doesn't have any account",
+              duration: 4000,
+              closeButton: true,
+            });
+          }
           const otp = await sendOtp(user.email);
           const a = await createOtp(otp, user.id);
           console.log(a);

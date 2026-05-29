@@ -1,9 +1,10 @@
+import AddUserModal from "@/components/manager-settings/user-and-roles/AddUserModal";
 import RolesBox from "@/components/manager-settings/user-and-roles/RolesBox";
 import UserTable from "@/components/manager-settings/user-and-roles/UserTable";
-import { Button } from "@/components/ui/button";
-import React from "react";
-import { GoPlus } from "react-icons/go";
 
+export const metadata = {
+  title: "Users & Roles",
+};
 export default function page() {
   return (
     <div className="pt-18 px-2 sm:px-4 pb-8">
@@ -14,10 +15,7 @@ export default function page() {
             Manage users, their roles and permission.
           </p>
         </div>
-        <Button className="bg-primary-green w-[48%] sm:w-fit cursor-pointer text-white rounded-sm">
-          <GoPlus />
-          <p>Add User</p>
-        </Button>
+        <AddUserModal />
       </div>
 
       <UserTable />
@@ -25,3 +23,4 @@ export default function page() {
     </div>
   );
 }
+// http://localhost:3000/worker/join-workspace/invitecode-workerId

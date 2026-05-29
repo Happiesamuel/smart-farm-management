@@ -67,7 +67,6 @@ export default function DashboardFarms() {
   ];
   const { collaspe } = useCollaspe();
   const { user, workspace, role } = useApp();
-  console.log(user, workspace, role);
   return (
     <div className="pb-4">
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7 gap-2">
