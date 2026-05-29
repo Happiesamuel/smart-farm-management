@@ -82,6 +82,8 @@ export async function getGuestById(userId: string | undefined) {
       fullName: doc.fullName,
       email: doc.email,
       avatar: doc.avatar,
+      phone: doc.phone,
+      password: doc.password,
     };
   } catch (err) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");

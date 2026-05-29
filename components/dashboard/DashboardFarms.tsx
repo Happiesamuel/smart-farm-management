@@ -1,6 +1,7 @@
 "use client";
 
 import { useCollaspe } from "@/context/SidebarCollasibleContext";
+import { useApp } from "@/stores/useAppStore";
 import { FaRegCalendarCheck } from "react-icons/fa6";
 import { GrMoney } from "react-icons/gr";
 import { PiFarm, PiPlant, PiPackage, PiChartLine } from "react-icons/pi";
@@ -65,6 +66,8 @@ export default function DashboardFarms() {
     },
   ];
   const { collaspe } = useCollaspe();
+  const { user, workspace, role } = useApp();
+  console.log(user, workspace, role);
   return (
     <div className="pb-4">
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7 gap-2">

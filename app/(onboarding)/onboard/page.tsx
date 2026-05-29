@@ -11,6 +11,7 @@ import { GiChestnutLeaf } from "react-icons/gi";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Cookies from "js-cookie";
+import { useApp } from "@/stores/useAppStore";
 
 export default function Page() {
   const arr = [
@@ -84,11 +85,12 @@ export default function Page() {
   ];
   const [select, setSelect] = useState<string | null>(null);
   const router = useRouter();
+  const { setRole } = useApp();
 
   const handleSelectRole = () => {
     if (!select) return;
     Cookies.set("role", select, { path: "/" });
-
+    setRole(select);
     if (select === "owner") {
       router.push("/owner/login");
     } else {

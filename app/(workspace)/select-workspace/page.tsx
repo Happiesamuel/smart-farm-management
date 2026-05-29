@@ -42,7 +42,7 @@ export default function Page() {
       </div>
 
       <div className="h-[75vh] overflow-scroll no-scroll space-y-4">
-        <WorkspaceList userId={data!.id} />
+        <WorkspaceList user={data!} />
         <div className="bg-[#f5f8f3]  mt-4 bottom-4 mx-auto  w-full border border-border p-6 rounded-lg flex items-center gap-3">
           <IoShieldCheckmarkOutline className="text-primary-green text-5xl" />
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 w-full">

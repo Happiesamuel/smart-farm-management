@@ -34,43 +34,6 @@ export async function createFarm(obj: FarmObj) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");
   }
 }
-// export async function getFarmInWorkspace(
-//   userId: string | undefined,
-//   workspaceId: string,
-// ) {
-//   try {
-//     const { database } = await createAdminClient();
-//     const result = await database.listDocuments(
-//       appwriteConfig.databaseId,
-//       appwriteConfig.farmCollectionId,
-//       [Query.equal("users", userId!), Query.equal("workspaces", workspaceId!)],
-//     );
-
-//     if (result.documents.length === 0) {
-//       return null;
-//     }
-//     console.log(result.documents);
-// return result.documents.map((doc) => {
-//   return {
-//     id: doc.$id,
-//     farmName: doc.farmName,
-//     status: doc.status,
-//     unit: doc.unit,
-//     soilType: doc.soilType,
-//     description: doc.description,
-//     workspaces: doc.workspaces,
-//     users: doc.users,
-//     address: doc.address,
-//     lat: doc.lat,
-//     lng: doc.lng,
-//     farmImage: doc.farmImage,
-//     size: doc.size,
-//   };
-// });
-//   } catch (err) {
-//     throw new Error(err instanceof Error ? err.message : "Unknown error");
-//   }
-// }
 
 export const getFarmInWorkspace = async ({
   userId,
@@ -96,7 +59,6 @@ export const getFarmInWorkspace = async ({
     appwriteConfig.farmCollectionId,
     [Query.equal("workspaces", workspaceId)],
   );
-  console.log(result.documents, "sdsdd");
   return result.documents.map((doc) => {
     return {
       id: doc.$id,
