@@ -21,13 +21,18 @@ import { Input } from "@/components/ui/input";
 import ButtonLoader from "@/components/layout/ButtonLoader";
 import { useRouter } from "next/navigation";
 import { MdOutlineMailOutline } from "react-icons/md";
-import { FaXmark } from "react-icons/fa6";
+import { FaRegUser, FaXmark } from "react-icons/fa6";
 import { getGuestByEmail } from "@/servers/user-action";
 import { useApp } from "@/stores/useAppStore";
+import { inviteUser } from "@/lib/otp";
+import { appwriteConfig } from "@/servers/appwrite-client";
 const userFormSchema = z.object({
   email: z
     .string({ message: "Please enter your email" })
     .email({ message: "Please enter a valid email address" }),
+  fullName: z
+    .string({ message: "Please enter full name" })
+    .min(4, { message: "name name must be at least 4 characters." }),
 });
 
 export default function AddUserModal() {
@@ -61,64 +66,97 @@ export function AddUserFormModal({
       document.body.style.overflow = "auto";
     }
 
-    // cleanup (important)
     return () => {
       document.body.style.overflow = "auto";
     };
   }, [open]);
   const { create, status } = useCreateWorker();
-  const { user } = useApp();
+  const { user, workspace } = useApp();
+  const [load, setLoad] = useState(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof userFormSchema>>({
     resolver: zodResolver(userFormSchema),
   });
 
   async function onSubmit(values: z.infer<typeof userFormSchema>) {
-    try {
-      console.log(values);
-      const guest = await getGuestByEmail(values.email);
-      if (!guest) {
-        console.log("fetch");
-        //if no user...create acc in appwrite...create user table...send link to email...that enables user to update ther acc both in appwrit and user table and join/create workspacemember
-        //  /worker/join-workspace/workspaceSlug/{workspaceInviteCode}-{newGuestId}-abc
-      } else {
-        if (guest.email === user?.email) {
-          console.log(true);
-        } else {
-          console.log(guest, values);
-          //if user exists send link diifent from first link..that enable users to just create workspacemember..or join workspcemember
-          ///worker/join-workspace/workspaceSlug/{workspaceInviteCode}-{newGuestId}-xyz
-        }
-      }
-
+    if (values.email === user?.email) {
+      setLoad(false);
       onClose();
-      // form.reset();
-      const newObj = { fullName: "", phone: "", email: "", password: "" };
-      //   create(newObj, {
-      //     onSuccess: async (user) => {
-      //       toast("User added successfully", {
-      //         description:
-      //           "A verification link has been sent to user's email address.",
-      //         duration: 4000,
-      //         closeButton: true,
-      //       });
-      //     },
-      //     onError: (err) =>
-      //       toast("Error adding user", {
-      //         description: err.message,
-      //         duration: 4000,
-      //         closeButton: true,
-      //       }),
-      //   });
-    } catch (error) {
-      toast("Error Signing up", {
-        description: (error as Error).message,
+      form.reset();
+      return toast("Failed to send email", {
+        description: "Cannot send email to your email",
         duration: 4000,
         closeButton: true,
       });
+    } else {
+      try {
+        const guest = await getGuestByEmail(values.email);
+        setLoad(true);
+        if (!guest) {
+          const { users, workspaceId, ...rest } = workspace!;
+          console.log(users, workspaceId);
+          const newObj = { ...values, phone: "", password: "hs_password" };
+          create(
+            {
+              work: rest,
+              obj: newObj,
+            },
+            {
+              onSuccess: async () => {
+                setLoad(false);
+                onClose();
+                form.reset();
+                return toast("User added successfully", {
+                  description:
+                    "A verification link has been sent to user's email address.",
+                  duration: 4000,
+                  closeButton: true,
+                });
+              },
+              onError: (err) => {
+                setLoad(false);
+                toast("Error adding user", {
+                  description: err.message,
+                  duration: 4000,
+                  closeButton: true,
+                });
+              },
+            },
+          );
+
+          //if no user...create acc in appwrite...create user table...send link to email...that enables user to update ther acc both in appwrit and user table and join/create workspacemember
+          //  /worker/join-workspace/workspaceSlug/{workspaceInviteCode}-{newGuestId}-abc
+        } else {
+          await inviteUser(
+            guest.email,
+            guest.fullName,
+            workspace!.name,
+            `${appwriteConfig.appUrl}/worker/join-workspace/${workspace!.id}/${workspace!.inviteCode}-${guest.id}-${guest.password !== "hs_password" ? "xyz" : "abc"}`,
+          );
+          setLoad(false);
+          onClose();
+          form.reset();
+          return toast("User added successfully", {
+            description:
+              "A verification link has been sent to user's email address.",
+            duration: 4000,
+            closeButton: true,
+          });
+          //if user exists send link diifent from first link..that enable users to just create workspacemember..or join workspcemember
+          ///worker/join-workspace/workspaceSlug/{workspaceInviteCode}-{newGuestId}-xyz
+        }
+      } catch (error) {
+        setLoad(false);
+        onClose();
+        toast("Error Adding user", {
+          description: (error as Error).message,
+          duration: 4000,
+          closeButton: true,
+        });
+      }
     }
   }
-
+  // eghogho.odion@physci.uniben.edu
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-150 flex items-center justify-center">
@@ -133,35 +171,59 @@ export function AddUserFormModal({
         </div>
         <div className="space-y-3">
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-3 md:space-y-4 pt-4  mx-auto"
-            >
-              <FormField
-                control={form.control}
-                name={"email"}
-                render={({ field }) => (
-                  <FormItem className="px-2.5 gap-1 md:px-5">
-                    <FormLabel className="text-sm p-0 font-semibold text-dark/90">
-                      Email
-                    </FormLabel>
-                    <div className="flex items-center w-full justify-between">
-                      <FormControl>
-                        <div className="flex items-center justify-between h-10 px-2 border border-border/80 rounded-md w-full">
-                          <MdOutlineMailOutline className="text-xl text-primary-green " />
-                          <Input
-                            className="text-sm h-4 border-none rounded-none  "
-                            type={"email"}
-                            placeholder={"Enter user's email"}
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="space-y-3  py-4  mx-auto max-w-[95%]">
+                <FormField
+                  control={form.control}
+                  name={"fullName"}
+                  render={({ field }) => (
+                    <FormItem className="px-2.5 gap-1 md:px-5">
+                      <FormLabel className="text-sm p-0 font-semibold text-dark/90">
+                        Full name
+                      </FormLabel>
+                      <div className="flex items-center w-full justify-between">
+                        <FormControl>
+                          <div className="flex items-center justify-between h-10 px-2 border border-border/80 rounded-md w-full">
+                            <FaRegUser className="text-lg text-primary-green " />
+                            <Input
+                              className="text-sm h-4 border-none rounded-none  "
+                              type={"text"}
+                              placeholder={"Enter user's full name"}
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={"email"}
+                  render={({ field }) => (
+                    <FormItem className="px-2.5 gap-1 md:px-5">
+                      <FormLabel className="text-sm p-0 font-semibold text-dark/90">
+                        Email
+                      </FormLabel>
+                      <div className="flex items-center w-full justify-between">
+                        <FormControl>
+                          <div className="flex items-center justify-between h-10 px-2 border border-border/80 rounded-md w-full">
+                            <MdOutlineMailOutline className="text-xl text-primary-green " />
+                            <Input
+                              className="text-sm h-4 border-none rounded-none  "
+                              type={"email"}
+                              placeholder={"Enter user's email"}
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <div className="flex rounded-b-xl px-2.5 md:px-5  items-center gap-2 justify-end bg-zinc-100 py-3">
                 <Button
                   type="reset"
@@ -172,10 +234,10 @@ export function AddUserFormModal({
                 </Button>
                 <Button
                   type="submit"
-                  disabled={status === "pending"}
+                  disabled={status === "pending" || load == true}
                   className="disabled:opacity-70 text-white transition-all duration-200 bg-primary-green  rounded-md  cursor-pointer border-none flex items-center justify-center px-6 gap-2"
                 >
-                  {status === "pending" ? (
+                  {status === "pending" || load === true ? (
                     <>
                       <ButtonLoader />
                       Adding user...

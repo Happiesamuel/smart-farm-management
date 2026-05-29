@@ -10,6 +10,7 @@ export const appwriteConfig = {
   endpoint: process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!,
   projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!,
   appUrl: process.env.NEXT_PUBLIC_APP_URL!,
+  plunkApiKey: process.env.PLUNK_API_KEY!,
   appwriteApiKey: process.env.APPWRITE_API_KEY!,
   databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
   bucketId: process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID!,

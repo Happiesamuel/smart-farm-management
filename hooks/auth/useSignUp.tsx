@@ -1,6 +1,6 @@
 "use client";
 
-import { UserObj } from "@/lib/types";
+import { UserObj, WorkspaceObjId } from "@/lib/types";
 import {
   createManagerUser,
   createWorkerUser,
@@ -18,7 +18,13 @@ export function useCreateManager() {
 }
 export function useCreateWorker() {
   const { mutate: create, status } = useMutation({
-    mutationFn: async (obj: UserObj) => await createWorkerUser(obj),
+    mutationFn: async ({
+      work,
+      obj,
+    }: {
+      work: Omit<WorkspaceObjId, "users" | "workspaceId">;
+      obj: UserObj;
+    }) => await createWorkerUser(obj, work),
   });
 
   return { create, status };

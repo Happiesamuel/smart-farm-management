@@ -7,9 +7,10 @@ import {
   UserObjId,
   WorkspaceMemberObj,
   WorkspaceObj,
+  WorkspaceObjId,
 } from "@/lib/types";
 import { createUser } from "./user-action";
-import { sendOtp } from "@/lib/otp";
+import { inviteUser, sendOtp } from "@/lib/otp";
 import { createOtp } from "./email-actions";
 import { appwriteConfig } from "./appwrite-client";
 import { cookies } from "next/headers";
@@ -119,9 +120,17 @@ export async function createManagerUser(obj: UserObj) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");
   }
 }
-export async function createWorkerUser(obj: UserObj) {
+export async function createWorkerUser(
+  obj: UserObj,
+  work: Omit<WorkspaceObjId, "users" | "workspaceId">,
+) {
   try {
-    const { account } = await createAdminClient();
+    const { account, avatar } = await createAdminClient();
+    const avatarUrl = avatar.getInitials({
+      name: obj.fullName,
+      width: 200,
+      height: 200,
+    });
 
     const user = await account.create(
       ID.unique(),
@@ -133,11 +142,18 @@ export async function createWorkerUser(obj: UserObj) {
     const userObj = {
       ...obj,
       userId: user.$id,
-      avatar: "",
+      avatar: avatarUrl,
       isVerified: true,
     };
 
     const guest = (await createUser(userObj)) as UserObjId;
+
+    await inviteUser(
+      guest.email,
+      guest.fullName,
+      work.name,
+      `${appwriteConfig.appUrl}/worker/join-workspace/${work.id}/${work.inviteCode}-${guest.id}-abc`,
+    );
 
     return {
       id: guest.id,
