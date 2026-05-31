@@ -70,7 +70,7 @@ export function OwnerSignupForm() {
     setShow(!show);
   }
   function handleClick2() {
-    setShow2(!show);
+    setShow2(!show2);
   }
   return (
     <Form {...form}>

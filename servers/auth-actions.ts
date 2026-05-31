@@ -131,30 +131,25 @@ export async function createWorkerUser(
       width: 200,
       height: 200,
     });
-
     const user = await account.create(
       ID.unique(),
       obj.email,
       obj.password,
       obj.fullName,
     );
-
     const userObj = {
       ...obj,
       userId: user.$id,
       avatar: avatarUrl,
       isVerified: true,
     };
-
     const guest = (await createUser(userObj)) as UserObjId;
-
     await inviteUser(
       guest.email,
       guest.fullName,
       work.name,
       `${appwriteConfig.appUrl}/worker/join-workspace/${work.id}/${work.inviteCode}-${guest.id}-abc`,
     );
-
     return {
       id: guest.id,
       email: guest.email,
@@ -189,6 +184,7 @@ export async function createWorkspace(slug: string, obj: WorkspaceObj) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");
   }
 }
+
 export async function createWorkspaceMember(obj: WorkspaceMemberObj) {
   try {
     const { database } = await createAdminClient();
@@ -256,3 +252,36 @@ export const recreateOtp = async (email: string, userId: string) => {
     );
   }
 };
+
+type SetupUserParams = {
+  email: string;
+  oldPassword: string;
+  newPassword: string;
+  fullName: string;
+};
+
+export async function setupUserSessionAndProfile({
+  email,
+  oldPassword,
+  newPassword,
+  fullName,
+}: SetupUserParams) {
+  try {
+    await login(email, oldPassword);
+
+    const { account } = await createSessionClient();
+
+    if (fullName) {
+      await account.updateName(fullName);
+    }
+
+    if (newPassword && oldPassword !== newPassword) {
+      await account.updatePassword(newPassword, oldPassword);
+    }
+
+    return true;
+  } catch (error) {
+    console.error("SETUP PROFILE ERROR:", error);
+    throw error;
+  }
+}

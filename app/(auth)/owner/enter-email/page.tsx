@@ -1,8 +1,10 @@
-"use client";
 import AuthBottom from "@/components/auth/AuthBottom";
 import { EmailForm } from "@/components/auth/EmailForm";
 import Link from "next/link";
 import { BiArrowBack } from "react-icons/bi";
+export const metadata = {
+  title: "Enter your Email",
+};
 export default function Page() {
   return (
     <div className="flex flex-col h-full py-4 gap-2">

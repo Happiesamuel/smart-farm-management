@@ -3,6 +3,7 @@ import { WorkspaceMemberObj, WorkspaceObj } from "@/lib/types";
 import { createWorkspace, createWorkspaceMember } from "@/servers/auth-actions";
 import {
   getWorkspace,
+  getWorkspaceByWorkspaceId,
   getWorkspaceMembersWithWorkspaceId,
 } from "@/servers/workspace-action";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -27,9 +28,23 @@ export function useGetWorkspace(userId: string) {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["workspace"],
+    queryKey: ["workspace", userId],
     queryFn: async () => await getWorkspace(userId),
     enabled: !!userId,
+  });
+
+  return { workspace, status, error, refetch };
+}
+export function useGetWorkspaceByWorkspaceId(workspaceId: string | undefined) {
+  const {
+    data: workspace,
+    status,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["workspace", workspaceId],
+    queryFn: async () => await getWorkspaceByWorkspaceId(workspaceId!),
+    enabled: !!workspaceId,
   });
 
   return { workspace, status, error, refetch };

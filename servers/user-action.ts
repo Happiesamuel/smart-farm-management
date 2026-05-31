@@ -89,6 +89,30 @@ export async function getGuestById(userId: string | undefined) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");
   }
 }
+export async function getGuestByGuestId(userId: string | undefined) {
+  try {
+    const { database } = await createAdminClient();
+    const result = await database.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      [Query.equal("$id", userId!)],
+    );
+    if (result.documents.length === 0) {
+      return null;
+    }
+    const doc = result.documents[0];
+    return {
+      id: doc.$id,
+      fullName: doc.fullName,
+      email: doc.email,
+      avatar: doc.avatar,
+      phone: doc.phone,
+      password: doc.password,
+    };
+  } catch (err) {
+    throw new Error(err instanceof Error ? err.message : "Unknown error");
+  }
+}
 export async function getGuestByEmail(email: string | undefined) {
   try {
     const { database } = await createAdminClient();

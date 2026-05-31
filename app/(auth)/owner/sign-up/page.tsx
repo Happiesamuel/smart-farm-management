@@ -2,7 +2,9 @@ import AuthBottom from "@/components/auth/AuthBottom";
 import { OwnerSignupForm } from "@/components/auth/OwnerSignupForm";
 import Link from "next/link";
 import { BiArrowBack } from "react-icons/bi";
-
+export const metadata = {
+  title: "Create Account",
+};
 export default function page() {
   return (
     <div className="flex flex-col h-full py-4 gap-2">

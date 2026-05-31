@@ -1,0 +1,25 @@
+"use client";
+import { Account, Avatars, Client, Databases, Storage } from "appwrite";
+import { appwriteConfig } from "./appwrite-client";
+export async function createAdminClient() {
+  const client = new Client()
+    .setEndpoint(appwriteConfig.endpoint)
+    .setProject(appwriteConfig.projectId);
+  // .setKey(appwriteConfig.appwriteApiKey);
+
+  return {
+    get avatar() {
+      return new Avatars(client);
+    },
+    get account() {
+      return new Account(client);
+    },
+    get database() {
+      return new Databases(client);
+    },
+
+    get storage() {
+      return new Storage(client);
+    },
+  };
+}

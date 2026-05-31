@@ -3,6 +3,7 @@
 import {
   getCurrentUser,
   getGuestByEmail,
+  getGuestByGuestId,
   getGuestById,
 } from "@/servers/user-action";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -34,6 +35,19 @@ export function useGetUser() {
     queryFn: async () => await getGuestById(user!.id),
     staleTime: 1000 * 60 * 10,
     enabled: status === "success" && !!user?.id,
+  });
+
+  return { data, userStat, error };
+}
+export function useGetUserWithoutSeeion(userId: string) {
+  const {
+    data,
+    status: userStat,
+    error,
+  } = useQuery({
+    queryKey: ["guest", userId],
+    queryFn: async () => await getGuestByGuestId(userId),
+    enabled: !!userId,
   });
 
   return { data, userStat, error };

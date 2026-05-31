@@ -3,6 +3,7 @@ import { Geist, Inter, Outfit } from "next/font/google";
 import "../globals.css";
 import LayoutApp from "@/LayoutApp";
 import NextTopLoader from "nextjs-toploader";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -53,6 +54,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <NextTopLoader color="#66bb6a" height={4} showSpinner={false} />
         <LayoutApp>{children}</LayoutApp>
+        <Toaster position="top-center" />
       </body>
     </html>
   );

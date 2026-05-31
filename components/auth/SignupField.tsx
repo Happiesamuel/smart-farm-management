@@ -20,6 +20,7 @@ interface FieldType {
   placeholder: string;
   Icon?: IconType;
   onclick?(): void;
+  disable?: boolean;
 }
 export default function SignupField({
   name,
@@ -29,6 +30,7 @@ export default function SignupField({
   control,
   Icon,
   onclick,
+  disable,
 }: FieldType) {
   return (
     <FormField
@@ -45,6 +47,7 @@ export default function SignupField({
                 </FormLabel>
                 <FormControl>
                   <Input
+                    disabled={disable}
                     className="text-sm h-4 rounded-none p-0 border-none"
                     type={type}
                     placeholder={placeholder}
