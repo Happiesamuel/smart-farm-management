@@ -22,7 +22,19 @@ export interface UserObjId extends UserObj {
 }
 export interface WorkspaceObjId extends WorkspaceObj {
   id: string;
+  createdAt?: string;
 }
+
+export interface WorkerWorspace {
+  role: string;
+  id: string;
+  name: string;
+  users: string;
+  workspaceId: string;
+  inviteCode: string;
+  createdAt: string;
+}
+
 export interface WorkspaceMemberObj {
   users: string;
   workspaces: string;

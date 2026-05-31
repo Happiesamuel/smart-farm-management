@@ -22,15 +22,13 @@ import GeneralLoader from "../loader/GeneralLoader";
 import { UserObjId } from "@/lib/types";
 import { useUpdateUser } from "@/hooks/auth/useUpdateUser";
 import {
-  changePassword,
   createWorkspaceMember,
   login,
   setupUserSessionAndProfile,
 } from "@/servers/auth-actions";
 import { createAdminClient } from "@/servers/appCli";
-import { createSessionClient } from "@/servers/appwrite";
-import { getWorkspaceMembersWithWorkspaceId } from "@/servers/workspace-action";
-
+import Cookies from "js-cookie";
+import { useApp } from "@/stores/useAppStore";
 export function JoinWorkspaceForm({
   user,
   workspaceId,
@@ -47,6 +45,7 @@ export function JoinWorkspaceForm({
       email: user.email,
     },
   });
+  const { setRole } = useApp();
   const [checked, setChecked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   async function onSubmit(values: z.infer<typeof signupFormSchema>) {
@@ -84,12 +83,15 @@ export function JoinWorkspaceForm({
                 role: "worker",
                 joinedAt: new Date().toISOString(),
               });
+              Cookies.set("role", "worker", { path: "/" });
+              setRole("worker");
 
               toast("Joined workspace successfully", {
                 description: "Proceed to select workspace.",
                 duration: 4000,
                 closeButton: true,
               });
+              router.push("/worker/select-workspace");
             } catch (err) {
               toast("Error setting up account", {
                 description: (err as Error).message,
@@ -227,18 +229,19 @@ export function JoinWorkspace({
   parsed,
 }: {
   workspaceId: string;
-  parsed: { inviteCode: string; userId: string };
+  parsed: { inviteCode: string; userId: string; signature: string };
 }) {
-  const { userId } = parsed;
-
+  const { userId, signature } = parsed;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setRole } = useApp();
+  const router = useRouter();
   const { data, userStat } = useGetUserWithoutSeeion(userId);
   const { workspace, status } = useGetWorkspaceByWorkspaceId(workspaceId);
 
   if (userStat === "pending" || status === "pending") {
     return <GeneralLoader>Verifying invitation...</GeneralLoader>;
   }
-
-  if (!data || !workspace) {
+  if (!data || !workspace || (signature !== "abc" && signature !== "xyz")) {
     return (
       <div className="flex items-center flex-col gap-2 justify-center h-[50vh] lg:h-full">
         <div className="bg-[#f0782d]/10 size-16 flex items-center justify-center rounded-full">
@@ -251,9 +254,41 @@ export function JoinWorkspace({
       </div>
     );
   }
+  async function handleSubmit() {
+    try {
+      if (isSubmitting) return;
+      setIsSubmitting(true);
+      await login(data!.email, data!.password);
+      await createWorkspaceMember({
+        users: data!.id,
+        workspaces: workspaceId,
+        role: "worker",
+        joinedAt: new Date().toISOString(),
+      });
+      toast("Joined workspace successfully", {
+        description: "Proceed to select workspace.",
+        duration: 4000,
+        closeButton: true,
+      });
+      setIsSubmitting(false);
+      Cookies.set("role", "worker", { path: "/" });
+      setRole("worker");
+      router.push("/worker/select-workspace");
+    } catch (err) {
+      toast("Error setting up account", {
+        description: (err as Error).message,
+        duration: 4000,
+        closeButton: true,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
-    <div className="flex flex-1 overflow-scroll no-scroll  lg:max-h-[94vh] lg:pt-28 relative items-center justify-center  flex-col">
+    <div
+      className={`flex flex-1 overflow-scroll no-scroll  lg:max-h-[94vh] ${signature === "abc" ? "lg:pt-28" : "lg:pt-0 pt-40"} relative items-center justify-center  flex-col`}
+    >
       <div className="flex items-center justify-center flex-col gap-2">
         <div className="bg-[#f0782d]/10 size-16 flex items-center justify-center rounded-full">
           <MdEngineering className="text-[#f0782d] text-3xl" />
@@ -268,7 +303,24 @@ export function JoinWorkspace({
         </div>
       </div>
 
-      <JoinWorkspaceForm workspaceId={workspaceId} user={data} />
+      {signature === "abc" ? (
+        <JoinWorkspaceForm workspaceId={workspaceId} user={data} />
+      ) : (
+        <Button
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className="disabled:opacity-70 text-white mt-4 max-w-[80%] transition-all duration-200 bg-[#f0782d] h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2"
+        >
+          {isSubmitting ? (
+            <>
+              <ButtonLoader />
+              Joining...
+            </>
+          ) : (
+            "Join workspace"
+          )}
+        </Button>
+      )}
     </div>
   );
 }

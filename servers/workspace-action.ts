@@ -86,6 +86,24 @@ export async function getWorkspaceMembersWithWorkspaceId(
     throw new Error(err instanceof Error ? err.message : "Unknown error");
   }
 }
+
+export const getWorkspaceMembers = async (workspaceId: string) => {
+  const { database } = await createAdminClient();
+  const members = await database.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.workspaceMembersCollectionId,
+    [Query.equal("workspaces", workspaceId)],
+  );
+  return members.documents.map((x) => {
+    return {
+      role: x.role,
+      users: x.users,
+      workspaces: x.workspaces,
+      id: x.$id,
+    };
+  });
+};
+
 export const getUserWorkspacesWithRole = async ({
   userId,
 }: {
@@ -102,15 +120,24 @@ export const getUserWorkspacesWithRole = async ({
 
   if (workspaceIds.length === 0) return [];
 
-  const workspaces = await database.listDocuments(
+  const { documents } = await database.listDocuments(
     appwriteConfig.databaseId,
     appwriteConfig.workspaceCollectionId,
     [Query.equal("$id", workspaceIds)],
   );
+  const newWork = documents.map((doc) => {
+    return {
+      id: doc.$id,
+      name: doc.name,
+      users: doc.user,
+      workspaceId: doc.workspaceId,
+      inviteCode: doc.inviteCode,
+      createdAt: doc.$createdAt,
+    };
+  });
 
-  // merge role into workspace
-  return workspaces.documents.map((ws) => {
-    const member = memberships.documents.find((m) => m.workspaces === ws.$id);
+  return newWork.map((ws) => {
+    const member = memberships.documents.find((m) => m.workspaces === ws.id);
 
     return {
       ...ws,

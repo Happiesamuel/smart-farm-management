@@ -1,18 +1,17 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
 export function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
-  const publicPaths = ["/auth/callback", "/api/auth"];
+  const publicPaths = ["/auth/callback", "/api/auth", "/worker/join-workspace"];
   if (publicPaths.some((p) => path.startsWith(p))) {
     return NextResponse.next();
   }
 
-  // ✅ Only rely on your own httpOnly cookie, not Appwrite's browser cookie
   const hasSession =
-    !!req.cookies.get("a_session")?.value ||
-    req.cookies.getAll().some((c) => c.name.startsWith("a_session_"));
+    !!req.cookies.get("session")?.value ||
+    req.cookies.getAll().some((c) => c.name.startsWith("a_session_")) ||
+    req.cookies.getAll().some((c) => c.name.startsWith("a_session"));
 
   const activeWorkspace = req.cookies.get("activeWorkspace")?.value;
   const role = req.cookies.get("role")?.value;
@@ -22,8 +21,15 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  const isWorkerOrManager = role === "worker" || role === "manager";
+  const isOwner = role === "owner";
+
   // 🚨 1. Force onboarding if no role
-  if (!role && path !== "/onboard") {
+  if (
+    !role &&
+    path !== "/onboard" &&
+    !path.startsWith("/worker/join-workspace")
+  ) {
     return NextResponse.redirect(new URL("/onboard", req.url));
   }
 
@@ -31,6 +37,13 @@ export function middleware(req: NextRequest) {
   if (!hasSession) {
     if (path.startsWith("/user") || path === "/select-workspace") {
       return NextResponse.redirect(new URL("/owner/login", req.url));
+    }
+
+    if (
+      path.startsWith("/worker") &&
+      !path.startsWith("/worker/join-workspace")
+    ) {
+      return NextResponse.redirect(new URL("/worker/login", req.url));
     }
   }
 
@@ -43,23 +56,78 @@ export function middleware(req: NextRequest) {
 
   if (hasSession && isAuthPage) {
     if (activeWorkspace) {
+      if (isWorkerOrManager) {
+        return NextResponse.redirect(
+          new URL(`/worker/${activeWorkspace}/dashboard`, req.url),
+        );
+      }
       return NextResponse.redirect(
         new URL(`/user/${activeWorkspace}/dashboard`, req.url),
       );
     }
-
+    // no workspace yet → role-based select workspace
+    if (isWorkerOrManager) {
+      return NextResponse.redirect(
+        new URL("/worker/select-workspace", req.url),
+      );
+    }
     return NextResponse.redirect(new URL("/select-workspace", req.url));
   }
 
   // 🚨 4. Logged in but NO workspace
-  if (hasSession && !activeWorkspace && path.startsWith("/user")) {
-    return NextResponse.redirect(new URL("/select-workspace", req.url));
+  if (hasSession && !activeWorkspace) {
+    if (path.startsWith("/user")) {
+      return NextResponse.redirect(new URL("/select-workspace", req.url));
+    }
+    if (path.startsWith("/worker") && path !== "/worker/select-workspace") {
+      return NextResponse.redirect(
+        new URL("/worker/select-workspace", req.url),
+      );
+    }
+    // ✅ catch-all — logged in, no workspace, not already on select page
+    if (isOwner && path !== "/select-workspace") {
+      return NextResponse.redirect(new URL("/select-workspace", req.url));
+    }
+    if (isWorkerOrManager && path !== "/worker/select-workspace") {
+      return NextResponse.redirect(
+        new URL("/worker/select-workspace", req.url),
+      );
+    }
+  }
+  // 🚨 5. Logged in + workspace → block select pages
+  if (hasSession && activeWorkspace) {
+    if (isOwner && path === "/select-workspace") {
+      return NextResponse.redirect(
+        new URL(`/user/${activeWorkspace}/dashboard`, req.url),
+      );
+    }
+    if (isWorkerOrManager && path === "/worker/select-workspace") {
+      return NextResponse.redirect(
+        new URL(`/worker/${activeWorkspace}/dashboard`, req.url),
+      );
+    }
   }
 
-  // 🚨 5. Logged in + workspace → block select page
-  if (hasSession && activeWorkspace && path === "/select-workspace") {
+  // 🚨 6. Cross-role path protection
+  if (hasSession && isWorkerOrManager && path.startsWith("/user")) {
     return NextResponse.redirect(
-      new URL(`/user/${activeWorkspace}/dashboard`, req.url),
+      new URL(
+        activeWorkspace
+          ? `/worker/${activeWorkspace}/dashboard`
+          : "/worker/select-workspace",
+        req.url,
+      ),
+    );
+  }
+
+  if (hasSession && isOwner && path.startsWith("/worker")) {
+    return NextResponse.redirect(
+      new URL(
+        activeWorkspace
+          ? `/user/${activeWorkspace}/dashboard`
+          : "/select-workspace",
+        req.url,
+      ),
     );
   }
 
@@ -68,153 +136,29 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/auth/callback", // ← back in matcher so the publicPaths check above catches it
+    "/auth/callback",
     "/onboard",
     "/owner/:path*",
     "/select-workspace",
+    "/worker/:path*",
+    "/worker/select-workspace", // ✅ explicit
     "/user/:path*",
+    "/login",
   ],
 };
 
 // export function middleware(req: NextRequest) {
-//   const session = req.cookies.get("appwrite-session")?.value;
-//   const activeWorkspace = req.cookies.get("activeWorkspace")?.value;
-//   const role = req.cookies.get("role")?.value;
+//   const path = req.nextUrl.pathname;
 
-//   const url = req.nextUrl;
-//   const path = url.pathname;
-
-//   const bypass = req.cookies.get("bypass")?.value;
-
-//   if (bypass === "true") {
+//   const publicPaths = ["/auth/callback", "/api/auth"];
+//   if (publicPaths.some((p) => path.startsWith(p))) {
 //     return NextResponse.next();
 //   }
 
-//   // 🚫 No role → force onboard
-//   if (!role && path !== "/onboard") {
-//     return NextResponse.redirect(new URL("/onboard", req.url));
-//   }
-
-//   // 🚫 Logged in → block onboard & login
-//   if (
-//     session &&
-//     (path === "/onboard" ||
-//       path.includes("/login") ||
-//       path.includes("/sign-up") ||
-//       path.includes("/owner"))
-//   ) {
-//     if (activeWorkspace) {
-//       return NextResponse.redirect(
-//         new URL(`/user/${activeWorkspace}/dashboard`, req.url),
-//       );
-//     }
-
-//     return NextResponse.redirect(new URL("/select-workspace", req.url));
-//   }
-
-//   // 🚫 Not logged in → block protected routes
-//   if (!session && path.startsWith("/user")) {
-//     return NextResponse.redirect(new URL("/onboard", req.url));
-//   }
-
-//   // 🚫 Logged in but no workspace
-//   if (session && !activeWorkspace && path.startsWith("/user")) {
-//     return NextResponse.redirect(new URL("/select-workspace", req.url));
-//   }
-
-//   // 🚀 Has workspace → skip select page
-//   if (session && activeWorkspace && path === "/select-workspace") {
-//     return NextResponse.redirect(
-//       new URL(`/user/${activeWorkspace}/dashboard`, req.url),
-//     );
-//   }
-
-//   return NextResponse.next();
-// }
-
-// export const config = {
-//   matcher: [
-//     "/onboard",
-//     "/owner/login",
-//     "/worker/login",
-//     "/owner/:path*",
-//     "/owner/sign-up",
-//     "/select-workspace",
-//     "/user/:path*",
-//   ],
-// };
-
-// export function middleware(req: NextRequest) {
-//   const session = req.cookies.get("appwrite-session")?.value || req.cookies.get("a_session")?.value;
-//   const activeWorkspace = req.cookies.get("activeWorkspace")?.value;
-//   const role = req.cookies.get("role")?.value;
-//   const bypass = req.cookies.get("bypass")?.value;
-//   const path = req.nextUrl.pathname;
-//   if (bypass === "true") {
-//     return NextResponse.next();
-//   }
-//   // 🚨 1. Force onboarding if no role
-//   if (!role && path !== "/onboard") {
-//     return NextResponse.redirect(new URL("/onboard", req.url));
-//   }
-
-//   // 🚨 2. Not logged in → block ALL protected routes
-//   if (!session) {
-//     if (path.startsWith("/user") || path === "/select-workspace") {
-//       return NextResponse.redirect(new URL("/owner/login", req.url));
-//     }
-//   }
-
-//   // 🚨 3. Logged in → block auth pages (login / signup / onboard)
-//   const isAuthPage =
-//     path === "/owner/login" ||
-//     path === "/owner/sign-up" ||
-//     path.startsWith("/login") ||
-//     path === "/onboard";
-
-//   if (session && isAuthPage) {
-//     if (activeWorkspace) {
-//       return NextResponse.redirect(
-//         new URL(`/user/${activeWorkspace}/dashboard`, req.url),
-//       );
-//     }
-
-//     return NextResponse.redirect(new URL("/select-workspace", req.url));
-//   }
-
-//   // 🚨 4. Logged in but NO workspace → force select workspace
-//   if (session && !activeWorkspace && path.startsWith("/user")) {
-//     return NextResponse.redirect(new URL("/select-workspace", req.url));
-//   }
-
-//   // 🚨 5. Logged in + workspace → block select workspace page
-//   if (session && activeWorkspace && path === "/select-workspace") {
-//     return NextResponse.redirect(
-//       new URL(`/user/${activeWorkspace}/dashboard`, req.url),
-//     );
-//   }
-
-//   return NextResponse.next();
-// }
-// export const config = {
-//   matcher: [
-//     "/auth/callback",
-//     "/onboard",
-//     "/owner/:path*",
-//     "/select-workspace",
-//     "/user/:path*",
-//   ],
-// };
-
-// export function middleware(req: NextRequest) {
-//   const path = req.nextUrl.pathname;
-//   const hasAppwriteSession = req.cookies
-//     .getAll()
-//     .some((c) => c.name.startsWith("a_session"));
-
-//   const hasCustomSession = !!req.cookies.get("session")?.value;
-
-//   const hasSession = hasAppwriteSession || hasCustomSession;
+//   // ✅ Only rely on your own httpOnly cookie, not Appwrite's browser cookie
+//   const hasSession =
+//     !!req.cookies.get("a_session")?.value ||
+//     req.cookies.getAll().some((c) => c.name.startsWith("a_session_"));
 
 //   const activeWorkspace = req.cookies.get("activeWorkspace")?.value;
 //   const role = req.cookies.get("role")?.value;
@@ -270,7 +214,7 @@ export const config = {
 
 // export const config = {
 //   matcher: [
-//     // "/auth/callback",
+//     "/auth/callback", // ← back in matcher so the publicPaths check above catches it
 //     "/onboard",
 //     "/owner/:path*",
 //     "/select-workspace",

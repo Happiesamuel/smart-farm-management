@@ -2,8 +2,10 @@
 import { WorkspaceMemberObj, WorkspaceObj } from "@/lib/types";
 import { createWorkspace, createWorkspaceMember } from "@/servers/auth-actions";
 import {
+  getUserWorkspacesWithRole,
   getWorkspace,
   getWorkspaceByWorkspaceId,
+  getWorkspaceMembers,
   getWorkspaceMembersWithWorkspaceId,
 } from "@/servers/workspace-action";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -49,10 +51,7 @@ export function useGetWorkspaceByWorkspaceId(workspaceId: string | undefined) {
 
   return { workspace, status, error, refetch };
 }
-export function useGetWorkspaceMembersWithWorkspaceId(
-  workspaceId: string,
-  userId: string,
-) {
+export function useGetWorkspaceMembersWithWorkspaceId(workspaceId: string) {
   const {
     data: workspaceMember,
     status,
@@ -60,12 +59,25 @@ export function useGetWorkspaceMembersWithWorkspaceId(
     refetch,
   } = useQuery({
     queryKey: ["workspaceMembers", workspaceId],
-    queryFn: async () =>
-      await getWorkspaceMembersWithWorkspaceId(workspaceId, userId),
-    enabled: !!workspaceId && !!userId,
+    queryFn: async () => await getWorkspaceMembers(workspaceId),
+    enabled: !!workspaceId,
   });
 
   return { workspaceMember, status, error, refetch };
+}
+export function useGetWorkspaceMembersWithRole(userId: string) {
+  const {
+    data: workspace,
+    status,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["workspace", userId],
+    queryFn: async () => await getUserWorkspacesWithRole({ userId }),
+    enabled: !!userId,
+  });
+
+  return { workspace, status, error, refetch };
 }
 
 export function useCreateWorkspaceMember() {
