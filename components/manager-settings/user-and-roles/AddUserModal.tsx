@@ -26,6 +26,7 @@ import { getGuestByEmail } from "@/servers/user-action";
 import { useApp } from "@/stores/useAppStore";
 import { inviteUser } from "@/lib/otp";
 import { appwriteConfig } from "@/servers/appwrite-client";
+import { checkUserInWorkspace } from "@/servers/workspace-action";
 const userFormSchema = z.object({
   email: z
     .string({ message: "Please enter your email" })
@@ -83,77 +84,112 @@ export function AddUserFormModal({
       setLoad(false);
       onClose();
       form.reset();
+
       return toast("Failed to send email", {
         description: "Cannot send email to your email",
-        duration: 4000,
-        closeButton: true,
       });
-    } else {
-      try {
-        const guest = await getGuestByEmail(values.email);
-        setLoad(true);
-        if (!guest) {
-          const { users, workspaceId, ...rest } = workspace!;
-          console.log(users, workspaceId);
-          const newObj = { ...values, phone: "", password: "hs_password" };
-          create(
-            {
-              work: rest,
-              obj: newObj,
-            },
-            {
-              onSuccess: async () => {
-                setLoad(false);
-                onClose();
-                form.reset();
-                return toast("User added successfully", {
-                  description:
-                    "A verification link has been sent to user's email address.",
-                  duration: 4000,
-                  closeButton: true,
-                });
-              },
-              onError: (err) => {
-                setLoad(false);
-                toast("Error adding user", {
-                  description: err.message,
-                  duration: 4000,
-                  closeButton: true,
-                });
-              },
-            },
-          );
+    }
 
-          //if no user...create acc in appwrite...create user table...send link to email...that enables user to update ther acc both in appwrit and user table and join/create workspacemember
-          //  /worker/join-workspace/workspaceSlug/{workspaceInviteCode}-{newGuestId}-abc
-        } else {
-          await inviteUser(
-            guest.email,
-            guest.fullName,
-            workspace!.name,
-            `${appwriteConfig.appUrl}/worker/join-workspace/${workspace!.id}/${workspace!.inviteCode}-${guest.id}-${guest.password !== "hs_password" ? "xyz" : "abc"}`,
-          );
+    try {
+      setLoad(true);
+
+      const guest = await getGuestByEmail(values.email);
+
+      // ✅ IF USER EXISTS → CHECK MEMBERSHIP FIRST
+      if (guest) {
+        const alreadyJoined = await checkUserInWorkspace({
+          userId: guest.id,
+          workspaceId: workspace!.id,
+        });
+
+        if (alreadyJoined) {
           setLoad(false);
           onClose();
           form.reset();
-          return toast("User added successfully", {
-            description:
-              "A verification link has been sent to user's email address.",
-            duration: 4000,
-            closeButton: true,
+
+          return toast("User already in workspace", {
+            description: "This user is already part of this workspace.",
           });
-          //if user exists send link diifent from first link..that enable users to just create workspacemember..or join workspcemember
-          ///worker/join-workspace/workspaceSlug/{workspaceInviteCode}-{newGuestId}-xyz
         }
-      } catch (error) {
+
+        // ✅ SEND INVITE
+        await inviteUser(
+          guest.email,
+          guest.fullName,
+          workspace!.name,
+          `${appwriteConfig.appUrl}/worker/join-workspace/${workspace!.id}/${workspace!.inviteCode}-${guest.id}-${guest.password !== "hs_password" ? "xyz" : "abc"}`,
+        );
+
         setLoad(false);
         onClose();
-        toast("Error Adding user", {
-          description: (error as Error).message,
-          duration: 4000,
-          closeButton: true,
+        form.reset();
+
+        return toast("Invite sent successfully", {
+          description: "User has been invited to the workspace.",
         });
       }
+
+      // ✅ IF USER DOES NOT EXIST → CREATE + INVITE
+      const { users, workspaceId, ...rest } = workspace!;
+      const newObj = {
+        ...values,
+        phone: "",
+        password: "hs_password",
+      };
+
+      create(
+        {
+          work: rest,
+          obj: newObj,
+        },
+        {
+          onSuccess: async (newUser) => {
+            try {
+              // ✅ CHECK AGAIN AFTER CREATION (SAFETY)
+              const alreadyJoined = await checkUserInWorkspace({
+                userId: newUser.id,
+                workspaceId,
+              });
+
+              if (!alreadyJoined) {
+                await inviteUser(
+                  newUser.email,
+                  newUser.name,
+                  workspace!.name,
+                  `${appwriteConfig.appUrl}/worker/join-workspace/${workspace!.id}/${workspace!.inviteCode}-${newUser.id}-abc`,
+                );
+              }
+
+              setLoad(false);
+              onClose();
+              form.reset();
+
+              toast("User created & invited", {
+                description: "Verification link sent to email.",
+              });
+            } catch (err) {
+              setLoad(false);
+              toast("Error sending invite", {
+                description: (err as Error).message,
+              });
+            }
+          },
+
+          onError: (err) => {
+            setLoad(false);
+            toast("Error adding user", {
+              description: err.message,
+            });
+          },
+        },
+      );
+    } catch (error) {
+      setLoad(false);
+      onClose();
+
+      toast("Error Adding user", {
+        description: (error as Error).message,
+      });
     }
   }
   // eghogho.odion@physci.uniben.edu

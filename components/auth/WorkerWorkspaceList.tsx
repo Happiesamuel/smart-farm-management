@@ -24,10 +24,9 @@ export default function WorkerWorkspaceList({ user }: { user: UserObjId }) {
   if (status === "pending")
     return (
       <div className="flex items-center h-[400px] justify-center">
-        <div className="size-6 border-2 border-light-green/30 border-t-primary-green rounded-full animate-spin"></div>
+        <div className="size-6 border-2 border-light-green/30 border-t-[#f0782d] rounded-full animate-spin"></div>
       </div>
     );
-  console.log(workspace);
   if (!workspace?.length)
     return (
       <div className="flex items-center flex-col h-[300px] gap-2 justify-center">

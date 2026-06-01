@@ -29,6 +29,24 @@ export async function getWorkspace(userId: string | undefined) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");
   }
 }
+
+export const checkUserInWorkspace = async ({
+  userId,
+  workspaceId,
+}: {
+  userId: string;
+  workspaceId: string;
+}) => {
+  const { database } = await createAdminClient();
+  const existing = await database.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.workspaceMembersCollectionId,
+    [Query.equal("users", userId), Query.equal("workspaces", workspaceId)],
+  );
+
+  return existing.total > 0;
+};
+
 export async function getWorkspaceByWorkspaceId(
   workspaceId: string | undefined,
 ) {

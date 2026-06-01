@@ -29,6 +29,7 @@ import {
 import { createAdminClient } from "@/servers/appCli";
 import Cookies from "js-cookie";
 import { useApp } from "@/stores/useAppStore";
+import { checkUserInWorkspace } from "@/servers/workspace-action";
 export function JoinWorkspaceForm({
   user,
   workspaceId,
@@ -55,6 +56,25 @@ export function JoinWorkspaceForm({
     try {
       const { confirmPassword, ...rest } = values;
 
+      // ✅ CHECK FIRST (VERY IMPORTANT)
+      const alreadyJoined = await checkUserInWorkspace({
+        userId: user!.id,
+        workspaceId,
+      });
+
+      if (alreadyJoined) {
+        toast("You already belong to this workspace", {
+          description: "Proceed to select workspace.",
+        });
+
+        Cookies.set("role", "worker", { path: "/" });
+        setRole("worker");
+
+        router.push("/worker/select-workspace");
+        return;
+      }
+
+      // ✅ Generate avatar
       const { avatar } = await createAdminClient();
 
       const avatarUrl = avatar.getInitials({
@@ -65,63 +85,51 @@ export function JoinWorkspaceForm({
 
       const data = { ...rest, avatar: avatarUrl };
 
-      update(
-        { obj: data, userId: user.id },
-        {
-          onSuccess: async () => {
-            try {
-              await setupUserSessionAndProfile({
-                email: user.email,
-                oldPassword: user.password,
-                newPassword: data.password,
-                fullName: data.fullName,
-              });
-
-              await createWorkspaceMember({
-                users: user.id,
-                workspaces: workspaceId,
-                role: "worker",
-                joinedAt: new Date().toISOString(),
-              });
-              Cookies.set("role", "worker", { path: "/" });
-              setRole("worker");
-
-              toast("Joined workspace successfully", {
-                description: "Proceed to select workspace.",
-                duration: 4000,
-                closeButton: true,
-              });
-              router.push("/worker/select-workspace");
-            } catch (err) {
-              toast("Error setting up account", {
-                description: (err as Error).message,
-                duration: 4000,
-                closeButton: true,
-              });
-            } finally {
-              setIsSubmitting(false);
-            }
+      // ✅ Update user first
+      await new Promise((resolve, reject) => {
+        update(
+          { obj: data, userId: user.id },
+          {
+            onSuccess: resolve,
+            onError: reject,
           },
+        );
+      });
 
-          onError: (err) => {
-            setIsSubmitting(false);
+      // ✅ Setup session
+      await setupUserSessionAndProfile({
+        email: user.email,
+        oldPassword: user.password,
+        newPassword: data.password,
+        fullName: data.fullName,
+      });
 
-            toast("Error joining workspace", {
-              description: err.message,
-              duration: 4000,
-              closeButton: true,
-            });
-          },
-        },
-      );
+      // ✅ Now create membership
+      await createWorkspaceMember({
+        users: user.id,
+        workspaces: workspaceId,
+        role: "worker",
+        joinedAt: new Date().toISOString(),
+      });
+
+      Cookies.set("role", "worker", { path: "/" });
+      setRole("worker");
+
+      toast("Joined workspace successfully", {
+        description: "Proceed to select workspace.",
+        duration: 4000,
+        closeButton: true,
+      });
+
+      router.push("/worker/select-workspace");
     } catch (error) {
-      setIsSubmitting(false);
-
       toast("Error joining workspace", {
         description: (error as Error).message,
         duration: 4000,
         closeButton: true,
       });
+    } finally {
+      setIsSubmitting(false); // ✅ ONLY HERE
     }
   }
   const [show, setShow] = useState(false);
@@ -254,31 +262,47 @@ export function JoinWorkspace({
       </div>
     );
   }
+
   async function handleSubmit() {
     try {
       if (isSubmitting) return;
       setIsSubmitting(true);
+
       await login(data!.email, data!.password);
+
+      const alreadyJoined = await checkUserInWorkspace({
+        userId: data!.id,
+        workspaceId,
+      });
+
+      if (alreadyJoined) {
+        toast("You already belong to this workspace", {
+          description: "Proceed to select workspace.",
+        });
+        Cookies.set("role", "worker", { path: "/" });
+        setRole("worker");
+        router.push("/worker/select-workspace");
+        return;
+      }
+
       await createWorkspaceMember({
         users: data!.id,
         workspaces: workspaceId,
         role: "worker",
         joinedAt: new Date().toISOString(),
       });
+
       toast("Joined workspace successfully", {
         description: "Proceed to select workspace.",
-        duration: 4000,
-        closeButton: true,
       });
-      setIsSubmitting(false);
+
       Cookies.set("role", "worker", { path: "/" });
       setRole("worker");
+
       router.push("/worker/select-workspace");
     } catch (err) {
       toast("Error setting up account", {
         description: (err as Error).message,
-        duration: 4000,
-        closeButton: true,
       });
     } finally {
       setIsSubmitting(false);

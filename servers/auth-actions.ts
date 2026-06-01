@@ -9,11 +9,12 @@ import {
   WorkspaceObj,
   WorkspaceObjId,
 } from "@/lib/types";
-import { createUser } from "./user-action";
+import { createUser, getGuestByEmail } from "./user-action";
 import { inviteUser, sendOtp } from "@/lib/otp";
 import { createOtp } from "./email-actions";
 import { appwriteConfig } from "./appwrite-client";
 import { cookies } from "next/headers";
+import { checkUserInWorkspace } from "./workspace-action";
 
 export const loginWithGoogle = async () => {
   const { account } = await createAdminClient();
@@ -125,30 +126,67 @@ export async function createWorkerUser(
 ) {
   try {
     const { account, avatar } = await createAdminClient();
+
+    // ✅ STEP 1: CHECK IF USER EXISTS
+    const existingUser = await getGuestByEmail(obj.email);
+
+    if (existingUser) {
+      // ✅ STEP 2: CHECK IF ALREADY IN WORKSPACE
+      const alreadyJoined = await checkUserInWorkspace({
+        userId: existingUser.id,
+        workspaceId: work.id,
+      });
+
+      if (alreadyJoined) {
+        throw new Error("User already belongs to this workspace");
+      }
+
+      // ✅ SEND INVITE ONLY
+      await inviteUser(
+        existingUser.email,
+        existingUser.fullName,
+        work.name,
+        `${appwriteConfig.appUrl}/worker/join-workspace/${work.id}/${work.inviteCode}-${existingUser.id}-xyz`,
+      );
+
+      return {
+        id: existingUser.id,
+        email: existingUser.email,
+        name: existingUser.fullName,
+      };
+    }
+
+    // ✅ STEP 3: CREATE NEW USER
     const avatarUrl = avatar.getInitials({
       name: obj.fullName,
       width: 200,
       height: 200,
     });
+
     const user = await account.create(
       ID.unique(),
       obj.email,
       obj.password,
       obj.fullName,
     );
+
     const userObj = {
       ...obj,
       userId: user.$id,
       avatar: avatarUrl,
       isVerified: true,
     };
+
     const guest = (await createUser(userObj)) as UserObjId;
+
+    // ✅ STEP 4: SEND INVITE
     await inviteUser(
       guest.email,
       guest.fullName,
       work.name,
       `${appwriteConfig.appUrl}/worker/join-workspace/${work.id}/${work.inviteCode}-${guest.id}-abc`,
     );
+
     return {
       id: guest.id,
       email: guest.email,
