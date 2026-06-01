@@ -38,9 +38,16 @@ export const forgottenPasswordFormSchema = z.object({
 });
 export const recoverPasswordFormSchema = z
   .object({
-    password: z.string().min(8, {
-      message: "Password must be at least 8 characters.",
-    }),
+    password: z
+      .string({ message: "Please enter your password" })
+      .min(8, { message: "Password must be at least 8 characters." })
+      .max(64, { message: "Password is too long." })
+      .regex(/[a-z]/, { message: "Must include at least one lowercase letter" })
+      .regex(/[A-Z]/, { message: "Must include at least one uppercase letter" })
+      .regex(/[0-9]/, { message: "Must include at least one number" })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: "Must include at least one special character",
+      }),
     confirmPassword: z.string().min(8, {
       message: "Password must be at least 8 characters.",
     }),
@@ -51,9 +58,17 @@ export const recoverPasswordFormSchema = z
   });
 export const setPasswordFormSchema = z
   .object({
-    password: z.string({ message: "Please enter your password" }).min(8, {
-      message: "Password must be at least 8 characters.",
-    }),
+    password: z
+      .string({ message: "Please enter your password" })
+      .min(8, { message: "Password must be at least 8 characters." })
+      .max(64, { message: "Password is too long." })
+      .regex(/[a-z]/, { message: "Must include at least one lowercase letter" })
+      .regex(/[A-Z]/, { message: "Must include at least one uppercase letter" })
+      .regex(/[0-9]/, { message: "Must include at least one number" })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: "Must include at least one special character",
+      }),
+
     confirmPassword: z
       .string({ message: "Please enter your password" })
       .min(8, {
@@ -69,18 +84,27 @@ export const signupFormSchema = z
     fullName: z.string({ message: "Please enter your full name" }).min(2, {
       message: "full name must be at least 2 characters.",
     }),
-    phone: z.string({ message: "Please enter your phone number" }).min(11, {
-      message: "Phone number must be at least 11 characters.",
-    }),
-    // country: z.string({
-    //   required_error: "Please select a country.",
-    // }),
+    phone: z
+      .string({ message: "Please enter your phone number" })
+      .trim()
+      .regex(/^\+?\d+$/, "Invalid phone format")
+      .refine((val) => val.length >= 10 && val.length <= 15, {
+        message: "Phone number must be between 10–15 digits",
+      }),
+
     email: z
       .string({ message: "Please enter your email" })
       .email({ message: "Please enter a valid email address" }),
-    password: z.string({ message: "Please enter your password" }).min(8, {
-      message: "Password must be at least 8 characters.",
-    }),
+    password: z
+      .string({ message: "Please enter your password" })
+      .min(8, { message: "Password must be at least 8 characters." })
+      .max(64, { message: "Password is too long." })
+      .regex(/[a-z]/, { message: "Must include at least one lowercase letter" })
+      .regex(/[A-Z]/, { message: "Must include at least one uppercase letter" })
+      .regex(/[0-9]/, { message: "Must include at least one number" })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: "Must include at least one special character",
+      }),
     confirmPassword: z
       .string({ message: "Please enter your password" })
       .min(8, {
@@ -93,9 +117,16 @@ export const signupFormSchema = z
   });
 export const resetPasswordFormSchema = z
   .object({
-    password: z.string({ message: "Please enter your password" }).min(8, {
-      message: "Password must be at least 8 characters.",
-    }),
+    password: z
+      .string({ message: "Please enter your password" })
+      .min(8, { message: "Password must be at least 8 characters." })
+      .max(64, { message: "Password is too long." })
+      .regex(/[a-z]/, { message: "Must include at least one lowercase letter" })
+      .regex(/[A-Z]/, { message: "Must include at least one uppercase letter" })
+      .regex(/[0-9]/, { message: "Must include at least one number" })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: "Must include at least one special character",
+      }),
     confirmPassword: z
       .string({ message: "Please enter your password" })
       .min(8, {
@@ -113,9 +144,16 @@ export const profileFormSchema = z
       .min(8, {
         message: "Password must be at least 8 characters.",
       }),
-    password: z.string({ message: "Please enter your password" }).min(8, {
-      message: "Password must be at least 8 characters.",
-    }),
+    password: z
+      .string({ message: "Please enter your password" })
+      .min(8, { message: "Password must be at least 8 characters." })
+      .max(64, { message: "Password is too long." })
+      .regex(/[a-z]/, { message: "Must include at least one lowercase letter" })
+      .regex(/[A-Z]/, { message: "Must include at least one uppercase letter" })
+      .regex(/[0-9]/, { message: "Must include at least one number" })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: "Must include at least one special character",
+      }),
     confirmPassword: z
       .string({ message: "Please enter your password" })
       .min(8, {
