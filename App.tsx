@@ -13,6 +13,7 @@ export default function App({ children }: { children: ReactNode }) {
   const { role } = useApp();
   const pathname = usePathname();
   const ownerPath = pathname.startsWith("/user");
+  const workerPath = pathname.startsWith("/worker");
   return (
     <div className="flex max-w-480 mx-auto my-0">
       <div
@@ -21,7 +22,7 @@ export default function App({ children }: { children: ReactNode }) {
         <div className="hidde w-full lg:block">
           {role === "owner" || ownerPath ? (
             <ManagerSidebar />
-          ) : role === "worker" ? (
+          ) : role === "worker" || workerPath ? (
             <WorkerSidebar />
           ) : (
             ""

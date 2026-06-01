@@ -39,7 +39,7 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-scroll no-scroll   lg:max-h-[91vh] pt-10 lg:pt-20 relative items-center justify-start  flex-col">
+      <div className="flex flex-1 overflow-scroll no-scroll   lg:max-h-[91vh] lg:pt-20 relative items-center justify-start  flex-col">
         <div className="flex items-center justify-center flex-col gap-2">
           <div className="bg-primary-green/10 size-16 text-2xl flex items-center justify-center rounded-full">
             🌿

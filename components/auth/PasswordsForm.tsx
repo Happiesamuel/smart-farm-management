@@ -17,7 +17,13 @@ import { UserObjId } from "@/lib/types";
 import { changePassword, logout } from "@/servers/auth-actions";
 import Cookies from "js-cookie";
 import { updateUser } from "@/servers/user-action";
-export function PasswordForm({ user }: { user: UserObjId }) {
+export function PasswordForm({
+  user,
+  type = "owner",
+}: {
+  type?: string;
+  user: UserObjId;
+}) {
   const { loginUser, status } = useLogin();
   const router = useRouter();
   const form = useForm<z.infer<typeof resetPasswordFormSchema>>({
@@ -43,10 +49,11 @@ export function PasswordForm({ user }: { user: UserObjId }) {
             // 3. Logout + cleanup
             await logout();
 
+            Cookies.set("role", type, { path: "/" });
             Cookies.remove("bypass");
             localStorage.removeItem("user");
 
-            router.replace("/owner/login");
+            router.replace(`/${type}/login`);
           },
           onError: (err) => {
             Cookies.remove("bypass");
@@ -101,7 +108,7 @@ export function PasswordForm({ user }: { user: UserObjId }) {
         <Button
           type="submit"
           disabled={status === "pending"}
-          className="disabled:opacity-70 text-white transition-all duration-200 bg-primary-green h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2"
+          className={`disabled:opacity-70 text-white transition-all duration-200 ${type === "owner" ? "bg-primary-green" : "bg-[#f0782d]"} h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2`}
         >
           {status === "pending" ? (
             <>

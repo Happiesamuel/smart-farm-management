@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { json, z } from "zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,7 +23,7 @@ import { useGetUserByEmail } from "@/hooks/useGetSession";
 import { sendOtp } from "@/lib/otp";
 import { createOtp } from "@/servers/email-actions";
 
-export function EmailForm() {
+export function EmailForm({ type = "owner" }: { type?: string }) {
   const { getUser, status } = useGetUserByEmail();
   const router = useRouter();
   const form = useForm<z.infer<typeof emailFormSchema>>({
@@ -51,7 +51,7 @@ export function EmailForm() {
             duration: 4000,
             closeButton: true,
           });
-          router.push(`/owner/verify-email`);
+          router.push(`/${type}/verify-email`);
         },
         onError: (err) =>
           toast("Email not found", {
@@ -81,7 +81,9 @@ export function EmailForm() {
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-4 border border-border rounded-md px-4 py-2">
-                <MdOutlineEmail className="text-xl text-primary-green" />
+                <MdOutlineEmail
+                  className={`text-xl ${type === "owner" ? "text-primary-green" : "text-[#f0782d]"} `}
+                />
                 <div className="flex items-center w-full justify-between">
                   <div className="w-full">
                     <FormLabel className="text-sm p-0 font-semibold text-dark/90">
@@ -104,7 +106,7 @@ export function EmailForm() {
         <Button
           type="submit"
           disabled={status === "pending"}
-          className="disabled:opacity-70 text-white transition-all duration-200 bg-primary-green h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2"
+          className={`disabled:opacity-70 text-white transition-all duration-200 ${type === "owner" ? "bg-primary-green" : "bg-[#f0782d]"}  h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2"`}
         >
           {status === "pending" ? (
             <>

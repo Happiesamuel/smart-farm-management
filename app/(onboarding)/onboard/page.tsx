@@ -93,8 +93,9 @@ export default function Page() {
     setRole(select);
     if (select === "owner") {
       router.push("/owner/login");
-    } else {
-      router.push("/user/login");
+    }
+    if (select === "worker") {
+      router.push("/worker/login");
     }
   };
 

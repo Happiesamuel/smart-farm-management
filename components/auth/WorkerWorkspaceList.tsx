@@ -75,11 +75,11 @@ function WorkItem({
     <div
       key={work.id}
       onClick={() => handleActive(work.workspaceId)}
-      className={`${active === work.workspaceId ? "border-primary-green" : "border-border"} p-6 cursor-pointer rounded-lg border flex items-center justify-between gap-4`}
+      className={`${active === work.workspaceId ? "border-[#f0782d]" : "border-border"} p-6 cursor-pointer rounded-lg border flex items-center justify-between gap-4`}
     >
       <div className="flex sm:flex-row flex-col gap-2 sm:items-center justify-between w-full ">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center rounded-full size-16 text-xl font-semibold bg-[#e8f5ec] text-[#2d8952]">
+          <div className="flex items-center justify-center rounded-full size-16 text-xl font-semibold bg-[#f0782d]/10 text-[#f0782d]">
             {work.name
               .split(" ")
               .slice(0, 2)
@@ -93,7 +93,7 @@ function WorkItem({
         <Button
           disabled={active !== work.workspaceId}
           onClick={() => addHandleClick(work)}
-          className={`h-10 text-sm px-5 w-full sm:w-fit ${active === work.workspaceId ? "bg-primary-green text-white" : "bg-transparent border border-dark/15 text-dark!"}  `}
+          className={`h-10 text-sm px-5 w-full sm:w-fit ${active === work.workspaceId ? "bg-[#f0782d] text-white" : "bg-transparent border border-dark/15 text-dark!"}  `}
         >
           <Link
             onClick={() => addHandleClick(work)}

@@ -16,7 +16,15 @@ import { useResendOtp, useValidateOtp } from "@/hooks/auth/useSignUp";
 import { toast } from "sonner";
 import { usePathname, useRouter } from "next/navigation";
 
-export default function OTPForm({ email, id }: { email: string; id: string }) {
+export default function OTPForm({
+  email,
+  id,
+  type = "owner",
+}: {
+  email: string;
+  id: string;
+  type?: string;
+}) {
   const { resend, error: resendErr } = useResendOtp();
   const pathname = usePathname();
   const router = useRouter();
@@ -109,14 +117,14 @@ export default function OTPForm({ email, id }: { email: string; id: string }) {
         onSuccess: () => {
           toast("OTP verified", {
             description:
-              pathname === "/owner/verify-email"
+              pathname === `/${type}/verify-email`
                 ? "Set your new password"
                 : "Create your workspace to continue",
             duration: 4000,
             closeButton: true,
           });
-          return pathname === "/owner/verify-email"
-            ? router.push("/owner/change-password")
+          return pathname === `/${type}/verify-email`
+            ? router.push(`/${type}/change-password`)
             : router.push("/owner/create-workspace");
         },
         onError: () => {
@@ -158,7 +166,9 @@ export default function OTPForm({ email, id }: { email: string; id: string }) {
 
         <p className="text-center text-sm text-zinc-500">
           Code expires in{" "}
-          <span className="text-primary-green font-semibold">
+          <span
+            className={`${type === "owner" ? "text-primary-green " : "text-[#f0782d] "} font-semibold`}
+          >
             {" "}
             {formattedTime}
           </span>
@@ -167,7 +177,7 @@ export default function OTPForm({ email, id }: { email: string; id: string }) {
         <Button
           type="submit"
           disabled={validateStat === "pending"}
-          className="disabled:opacity-70 text-white transition-all duration-200 bg-primary-green h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2"
+          className={`disabled:opacity-70 text-white transition-all duration-200 ${type === "owner" ? "bg-primary-green" : "bg-[#f0782d]"}  h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2`}
         >
           {validateStat === "pending" ? (
             <>
@@ -185,7 +195,7 @@ export default function OTPForm({ email, id }: { email: string; id: string }) {
             type="reset"
             disabled={disabled}
             onClick={handleResendOtp}
-            className="cursor-pointer text-primary-green disabled:text-primary-green/50"
+            className={`cursor-pointer ${type === "owner" ? "text-primary-green disabled:text-primary-green/50" : "text-[#f0782d] disabled:text-[#f0782d]/50"}  `}
           >
             Resend Code
           </button>

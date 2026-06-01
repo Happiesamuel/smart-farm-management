@@ -4,6 +4,7 @@ import { PasswordForm } from "@/components/auth/PasswordsForm";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BiArrowBack } from "react-icons/bi";
+import { MdEngineering } from "react-icons/md";
 export default function Page() {
   const user =
     typeof window !== "undefined"
@@ -13,7 +14,7 @@ export default function Page() {
       : null;
 
   const router = useRouter();
-  if (!user) router.push("/owner/login");
+  if (!user) router.push("/worker/login");
   if (!user) return;
   return (
     <div className="flex flex-col h-full py-4 gap-2">
@@ -25,19 +26,12 @@ export default function Page() {
           <BiArrowBack />
           <p className="hidden lg:block">Back to login</p>
         </Link>
-
-        <div className="hidden lg:flex items-center font-medium text-dark/90 gap-1 text-sm">
-          <p>New here?</p>
-          <Link className="text-primary-green" href={"/owner/sign-up"}>
-            Create an account
-          </Link>
-        </div>
       </div>
 
       <div className="flex flex-1 overflow-scroll no-scroll  lg:max-h-[91vh] pt-10 lg:pt-12 relative items-center justify-center  flex-col">
         <div className="flex items-center justify-center flex-col gap-2">
-          <div className="bg-primary-green/10 size-16 text-2xl flex items-center justify-center rounded-full">
-            🌿
+          <div className="bg-[#f0782d]/10 size-16 flex items-center justify-center rounded-full">
+            <MdEngineering className="text-[#f0782d] text-3xl" />
           </div>
           <div className="text-center space-y-1">
             <h3 className="font-semibold text-xl lg:text-3xl text-dark/90">
@@ -49,13 +43,8 @@ export default function Page() {
           </div>
         </div>
 
-        <PasswordForm user={user} />
-        <div className="flex lg:hidden items-center pt-2 font-medium text-dark/90 gap-1 text-sm">
-          <p>New here?</p>
-          <Link className="text-primary-green" href={"/owner/sign-up"}>
-            Create an account
-          </Link>
-        </div>
+        <PasswordForm type="worker" user={user} />
+
         <AuthBottom />
       </div>
     </div>
