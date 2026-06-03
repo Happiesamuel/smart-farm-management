@@ -56,6 +56,20 @@ export interface FarmObj {
   users: string;
   workspaces: string;
 }
+export interface FarmInfo {
+  description: string;
+  farmName: string;
+  farmImage?: string | File;
+  address: string;
+  lat: number;
+  lng: number;
+  size: number;
+  unit: string;
+  soilType: string;
+  status: string;
+  users: string;
+  workspaces: string;
+}
 export interface FieldInfo {
   fieldName: string;
   farm: string;

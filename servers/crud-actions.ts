@@ -6,6 +6,7 @@ import { createAdminClient } from "./appwrite";
 import {
   CropInfo,
   ExpenseInfo,
+  FarmInfo,
   FieldInfo,
   HarvestInfo,
   SalesInfo,
@@ -41,7 +42,13 @@ export const createDoc = async ({
   workspaceId: string;
   userId: string;
   data: Omit<
-    CropInfo | FieldInfo | HarvestInfo | TaskInfo | SalesInfo | ExpenseInfo,
+    | CropInfo
+    | FieldInfo
+    | HarvestInfo
+    | TaskInfo
+    | SalesInfo
+    | ExpenseInfo
+    | FarmInfo,
     "id" | "workspaces" | "users"
   >;
 }) => {
@@ -60,7 +67,17 @@ export const createDoc = async ({
   //   );
 };
 //single
-export const getDoc = async ({ collection, id, workspaceId, userId }: any) => {
+export const getDoc = async ({
+  collection,
+  id,
+  workspaceId,
+  userId,
+}: {
+  collection: string;
+  workspaceId: string;
+  userId: string;
+  id: string;
+}) => {
   await validateWorkspaceAccess({ userId, workspaceId });
   const { database } = await createAdminClient();
 
@@ -76,17 +93,45 @@ export const getDoc = async ({ collection, id, workspaceId, userId }: any) => {
 
   return doc;
 };
-export const getDocs = async ({ collection, workspaceId, userId }: any) => {
-  await validateWorkspaceAccess({ userId, workspaceId });
-  const { database } = await createAdminClient();
-
-  const res = await database.listDocuments(
-    appwriteConfig.databaseId,
-    collection,
-    [Query.equal("workspaces", workspaceId)],
-  );
-
-  return res.documents;
+export const getFarmDocs = async ({
+  collection,
+  workspaceId,
+  userId,
+  farmId,
+}: {
+  collection: string;
+  workspaceId: string;
+  userId: string;
+  farmId: string;
+}) => {
+  console.log(collection, workspaceId, userId, farmId);
+  //   await validateWorkspaceAccess({ userId, workspaceId });
+  //   const { database } = await createAdminClient();
+  //   const res = await database.listDocuments(
+  //     appwriteConfig.databaseId,
+  //     collection,
+  //   [Query.equal("workspaces", workspaceId),Query.equal("farms", farmId)],
+  //   );
+  //   return res.documents;
+};
+export const getDocs = async ({
+  collection,
+  workspaceId,
+  userId,
+}: {
+  collection: string;
+  workspaceId: string;
+  userId: string;
+}) => {
+  console.log(collection, workspaceId, userId);
+  //   await validateWorkspaceAccess({ userId, workspaceId });
+  //   const { database } = await createAdminClient();
+  //   const res = await database.listDocuments(
+  //     appwriteConfig.databaseId,
+  //     collection,
+  //     [Query.equal("workspaces", workspaceId)],
+  //   );
+  //   return res.documents;
 };
 export const updateDoc = async ({
   collection,
@@ -94,7 +139,13 @@ export const updateDoc = async ({
   data,
   workspaceId,
   userId,
-}: any) => {
+}: {
+  collection: string;
+  id: string;
+  data: Record<string, string>;
+  workspaceId: string;
+  userId: string;
+}) => {
   await validateWorkspaceAccess({ userId, workspaceId });
   const { database } = await createAdminClient();
   return await database.updateDocument(
@@ -111,7 +162,14 @@ export const updateField = async ({
   value,
   workspaceId,
   userId,
-}: any) => {
+}: {
+  collection: string;
+  id: string;
+  value: string;
+  field: string;
+  workspaceId: string;
+  userId: string;
+}) => {
   await validateWorkspaceAccess({ userId, workspaceId });
   const { database } = await createAdminClient();
   return await database.updateDocument(
@@ -128,7 +186,12 @@ export const deleteDoc = async ({
   id,
   workspaceId,
   userId,
-}: any) => {
+}: {
+  collection: string;
+  id: string;
+  workspaceId: string;
+  userId: string;
+}) => {
   await validateWorkspaceAccess({ userId, workspaceId });
   const { database } = await createAdminClient();
   return await database.deleteDocument(

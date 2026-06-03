@@ -1,7 +1,7 @@
 "use client";
 import { SalesInfo } from "@/lib/types";
-import { createDoc } from "@/servers/crud-actions";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createDoc, getDocs, getFarmDocs } from "@/servers/crud-actions";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateSales = () => {
   const queryClient = useQueryClient();
@@ -24,4 +24,44 @@ export const useCreateSales = () => {
     },
   });
   return { createSales, status };
+};
+
+export const useGetFarmSales = (
+  workspaceId: string,
+  userId: string,
+  farmId: string,
+) => {
+  const {
+    data: sales,
+    status,
+    error,
+  } = useQuery({
+    queryKey: ["sales", workspaceId, farmId],
+    queryFn: () =>
+      getFarmDocs({
+        collection: "sales",
+        workspaceId,
+        userId,
+        farmId,
+      }),
+    enabled: !!workspaceId && !!userId && !!farmId,
+  });
+  return { sales, error, status };
+};
+
+export const useGetSales = (workspaceId: string, userId: string) => {
+  const {
+    data: sales,
+    status,
+    error,
+  } = useQuery({
+    queryKey: ["sales", workspaceId],
+    queryFn: () =>
+      getDocs({
+        collection: "sales",
+        workspaceId,
+        userId,
+      }),
+  });
+  return { sales, error, status };
 };

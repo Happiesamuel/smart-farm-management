@@ -6,7 +6,6 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 
-import { useState } from "react";
 import { createFarmSchema } from "@/lib/schemas";
 import { PiPlant } from "react-icons/pi";
 import CreateFarmInput, {
@@ -19,14 +18,47 @@ import CreateFarmInput, {
 import { FiUser } from "react-icons/fi";
 import { FaRegSave } from "react-icons/fa";
 import { MdOutlineSignalWifiStatusbar4Bar } from "react-icons/md";
+import { toast } from "sonner";
+import { useCreateFarm } from "@/hooks/farms/useFarm";
+import { useApp } from "@/stores/useAppStore";
+import ButtonLoader from "@/components/layout/ButtonLoader";
 export default function CreateFarmForm() {
-  const [load, setLoad] = useState(false);
-  //   const { login, status } = useLogin();
   const form = useForm<z.infer<typeof createFarmSchema>>({
     resolver: zodResolver(createFarmSchema),
   });
+  const { workspace, user } = useApp();
+  const { createFarm, status } = useCreateFarm();
+  async function onSubmit(values: z.infer<typeof createFarmSchema>) {
+    const { location, ...rest } = values;
 
-  async function onSubmit(values: z.infer<typeof createFarmSchema>) {}
+    const newObj = {
+      ...rest,
+      address: location.address,
+      lat: location.lat,
+      lng: location.lng,
+      size: +rest.size,
+    };
+    const obj = {
+      userId: user!.id,
+      workspaceId: workspace!.id,
+      data: {
+        ...newObj,
+      },
+    };
+    createFarm(obj, {
+      onSuccess: () => {
+        toast("Farm created successfully", {
+          description: "You can now proceed to managing your farm",
+        });
+      },
+      onError: (err) =>
+        toast("Error creating farm", {
+          description: err.message,
+          duration: 4000,
+          closeButton: true,
+        }),
+    });
+  }
 
   const soil = [
     {
@@ -145,7 +177,16 @@ export default function CreateFarmForm() {
               type="submit"
               className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              <FaRegSave /> Save farm
+              {status === "pending" ? (
+                <>
+                  <ButtonLoader />
+                  Creating...
+                </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <FaRegSave /> Save Farm
+                </div>
+              )}
             </Button>
           </div>
         </form>
