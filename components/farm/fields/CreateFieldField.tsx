@@ -341,83 +341,87 @@ export function CreateFieldCombo({
     <FormField
       control={control}
       name={name}
-      render={({ field }) => (
-        <FormItem className="flex flex-col w-full">
-          <FormLabel>{label}</FormLabel>
+      render={({ field }) => {
+        return (
+          <FormItem className="flex flex-col w-full">
+            <FormLabel>{label}</FormLabel>
 
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <FormControl>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  className={cn(
-                    "w-full justify-between text-sm",
-                    !field.value && "text-dark/80",
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    {Icon && <Icon className="text-primary-green" />}
-                    {(field.value as string) || (placeholder1 as string)}
-                  </div>
-                  <IoIosArrowDown className="ml-2 h-4 w-4 opacity-50" />
-                </Button>
-              </FormControl>
-            </PopoverTrigger>
-
-            <PopoverContent className="w-full p-0">
-              <Command>
-                <CommandInput
-                  placeholder={placeholder2}
-                  value={inputValue}
-                  onValueChange={setInputValue}
-                />
-
-                <CommandEmpty>
-                  <div
-                    className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-accent"
-                    onClick={() => {
-                      field.onChange(inputValue);
-                      setOpen(false);
-                    }}
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className={cn(
+                      "w-full justify-between text-sm",
+                      !field.value && "text-dark/80",
+                    )}
                   >
-                    <Plus className="w-4 h-4" />
-                    Add &quot;{inputValue}&quot;
-                  </div>
-                </CommandEmpty>
+                    <div className="flex items-center gap-2">
+                      {Icon && <Icon className="text-primary-green" />}
+                      {(field.value as string) || (placeholder1 as string)}
+                    </div>
+                    <IoIosArrowDown className="ml-2 h-4 w-4 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
 
-                <CommandGroup className="max-h-[200px] overflow-scroll no-scroll">
-                  {array
-                    .filter((crop) =>
-                      crop.toLowerCase().includes(inputValue.toLowerCase()),
-                    )
-                    .map((crop) => (
-                      <CommandItem
-                        key={crop}
-                        value={crop}
-                        className="pr-2 hover:bg-primary-green hover:text-white cursor-pointer"
-                        onSelect={() => {
-                          field.onChange(crop);
-                          setOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            field.value === crop ? "opacity-100" : "opacity-0",
-                          )}
-                        />
-                        {crop}
-                      </CommandItem>
-                    ))}
-                </CommandGroup>
-              </Command>
-            </PopoverContent>
-          </Popover>
+              <PopoverContent className="w-full p-0">
+                <Command>
+                  <CommandInput
+                    placeholder={placeholder2}
+                    value={inputValue}
+                    onValueChange={setInputValue}
+                  />
 
-          <FormMessage />
-        </FormItem>
-      )}
+                  <CommandEmpty>
+                    <div
+                      className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-accent"
+                      onClick={() => {
+                        field.onChange(inputValue);
+                        setOpen(false);
+                      }}
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add &quot;{inputValue}&quot;
+                    </div>
+                  </CommandEmpty>
+
+                  <CommandGroup className="max-h-[200px] overflow-scroll no-scroll">
+                    {array
+                      .filter((crop) =>
+                        crop.toLowerCase().includes(inputValue.toLowerCase()),
+                      )
+                      .map((crop) => (
+                        <CommandItem
+                          key={crop}
+                          value={crop}
+                          className="pr-2 hover:bg-primary-green hover:text-white cursor-pointer"
+                          onSelect={() => {
+                            field.onChange(crop);
+                            setOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              field.value === crop
+                                ? "opacity-100"
+                                : "opacity-0",
+                            )}
+                          />
+                          {crop}
+                        </CommandItem>
+                      ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
+
+            <FormMessage />
+          </FormItem>
+        );
+      }}
     />
   );
 }

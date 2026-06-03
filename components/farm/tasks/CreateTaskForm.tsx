@@ -6,7 +6,6 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 
-import { useState } from "react";
 import { createTaskSchema } from "@/lib/schemas";
 import { PiFarm } from "react-icons/pi";
 
@@ -19,14 +18,42 @@ import CreateTaskInput, {
   CreateTaskSelect,
   CreateTaskText,
 } from "./CreateTaskField";
+import ButtonLoader from "@/components/layout/ButtonLoader";
+import { useParams } from "next/navigation";
+import { useApp } from "@/stores/useAppStore";
+import { toast } from "sonner";
+import { useCreateTask } from "@/hooks/tasks/useTask";
 export default function CreateTaskForm() {
-  const [load, setLoad] = useState(false);
-  //   const { login, status } = useLogin();
   const form = useForm<z.infer<typeof createTaskSchema>>({
     resolver: zodResolver(createTaskSchema),
   });
 
-  async function onSubmit(values: z.infer<typeof createTaskSchema>) {}
+  const { farmId } = useParams();
+  const { createTask, status } = useCreateTask();
+  const { workspace, user } = useApp();
+  async function onSubmit(values: z.infer<typeof createTaskSchema>) {
+    const obj = {
+      userId: user!.id,
+      workspaceId: workspace!.id,
+      data: {
+        ...values,
+        farmId: farmId!.toString(),
+      },
+    };
+    createTask(obj, {
+      onSuccess: () => {
+        toast("Task created successfully", {
+          description: "You can now proceed to managing your task",
+        });
+      },
+      onError: (err) =>
+        toast("Error creating task", {
+          description: err.message,
+          duration: 4000,
+          closeButton: true,
+        }),
+    });
+  }
 
   const farm = [
     {
@@ -158,9 +185,19 @@ export default function CreateTaskForm() {
             </Button>
             <Button
               type="submit"
+              disabled={status === "pending"}
               className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              <FaRegSave /> Add Task
+              {status === "pending" ? (
+                <>
+                  <ButtonLoader />
+                  Creating...
+                </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <FaRegSave /> Add Task
+                </div>
+              )}
             </Button>
           </div>
         </form>

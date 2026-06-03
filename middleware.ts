@@ -148,6 +148,32 @@ export function middleware(req: NextRequest) {
     );
   }
 
+  // 🚨 7. Workspace in URL must match active workspace cookie
+  if (hasSession && activeWorkspace) {
+    const userWorkspaceMatch = path.match(/^\/user\/([^/]+)/);
+    const workerWorkspaceMatch = path.match(/^\/worker\/([^/]+)/);
+
+    const urlWorkspace = userWorkspaceMatch?.[1] || workerWorkspaceMatch?.[1];
+
+    // ignore select-workspace and other non-workspace paths
+    if (
+      urlWorkspace &&
+      urlWorkspace !== "select-workspace" &&
+      urlWorkspace !== activeWorkspace
+    ) {
+      if (isOwner) {
+        return NextResponse.redirect(
+          new URL(`/user/${activeWorkspace}/dashboard`, req.url),
+        );
+      }
+      if (isWorkerOrManager) {
+        return NextResponse.redirect(
+          new URL(`/worker/${activeWorkspace}/dashboard`, req.url),
+        );
+      }
+    }
+  }
+
   if (hasSession && isOwner && path.startsWith("/worker")) {
     return NextResponse.redirect(
       new URL(

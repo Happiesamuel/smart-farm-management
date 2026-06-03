@@ -56,3 +56,102 @@ export interface FarmObj {
   users: string;
   workspaces: string;
 }
+export interface FieldInfo {
+  fieldName: string;
+  farm: string;
+  size: string;
+  unit: string;
+  soilType: string;
+  irrigationType?: string;
+  cropType: string;
+  plantingToHarvest: { from: string; to: string };
+  description: string;
+  farmId: string;
+  id: string;
+  workspaces: string;
+  users: string;
+}
+export interface CropInfo {
+  cropName: string;
+  plantingToHarvest: {
+    from: string;
+    to: string;
+  };
+  irrigationType?: string;
+  farm: string;
+  field: string;
+  expectedYield: string;
+  yieldUnit: string;
+  seedQuantity: string;
+  seedUnit: string;
+  areaPlanted: string;
+  areaUnit: string;
+  status: string;
+  soilType: string;
+  description: string;
+  farmId: string;
+  id: string;
+  workspaces: string;
+  users: string;
+}
+export interface HarvestInfo {
+  cropName: string;
+  buyer?: string;
+  date: string;
+  farm: string;
+  field: string;
+  quantity: string;
+  unit: string;
+  status: string;
+  quality: string;
+  amount: string;
+  description: string;
+  farmId: string;
+  id: string;
+  workspaces: string;
+  users: string;
+}
+export interface TaskInfo {
+  taskTitle: string;
+  farm: string;
+  field: string;
+  priority: string;
+  assignTo: string;
+  description: string;
+  dueDate: string;
+  farmId: string;
+  id: string;
+  workspaces: string;
+  users: string;
+}
+export interface SalesInfo {
+  crop: string;
+  field: string;
+  farm: string;
+  quantity: string;
+  unit: string;
+  unitPrice: string;
+  totalAmount: string;
+  saleDate: string;
+  buyer: string;
+  paymentMethod: string;
+  notes?: string;
+  farmId: string;
+  id: string;
+  workspaces: string;
+  users: string;
+}
+export interface ExpenseInfo {
+  category: string;
+  farm: string;
+  amount: string;
+  date: string;
+  paymentMethod: string;
+  notes?: string;
+  description: string;
+  receipt?: File;
+  farmId: string;
+  id: string;
+  workspaces: string;
+  users: string;
+}

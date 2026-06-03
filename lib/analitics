@@ -1,0 +1,200 @@
+🚀 STEP 1: BASIC FINANCIAL ANALYTICS
+✅ TOTAL EXPENSES
+export const getTotalExpenses = async ({
+  databases,
+  workspaceId,
+  userId,
+}: any) => {
+  const expenses = await getDocs({
+    databases,
+    collection: "expenses",
+    workspaceId,
+    userId,
+  });
+
+  return expenses.reduce((sum: number, exp: any) => {
+    return sum + exp.amount;
+  }, 0);
+};
+✅ TOTAL SALES (REVENUE)
+export const getTotalSales = async ({
+  databases,
+  workspaceId,
+  userId,
+}: any) => {
+  const sales = await getDocs({
+    databases,
+    collection: "sales",
+    workspaceId,
+    userId,
+  });
+
+  return sales.reduce((sum: number, sale: any) => {
+    return sum + sale.revenue;
+  }, 0);
+};
+✅ PROFIT / LOSS
+export const getProfit = async (params: any) => {
+  const totalExpenses = await getTotalExpenses(params);
+  const totalSales = await getTotalSales(params);
+
+  return {
+    revenue: totalSales,
+    expenses: totalExpenses,
+    profit: totalSales - totalExpenses,
+  };
+};
+🚀 STEP 2: FARM-LEVEL ANALYTICS
+✅ PROFIT PER FARM
+export const getFarmAnalytics = async ({
+  databases,
+  workspaceId,
+  userId,
+}: any) => {
+  const farms = await getDocs({
+    databases,
+    collection: "farms",
+    workspaceId,
+    userId,
+  });
+
+  const expenses = await getDocs({
+    databases,
+    collection: "expenses",
+    workspaceId,
+    userId,
+  });
+
+  const sales = await getDocs({
+    databases,
+    collection: "sales",
+    workspaceId,
+    userId,
+  });
+
+  return farms.map((farm: any) => {
+    const farmExpenses = expenses
+      .filter((e: any) => e.farmId === farm.$id)
+      .reduce((sum: number, e: any) => sum + e.amount, 0);
+
+    const farmSales = sales
+      .filter((s: any) => s.farmId === farm.$id)
+      .reduce((sum: number, s: any) => sum + s.revenue, 0);
+
+    return {
+      farmId: farm.$id,
+      farmName: farm.name,
+      revenue: farmSales,
+      expenses: farmExpenses,
+      profit: farmSales - farmExpenses,
+    };
+  });
+};
+🚀 STEP 3: CROP PERFORMANCE
+✅ BEST PERFORMING CROPS
+export const getCropAnalytics = async ({
+  databases,
+  workspaceId,
+  userId,
+}: any) => {
+  const crops = await getDocs({
+    databases,
+    collection: "crops",
+    workspaceId,
+    userId,
+  });
+
+  const harvests = await getDocs({
+    databases,
+    collection: "harvests",
+    workspaceId,
+    userId,
+  });
+
+  const sales = await getDocs({
+    databases,
+    collection: "sales",
+    workspaceId,
+    userId,
+  });
+
+  return crops.map((crop: any) => {
+    const cropHarvests = harvests.filter(
+      (h: any) => h.cropId === crop.$id
+    );
+
+    const cropSales = sales.filter(
+      (s: any) => s.cropId === crop.$id
+    );
+
+    const totalYield = cropHarvests.reduce(
+      (sum: number, h: any) => sum + h.quantity,
+      0
+    );
+
+    const revenue = cropSales.reduce(
+      (sum: number, s: any) => sum + s.revenue,
+      0
+    );
+
+    return {
+      cropName: crop.name,
+      yield: totalYield,
+      revenue,
+    };
+  });
+};
+🚀 STEP 4: MONTHLY ANALYTICS
+✅ TREND DATA
+export const getMonthlyAnalytics = async ({
+  databases,
+  workspaceId,
+  userId,
+}: any) => {
+  const sales = await getDocs({
+    databases,
+    collection: "sales",
+    workspaceId,
+    userId,
+  });
+
+  const grouped: Record<string, number> = {};
+
+  sales.forEach((sale: any) => {
+    const month = new Date(sale.$createdAt).toLocaleString("default", {
+      month: "short",
+    });
+
+    grouped[month] = (grouped[month] || 0) + sale.revenue;
+  });
+
+  return grouped;
+};
+🔥 WHAT YOU NOW HAVE
+Dashboard Analytics:
+✔ Total revenue
+✔ Total expenses
+✔ Profit/Loss
+✔ Farm performance
+✔ Crop performance
+✔ Monthly trends
+🚀 HOW TO USE IN DASHBOARD
+const { data } = useQuery({
+  queryKey: ["analytics", workspaceId],
+  queryFn: () =>
+    getProfit({
+      databases,
+      workspaceId,
+      userId,
+    }),
+});
+💡 NEXT LEVEL (OPTIONAL BUT POWERFUL)
+
+You can add:
+
+🔥 Smart Insights
+if (profit < 0) {
+  return "⚠️ Your farm is running at a loss";
+}
+🔥 Best Farm
+topFarm = farms.sort((a, b) => b.profit - a.profit)[0];

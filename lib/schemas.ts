@@ -364,9 +364,9 @@ export const createCropSchema = z.object({
   field: z
     .string({ message: "Please select field" })
     .min(1, "Please select a field"),
-  variety: z
-    .string({ message: "Please select variety" })
-    .min(1, "Please select variety"),
+  // variety: z
+  //   .string({ message: "Please select variety" })
+  //   .min(1, "Please select variety"),
   expectedYield: z.string({ message: "Expected yield is required" }).min(1, {
     message: "Expected Yield must be at least a characters.",
   }),
@@ -490,14 +490,15 @@ export const financeExpenseSchema = z.object({
     .optional(),
 });
 function comboSchema(message: string) {
-  return z.object(
-    {
-      id: z.string().optional(),
-      name: z.string().min(1, message),
-      isCustom: z.boolean().optional(),
-    },
-    { message: message },
-  );
+  return z.string({ message: message });
+  // return z.object(
+  //   {
+  //     id: z.string().optional(),
+  //     name: z.string().min(1, message),
+  //     isCustom: z.boolean().optional(),
+  //   },
+  //   { message: message },
+  // );
 }
 export const infoFormSchema = z.object({
   fullName: z.string({ message: "Please enter your full name" }).min(4, {

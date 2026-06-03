@@ -6,7 +6,6 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 
-import { useState } from "react";
 import { createCropSchema } from "@/lib/schemas";
 import { PiFarm, PiPlant } from "react-icons/pi";
 import { ImDroplet } from "react-icons/im";
@@ -21,14 +20,45 @@ import {
 import { TbRipple } from "react-icons/tb";
 import { MdSignalWifiStatusbar1Bar } from "react-icons/md";
 import { IoGrid } from "react-icons/io5";
+import { useCreateCrop } from "@/hooks/crops/useCrops";
+import { useApp } from "@/stores/useAppStore";
+import { useParams } from "next/navigation";
+import ButtonLoader from "@/components/layout/ButtonLoader";
+import { toast } from "sonner";
 export default function CreateCropForm() {
-  const [load, setLoad] = useState(false);
-  //   const { login, status } = useLogin();
   const form = useForm<z.infer<typeof createCropSchema>>({
     resolver: zodResolver(createCropSchema),
   });
-
-  async function onSubmit(values: z.infer<typeof createCropSchema>) {}
+  const { farmId } = useParams();
+  const { createCrop, status } = useCreateCrop();
+  const { workspace, user } = useApp();
+  async function onSubmit(values: z.infer<typeof createCropSchema>) {
+    const obj = {
+      userId: user!.id,
+      workspaceId: workspace!.id,
+      data: {
+        ...values,
+        plantingToHarvest: {
+          from: values.plantingToHarvest.from.toString(),
+          to: values.plantingToHarvest.to.toString(),
+        },
+        farmId: farmId!.toString(),
+      },
+    };
+    createCrop(obj, {
+      onSuccess: () => {
+        toast("Crop created successfully", {
+          description: "You can now proceed to managing your crop",
+        });
+      },
+      onError: (err) =>
+        toast("Error creating crop", {
+          description: err.message,
+          duration: 4000,
+          closeButton: true,
+        }),
+    });
+  }
 
   const farm = [
     {
@@ -311,9 +341,19 @@ export default function CreateCropForm() {
             </Button>
             <Button
               type="submit"
+              disabled={status === "pending"}
               className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              <FaRegSave /> Add Field
+              {status === "pending" ? (
+                <>
+                  <ButtonLoader />
+                  Creating...
+                </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <FaRegSave /> Add Crop
+                </div>
+              )}
             </Button>
           </div>
         </form>

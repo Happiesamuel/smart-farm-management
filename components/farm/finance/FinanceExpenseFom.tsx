@@ -6,7 +6,6 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { AiOutlineTag } from "react-icons/ai";
-import { useState } from "react";
 import { financeExpenseSchema } from "@/lib/schemas";
 import FinanceInput, {
   FinanceAmount,
@@ -18,22 +17,49 @@ import FinanceInput, {
 
 import { MdOutlinePayment } from "react-icons/md";
 import { FaRegSave } from "react-icons/fa";
-// import Field from "./Field";
+import { useApp } from "@/stores/useAppStore";
+import { useParams } from "next/navigation";
+import ButtonLoader from "@/components/layout/ButtonLoader";
+import { toast } from "sonner";
+import { useCreateExpenses } from "@/hooks/expense/useExpense";
 export default function FinanceExpenseFom() {
-  const [load, setLoad] = useState(false);
-  //   const { login, status } = useLogin();
   const form = useForm<z.infer<typeof financeExpenseSchema>>({
     resolver: zodResolver(financeExpenseSchema),
   });
+  const { farmId } = useParams();
+  const { createExpense, status } = useCreateExpenses();
+  const { workspace, user } = useApp();
+  async function onSubmit(values: z.infer<typeof financeExpenseSchema>) {
+    const obj = {
+      userId: user!.id,
+      workspaceId: workspace!.id,
+      data: {
+        ...values,
+        farmId: farmId!.toString(),
+      },
+    };
+    createExpense(obj, {
+      onSuccess: () => {
+        toast("Expenses created successfully", {
+          description: "You can now proceed to managing your task",
+        });
+      },
+      onError: (err) =>
+        toast("Error creating expenses", {
+          description: err.message,
+          duration: 4000,
+          closeButton: true,
+        }),
+    });
+  }
 
-  async function onSubmit(values: z.infer<typeof financeExpenseSchema>) {}
   const category = [
     {
       name: "Fertilizer",
       value: "fertilizer",
     },
     {
-      name: "Labout",
+      name: "Labour",
       value: "labour",
     },
     {
@@ -94,7 +120,7 @@ export default function FinanceExpenseFom() {
               control={form.control}
               label="Farm"
               placeholder="Select farm"
-              array={category}
+              array={farm}
               Icon={AiOutlineTag}
             />
           </div>
@@ -145,7 +171,16 @@ export default function FinanceExpenseFom() {
               type="submit"
               className="text-white bg-red-600 rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              <FaRegSave /> Save Expense
+              {status === "pending" ? (
+                <>
+                  <ButtonLoader />
+                  Creating...
+                </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <FaRegSave /> Save expense
+                </div>
+              )}
             </Button>
           </div>
         </form>

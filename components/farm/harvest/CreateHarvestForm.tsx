@@ -6,7 +6,6 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 
-import { useState } from "react";
 import { createHarvestSchema } from "@/lib/schemas";
 import { PiFarm, PiPlant } from "react-icons/pi";
 import { FaRegSave } from "react-icons/fa";
@@ -21,14 +20,42 @@ import {
 import { MdSignalWifiStatusbar1Bar } from "react-icons/md";
 import { IoGrid } from "react-icons/io5";
 import CreateHarvestInput from "./CreateHarvestField";
+import { useParams } from "next/navigation";
+import { useApp } from "@/stores/useAppStore";
+import { toast } from "sonner";
+import ButtonLoader from "@/components/layout/ButtonLoader";
+import { useCreateHavest } from "@/hooks/harvest/useHarvest";
 export default function CreateHarvestForm() {
-  const [load, setLoad] = useState(false);
-  //   const { login, status } = useLogin();
   const form = useForm<z.infer<typeof createHarvestSchema>>({
     resolver: zodResolver(createHarvestSchema),
   });
 
-  async function onSubmit(values: z.infer<typeof createHarvestSchema>) {}
+  const { farmId } = useParams();
+  const { createHarvest, status } = useCreateHavest();
+  const { workspace, user } = useApp();
+  async function onSubmit(values: z.infer<typeof createHarvestSchema>) {
+    const obj = {
+      userId: user!.id,
+      workspaceId: workspace!.id,
+      data: {
+        ...values,
+        farmId: farmId!.toString(),
+      },
+    };
+    createHarvest(obj, {
+      onSuccess: () => {
+        toast("Harvest created successfully", {
+          description: "You can now proceed to managing your crop",
+        });
+      },
+      onError: (err) =>
+        toast("Error creating harvest", {
+          description: err.message,
+          duration: 4000,
+          closeButton: true,
+        }),
+    });
+  }
 
   const farm = [
     {
@@ -213,9 +240,19 @@ export default function CreateHarvestForm() {
             </Button>
             <Button
               type="submit"
+              disabled={status === "pending"}
               className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              <FaRegSave /> Add Harvest
+              {status === "pending" ? (
+                <>
+                  <ButtonLoader />
+                  Creating...
+                </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <FaRegSave /> Add Harvest
+                </div>
+              )}
             </Button>
           </div>
         </form>

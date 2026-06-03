@@ -6,13 +6,11 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 
-import { useState } from "react";
 import { createFieldSchema } from "@/lib/schemas";
-import { PiFarm, PiPlant, PiPlantDuotone } from "react-icons/pi";
+import { PiFarm, PiPlantDuotone } from "react-icons/pi";
 import { ImDroplet } from "react-icons/im";
 import { FiUser } from "react-icons/fi";
 import { FaRegSave } from "react-icons/fa";
-import { GrFlag } from "react-icons/gr";
 import CreateFieldInput, {
   CreateFieldCombo,
   CreateFieldDate,
@@ -21,15 +19,45 @@ import CreateFieldInput, {
   CreateFieldText,
 } from "./CreateFieldField";
 import { TbRipple } from "react-icons/tb";
-import { CreateCropCombo } from "../crops/CreateCropField";
+import { useCreateField } from "@/hooks/fields/useFields";
+import ButtonLoader from "@/components/layout/ButtonLoader";
+import { toast } from "sonner";
+import { useApp } from "@/stores/useAppStore";
+import { useParams } from "next/navigation";
 export default function CreateFieldForm() {
-  const [load, setLoad] = useState(false);
-  //   const { login, status } = useLogin();
+  const { farmId } = useParams();
+  const { createField, status } = useCreateField();
   const form = useForm<z.infer<typeof createFieldSchema>>({
     resolver: zodResolver(createFieldSchema),
   });
-
-  async function onSubmit(values: z.infer<typeof createFieldSchema>) {}
+  const { workspace, user } = useApp();
+  async function onSubmit(values: z.infer<typeof createFieldSchema>) {
+    const obj = {
+      userId: user!.id,
+      workspaceId: workspace!.id,
+      data: {
+        ...values,
+        plantingToHarvest: {
+          from: values.plantingToHarvest.from.toString(),
+          to: values.plantingToHarvest.to.toString(),
+        },
+        farmId: farmId!.toString(),
+      },
+    };
+    createField(obj, {
+      onSuccess: () => {
+        toast("Field created successfully", {
+          description: "You can now proceed to managing your field",
+        });
+      },
+      onError: (err) =>
+        toast("Error creating crop", {
+          description: err.message,
+          duration: 4000,
+          closeButton: true,
+        }),
+    });
+  }
 
   const farm = [
     {
@@ -214,9 +242,19 @@ export default function CreateFieldForm() {
             </Button>
             <Button
               type="submit"
+              disabled={status === "pending"}
               className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              <FaRegSave /> Add Field
+              {status === "pending" ? (
+                <>
+                  <ButtonLoader />
+                  Creating...
+                </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <FaRegSave /> Add Field
+                </div>
+              )}
             </Button>
           </div>
         </form>
