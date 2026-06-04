@@ -99,3 +99,58 @@ export default function DashboardFarms() {
     </div>
   );
 }
+
+// const { data } = useDashboardStats(workspaceId, userId);
+
+// const stats = data?.stats.map((item) => {
+//   const uiMap: any = {
+//     "Total Farms": {
+//       icon: <PiFarm />,
+//       iconColor: "bg-[#e8f5ec] text-[#2d8952]",
+//       bg: "bg-[#f8fdf9]",
+//       border: "border-green-100",
+//     },
+//     "Total Fields": {
+//       icon: <TfiLayoutGrid4 />,
+//       iconColor: "bg-[#e1eefd] text-[#1058d6]",
+//       bg: "bg-[#f7fafe]",
+//       border: "border-blue-100",
+//     },
+//     "Total Crops": {
+//       icon: <PiPlant />,
+//       iconColor: "bg-[#f1ecfd] text-[#5837e8]",
+//       bg: "bg-[#f9f7fd]",
+//       border: "border-purple-100",
+//     },
+//     "Active Tasks": {
+//       icon: <FaRegCalendarCheck />,
+//       iconColor: "bg-[#fff1dd] text-[#de852c]",
+//       bg: "bg-[#fefaf2]",
+//       border: "border-orange-100",
+//     },
+//     "Total Revenue": {
+//       icon: <PiPackage />,
+//       iconColor: "bg-[#e7f5eb] text-[#056b36]",
+//       bg: "bg-[#f5faf6]",
+//       border: "border-green-100",
+//     },
+//     "Total Expenses": {
+//       icon: <GrMoney />,
+//       iconColor: "bg-[#fee7e7] text-[#e82a2d]",
+//       bg: "bg-[#fef5f5]",
+//       border: "border-red-100",
+//     },
+//     "Net Profit": {
+//       icon: <PiChartLine />,
+//       iconColor: "bg-[#e7f5eb] text-[#056b36]",
+//       bg: "bg-[#f5faf6]",
+//       border: "border-green-100",
+//     },
+//   };
+
+//   return {
+//     num: item.value,
+//     name: item.name,
+//     ...uiMap[item.name],
+//   };
+// });

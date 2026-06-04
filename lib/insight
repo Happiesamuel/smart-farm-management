@@ -226,3 +226,27 @@ Your system now has:
 🧠 Intelligence (logic)
 💬 Human-readable insights
 📊 Actionable feedback
+
+
+
+
+
+
+const insights: string[] = [];
+
+if (fieldsPerFarm >= 3) {
+  insights.push("Good field distribution across farms");
+}
+
+if (totalCrops < totalFields) {
+  insights.push("Some fields are underutilized");
+}
+
+if (profit < 0) {
+  insights.push("⚠️ Farm is running at a loss");
+}
+
+return {
+  ...data,
+  insights,
+};

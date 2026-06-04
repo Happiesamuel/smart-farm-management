@@ -4,6 +4,7 @@ import { createAdminClient } from "./appwrite";
 import { appwriteConfig } from "./appwrite-client";
 import { FarmObj } from "@/lib/types";
 import { uploadImage } from "@/lib/functions";
+import { validateWorkspaceAccess } from "./crud-actions";
 
 export async function createFarm(obj: FarmObj) {
   try {
@@ -112,3 +113,62 @@ export async function getFarm(userId: string | undefined) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");
   }
 }
+
+export const getFarmsWithStats = async ({
+  workspaceId,
+  userId,
+}: {
+  workspaceId: string;
+  userId: string;
+}) => {
+  await validateWorkspaceAccess({ userId, workspaceId });
+
+  const { database } = await createAdminClient();
+
+  const [farmsRes, fieldsRes, cropsRes, salesRes] = await Promise.all([
+    database.listDocuments(appwriteConfig.databaseId, "farms", [
+      Query.equal("workspaceId", workspaceId),
+    ]),
+    database.listDocuments(appwriteConfig.databaseId, "fields", [
+      Query.equal("workspaceId", workspaceId),
+    ]),
+    database.listDocuments(appwriteConfig.databaseId, "crops", [
+      Query.equal("workspaceId", workspaceId),
+    ]),
+    database.listDocuments(appwriteConfig.databaseId, "sales", [
+      Query.equal("workspaceId", workspaceId),
+    ]),
+  ]);
+
+  const farms = farmsRes.documents;
+  const fields = fieldsRes.documents;
+  const crops = cropsRes.documents;
+  const sales = salesRes.documents;
+
+  // 🔥 map farms with computed stats
+  const farmsWithStats = farms.map((farm) => {
+    const farmFields = fields.filter((f) => f.farmId === farm.$id);
+
+    const farmCrops = crops.filter((c) => c.farmId === farm.$id);
+
+    const farmSales = sales.filter((s) => s.farmId === farm.$id);
+
+    const totalRevenue = farmSales.reduce(
+      (sum: number, s) => sum + (s.revenue || 0),
+      0,
+    );
+
+    return {
+      id: farm.$id,
+      name: farm.name,
+      image: farm.image, // optional
+      location: farm.location,
+      totalFields: farmFields.length,
+      totalCrops: farmCrops.length,
+      revenue: `₦${totalRevenue.toLocaleString()}`,
+      status: farm.status || "Active",
+    };
+  });
+
+  return farmsWithStats;
+};

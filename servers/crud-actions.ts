@@ -12,6 +12,7 @@ import {
   SalesInfo,
   TaskInfo,
 } from "@/lib/types";
+import { uploadImage } from "@/lib/functions";
 
 export const validateWorkspaceAccess = async ({
   userId,
@@ -52,20 +53,44 @@ export const createDoc = async ({
     "id" | "workspaces" | "users"
   >;
 }) => {
-  console.log(collection, data, workspaceId, userId);
-  //   await validateWorkspaceAccess({ userId, workspaceId });
-  //   const { database } = await createAdminClient();
-  //   return await database.createDocument(
-  //     appwriteConfig.databaseId,
-  //     collection,
-  //     ID.unique(),
-  //     {
-  //       ...data,
-  //       workspaces: workspaceId,
-  //       users: userId,
-  //     },
-  //   );
+  let newData;
+  if (collection === "fields") {
+    const a = await img(data as Omit<FieldInfo, "id" | "workspaces" | "users">);
+    newData = { ...data, ...a };
+  } else {
+    newData = { ...data };
+  }
+  await validateWorkspaceAccess({ userId, workspaceId });
+  const { database } = await createAdminClient();
+  const a = await database.createDocument(
+    appwriteConfig.databaseId,
+    collection,
+    ID.unique(),
+    {
+      ...newData,
+      workspaces: workspaceId,
+      users: userId,
+    },
+  );
+  return {
+    id: a.$id,
+  };
 };
+export async function img(obj: Omit<FieldInfo, "id" | "workspaces" | "users">) {
+  const incl = Object.keys(obj).includes("fieldImage");
+
+  const { avatar } = await createAdminClient();
+  let lnk: string = "";
+  if (incl) {
+    const uploaded = await uploadImage(obj.fieldImage as unknown as File);
+    lnk = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.bucketId}/files/${uploaded.$id}/view?project=${appwriteConfig.projectId}&mode=admin`;
+  } else {
+    lnk = avatar.getInitials({
+      name: obj.fieldName,
+    });
+  }
+  return { fieldImage: lnk };
+}
 //single
 export const getDoc = async ({
   collection,
@@ -104,15 +129,16 @@ export const getFarmDocs = async ({
   userId: string;
   farmId: string;
 }) => {
-  console.log(collection, workspaceId, userId, farmId);
-  //   await validateWorkspaceAccess({ userId, workspaceId });
-  //   const { database } = await createAdminClient();
-  //   const res = await database.listDocuments(
-  //     appwriteConfig.databaseId,
-  //     collection,
-  //   [Query.equal("workspaces", workspaceId),Query.equal("farms", farmId)],
-  //   );
-  //   return res.documents;
+  await validateWorkspaceAccess({ userId, workspaceId });
+  const { database } = await createAdminClient();
+  const res = await database.listDocuments(
+    appwriteConfig.databaseId,
+    collection,
+    [Query.equal("workspaces", workspaceId), Query.equal("farms", farmId)],
+  );
+  return res.documents.map((d) => {
+    return { ...d };
+  });
 };
 export const getDocs = async ({
   collection,
@@ -123,15 +149,16 @@ export const getDocs = async ({
   workspaceId: string;
   userId: string;
 }) => {
-  console.log(collection, workspaceId, userId);
-  //   await validateWorkspaceAccess({ userId, workspaceId });
-  //   const { database } = await createAdminClient();
-  //   const res = await database.listDocuments(
-  //     appwriteConfig.databaseId,
-  //     collection,
-  //     [Query.equal("workspaces", workspaceId)],
-  //   );
-  //   return res.documents;
+  await validateWorkspaceAccess({ userId, workspaceId });
+  const { database } = await createAdminClient();
+  const res = await database.listDocuments(
+    appwriteConfig.databaseId,
+    collection,
+    [Query.equal("workspaces", workspaceId)],
+  );
+  return res.documents.map((d) => {
+    return { ...d };
+  });
 };
 export const updateDoc = async ({
   collection,

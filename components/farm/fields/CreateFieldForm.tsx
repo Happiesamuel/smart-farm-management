@@ -1,47 +1,93 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 
 import { createFieldSchema } from "@/lib/schemas";
-import { PiFarm, PiPlantDuotone } from "react-icons/pi";
+import { PiFarm } from "react-icons/pi";
 import { ImDroplet } from "react-icons/im";
 import { FiUser } from "react-icons/fi";
 import { FaRegSave } from "react-icons/fa";
 import CreateFieldInput, {
-  CreateFieldCombo,
-  CreateFieldDate,
   CreateFieldInputSelect,
   CreateFieldSelect,
   CreateFieldText,
+  CreateFieldUpload,
 } from "./CreateFieldField";
 import { TbRipple } from "react-icons/tb";
 import { useCreateField } from "@/hooks/fields/useFields";
 import ButtonLoader from "@/components/layout/ButtonLoader";
 import { toast } from "sonner";
 import { useApp } from "@/stores/useAppStore";
-import { useParams } from "next/navigation";
-export default function CreateFieldForm() {
-  const { farmId } = useParams();
+import { useGetFarm } from "@/hooks/farms/useFarm";
+import GeneralLoader from "@/components/loader/GeneralLoader";
+
+export default function CreateFieldFormFetch() {
+  const { workspace, user, ready } = useApp();
+  const { farms, status, error } = useGetFarm(
+    workspace?.id ?? null,
+    user?.id ?? null,
+  );
+
+  if (!ready) return <GeneralLoader>Loading...</GeneralLoader>;
+  if (!user && ready) return <p>error</p>;
+  if (status === "pending")
+    return <GeneralLoader>Loading form...</GeneralLoader>;
+  if (status === "error") return <p>{error?.message}</p>;
+
+  const farmOptions =
+    farms?.map((f) => ({
+      name: f.farmName,
+      value: f.$id,
+    })) ?? [];
+
+  return (
+    <CreateFieldForm
+      workspaceId={workspace!.id}
+      userId={user!.id}
+      farms={farmOptions}
+    />
+  );
+}
+
+function CreateFieldForm({
+  workspaceId,
+  userId,
+  farms,
+}: {
+  workspaceId: string;
+  userId: string;
+  farms: { name: string; value: string }[];
+}) {
   const { createField, status } = useCreateField();
+
   const form = useForm<z.infer<typeof createFieldSchema>>({
-    resolver: zodResolver(createFieldSchema),
+    resolver: zodResolver(createFieldSchema) as Resolver<
+      z.infer<typeof createFieldSchema>
+    >,
+    defaultValues: {
+      fieldName: "",
+      farm: "",
+      size: "0",
+      sizeUnit: "hectares",
+      soilType: "loamy",
+      irrigationType: undefined,
+      status: "active",
+      description: "",
+    },
   });
-  const { workspace, user } = useApp();
   async function onSubmit(values: z.infer<typeof createFieldSchema>) {
+    const { farm, ...val } = values;
     const obj = {
-      userId: user!.id,
-      workspaceId: workspace!.id,
+      userId: userId,
+      workspaceId: workspaceId,
       data: {
-        ...values,
-        plantingToHarvest: {
-          from: values.plantingToHarvest.from.toString(),
-          to: values.plantingToHarvest.to.toString(),
-        },
-        farmId: farmId!.toString(),
+        ...val,
+        size: +values.size,
+        farms: values.farm,
       },
     };
     createField(obj, {
@@ -51,7 +97,7 @@ export default function CreateFieldForm() {
         });
       },
       onError: (err) =>
-        toast("Error creating crop", {
+        toast("Error creating field", {
           description: err.message,
           duration: 4000,
           closeButton: true,
@@ -59,20 +105,6 @@ export default function CreateFieldForm() {
     });
   }
 
-  const farm = [
-    {
-      value: "greenValley",
-      name: "Green Valley Farm",
-    },
-    {
-      value: "sunrise",
-      name: "Sunrise Farm",
-    },
-    {
-      value: "hilltop",
-      name: "Hilltop Farm ",
-    },
-  ];
   const soil = [
     {
       value: "sandy",
@@ -103,15 +135,26 @@ export default function CreateFieldForm() {
   const arrSize = [
     {
       name: "acres",
-      value: "acre",
+      value: "acres",
     },
     {
       name: "hectares",
-      value: "ha",
+      value: "hectares",
     },
     {
       name: "square.m",
-      value: "mm",
+      value: "square.m",
+    },
+  ];
+
+  const stat = [
+    {
+      name: "Active",
+      value: "active",
+    },
+    {
+      name: "Inactive",
+      value: "inactive",
     },
   ];
   const irrigation = [
@@ -140,18 +183,6 @@ export default function CreateFieldForm() {
       value: "pivot",
     },
   ];
-  const cropOptions = [
-    "🌽Maize",
-    "🌾Rice",
-    "🥔Yam",
-    "🍅Tomato",
-    "🫑Pepper",
-    "🥔Cassava",
-    "🌾Beans",
-    "🌱Wheat",
-    "🥜Sorghum",
-    "🌾Soyabean",
-  ];
 
   return (
     <div className="w-full lg:w-[90%] mx-auto ">
@@ -176,7 +207,7 @@ export default function CreateFieldForm() {
               control={form.control}
               label="Select Farm"
               placeholder="Select farm"
-              array={farm}
+              array={farms}
               Icon={PiFarm}
             />
           </div>
@@ -188,8 +219,9 @@ export default function CreateFieldForm() {
               label="Field Size"
               placeholder="e.g. 100"
               placeholder2="arces"
+              type={"number"}
               name1="size"
-              name2="unit"
+              name2="sizeUnit"
             />
             <CreateFieldSelect
               name="soilType"
@@ -200,7 +232,7 @@ export default function CreateFieldForm() {
               Icon={TbRipple}
             />
           </div>
-          <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
+          <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
             <CreateFieldSelect
               name="irrigationType"
               control={form.control}
@@ -209,21 +241,16 @@ export default function CreateFieldForm() {
               array={irrigation}
               Icon={ImDroplet}
             />
-            <CreateFieldDate
-              label="Planting Date to Harvest Date"
-              name="plantingToHarvest"
-              control={form.control}
-            />
+            <CreateFieldUpload control={form.control} />
           </div>
           <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
-            <CreateFieldCombo
-              Icon={PiPlantDuotone}
-              array={cropOptions}
-              label="Crop Type"
-              placeholder1="Select or search crop"
-              placeholder2="Select"
-              name="cropType"
+            <CreateFieldSelect
+              name="status"
               control={form.control}
+              label="Status"
+              placeholder="Select status"
+              array={stat}
+              Icon={TbRipple}
             />
             <CreateFieldText
               label="Description (optional)"

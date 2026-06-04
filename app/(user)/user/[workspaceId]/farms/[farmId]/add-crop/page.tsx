@@ -1,4 +1,4 @@
-import CreateCropForm from "@/components/farm/crops/CreateCropForm";
+import CreateCropFormFetch from "@/components/farm/crops/CreateCropForm";
 
 import { PiPlantDuotone } from "react-icons/pi";
 
@@ -19,7 +19,7 @@ export default function page() {
         </div>
       </div>
 
-      <CreateCropForm />
+      <CreateCropFormFetch />
     </div>
   );
 }

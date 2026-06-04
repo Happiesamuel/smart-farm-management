@@ -30,13 +30,13 @@ import { Control, FieldPath } from "react-hook-form";
 import { IconType } from "react-icons";
 
 import z from "zod";
-import { createFieldSchema } from "@/lib/schemas";
+import { createFarmSchema, createFieldSchema } from "@/lib/schemas";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Check, Plus } from "lucide-react";
+import { CalendarIcon, Check, Plus, Upload } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { cn } from "@/lib/utils";
 interface InputCombo {
@@ -62,6 +62,7 @@ interface InputSelect {
   label: string;
   placeholder: string;
   placeholder2: string;
+  type?: string;
   array: { [key: string]: string }[];
 }
 interface Dates {
@@ -106,7 +107,7 @@ export function CreateFieldSelect({
                   </div>
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="max-h-[160px] z-200 bg-[#fff] border border-border text-dark">
+              <SelectContent className="max-h-[160px] mt-6 z-200 bg-white border border-border text-dark">
                 {array.map((select) => (
                   <SelectItem
                     className="cursor-pointer text-sm hover:bg-primary hover:text-white"
@@ -134,6 +135,7 @@ export function CreateFieldInputSelect({
   label,
   placeholder,
   placeholder2,
+  type = "text",
   array,
 }: InputSelect) {
   return (
@@ -147,6 +149,7 @@ export function CreateFieldInputSelect({
             <FormItem className="flex-1">
               <FormControl>
                 <Input
+                  type={type}
                   className="text-sm h-9 rounded-r-none border-r-0"
                   placeholder={placeholder}
                   {...field}
@@ -422,6 +425,88 @@ export function CreateFieldCombo({
           </FormItem>
         );
       }}
+    />
+  );
+}
+
+export function CreateFieldUpload({
+  control,
+}: {
+  control: Control<z.infer<typeof createFieldSchema>>;
+}) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  return (
+    <FormField
+      control={control}
+      name="fieldImage"
+      render={({ field }) => (
+        <FormItem className="w-full">
+          <FormLabel className="text-sm text-dark">
+            Field Image (optional)
+          </FormLabel>
+
+          <FormControl>
+            <div
+              onClick={() => inputRef.current?.click()}
+              className="border border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition"
+            >
+              <input
+                type="file"
+                ref={inputRef}
+                className="hidden"
+                accept=".jpg,.jpeg,.png"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+
+                  field.onChange(file);
+
+                  // Create preview only for images
+                  if (file.type.startsWith("image/")) {
+                    const url = URL.createObjectURL(file);
+                    setPreview(url);
+                  } else {
+                    setPreview(null);
+                  }
+                }}
+              />
+
+              {/* Upload UI */}
+              {!preview && (
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <Upload className="w-6 h-6 text-gray-500" />
+
+                  <p className="text-sm font-medium text-gray-700">
+                    Upload Field Image
+                  </p>
+
+                  <p className="text-xs text-gray-500">JPG, PNG (Max 5MB)</p>
+                </div>
+              )}
+
+              {/* IMAGE PREVIEW */}
+              {preview && (
+                <img
+                  src={preview}
+                  alt="image preview"
+                  className="mt-2 w-full h-40 object-cover object-center rounded-md"
+                />
+              )}
+
+              {/* File name fallback */}
+              {field.value && !preview && (
+                <p className="mt-3 text-xs text-green-600">
+                  {field.value.name}
+                </p>
+              )}
+            </div>
+          </FormControl>
+
+          <FormMessage />
+        </FormItem>
+      )}
     />
   );
 }

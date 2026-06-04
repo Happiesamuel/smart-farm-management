@@ -12,6 +12,7 @@ import { MdArrowForwardIos } from "react-icons/md";
 import Paginate from "../layout/Pagination";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useGetFarmsWithStats } from "@/hooks/farms/useFarm";
 const farms = [
   {
     id: 1,
@@ -76,12 +77,15 @@ const farms = [
 ];
 export default function FarmList() {
   const { workspaceId } = useParams();
+  // const { data: farms } = useGetFarmsWithStats(workspaceId, userId);
+  // status: farmFields.length > 0 ? "Active" : "Inactive"
+  // status: totalRevenue > 0 ? "Active" : "Inactive"
   return (
     <div className="py-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full  mx-auto">
         {farms.map((farm) => (
           <div
-            className=" w-full group  bg-white max-w-sm mx-auto rounded-xl border border-border/80  hover:shadow-sm transition-all duration-500 hover:-translate-y-1"
+            className=" w-full group  bg-white max-w-sm xl:max-w-lg mx-auto rounded-xl border border-border/80  hover:shadow-sm transition-all duration-500 hover:-translate-y-1"
             key={farm.id}
           >
             <div className="relative h-[160px] overflow-hidden w-full aspect-video">

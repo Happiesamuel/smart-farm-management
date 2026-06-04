@@ -1,6 +1,7 @@
 "use client";
 import { FarmInfo } from "@/lib/types";
 import { createDoc, getDocs } from "@/servers/crud-actions";
+import { getFarmsWithStats } from "@/servers/farm-actions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateFarm = () => {
@@ -25,7 +26,10 @@ export const useCreateFarm = () => {
   });
   return { createFarm, status };
 };
-export const useGetFarm = (workspaceId: string, userId: string) => {
+export const useGetFarm = (
+  workspaceId: string | null,
+  userId: string | null,
+) => {
   const {
     data: farms,
     status,
@@ -35,9 +39,31 @@ export const useGetFarm = (workspaceId: string, userId: string) => {
     queryFn: () =>
       getDocs({
         collection: "farms",
+        workspaceId: workspaceId as string,
+        userId: userId as string,
+      }),
+    enabled: !!workspaceId && !!userId,
+  });
+  return { farms, error, status };
+};
+
+export const useGetFarmsWithStats = (workspaceId: string, userId: string) => {
+  const {
+    data: farms,
+    status,
+    error,
+  } = useQuery({
+    queryKey: ["farms-with-stats", workspaceId],
+    queryFn: () =>
+      getFarmsWithStats({
         workspaceId,
         userId,
       }),
+    enabled: !!workspaceId && !!userId,
   });
-  return { farms, error, status };
+  return {
+    farms,
+    status,
+    error,
+  };
 };

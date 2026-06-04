@@ -105,7 +105,7 @@ export function CreateCropSelect({
                   </div>
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="max-h-[160px] z-200 bg-[#fff] border border-border text-dark">
+              <SelectContent className="max-h-[160px] z-200 bg-white mt-6 border border-border text-dark">
                 {array.map((select) => (
                   <SelectItem
                     className="cursor-pointer text-sm hover:bg-primary hover:text-white"

@@ -1,6 +1,6 @@
 export default function GeneralLoader({ children }: { children: string }) {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+    <div className="fixed inset-0 flex items-center justify-center bg-white z-150">
       <div className="flex flex-col items-center">
         <div className="animate-pulse text-4xl ">🌿</div>
 

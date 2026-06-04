@@ -72,38 +72,39 @@ export interface FarmInfo {
 }
 export interface FieldInfo {
   fieldName: string;
-  farm: string;
-  size: string;
-  unit: string;
-  soilType: string;
-  irrigationType?: string;
-  cropType: string;
-  plantingToHarvest: { from: string; to: string };
-  description: string;
-  farmId: string;
+  size: number;
+  fieldImage?: string | File;
+  sizeUnit: "hectares" | "acres" | "square.m";
+  soilType: "sandy" | "loamy" | "clay" | "silty" | "peaty" | "chalky";
+  irrigationType?:
+    | "drip"
+    | "sprinkler"
+    | "rain-fed"
+    | "manual"
+    | "flood"
+    | "pivot";
+  description?: string;
+  status: "active" | "inactive";
+  farms: string;
   id: string;
   workspaces: string;
   users: string;
 }
 export interface CropInfo {
   cropName: string;
-  plantingToHarvest: {
-    from: string;
-    to: string;
-  };
+  plantedDate: string | Date;
+  expectedHarvestDate: string | Date;
   irrigationType?: string;
-  farm: string;
-  field: string;
-  expectedYield: string;
+  expectedYield: number;
   yieldUnit: string;
-  seedQuantity: string;
+  seedQuantity: number;
   seedUnit: string;
-  areaPlanted: string;
+  areaPlanted: number;
   areaUnit: string;
   status: string;
-  soilType: string;
-  description: string;
-  farmId: string;
+  description?: string;
+  farms: string;
+  fields: string;
   id: string;
   workspaces: string;
   users: string;

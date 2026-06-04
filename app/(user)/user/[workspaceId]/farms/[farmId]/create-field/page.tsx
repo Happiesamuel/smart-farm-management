@@ -1,5 +1,4 @@
-import CreateFieldForm from "@/components/farm/fields/CreateFieldForm";
-
+import CreateFieldFormFetch from "@/components/farm/fields/CreateFieldForm";
 import { IoGrid } from "react-icons/io5";
 
 export default function page() {
@@ -19,7 +18,7 @@ export default function page() {
         </div>
       </div>
 
-      <CreateFieldForm />
+      <CreateFieldFormFetch />
     </div>
   );
 }

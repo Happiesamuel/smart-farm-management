@@ -19,15 +19,49 @@ import { FiUser } from "react-icons/fi";
 import { FaRegSave } from "react-icons/fa";
 import { MdOutlineSignalWifiStatusbar4Bar } from "react-icons/md";
 import { toast } from "sonner";
-import { useCreateFarm } from "@/hooks/farms/useFarm";
 import { useApp } from "@/stores/useAppStore";
 import ButtonLoader from "@/components/layout/ButtonLoader";
+import { useCreateFarm } from "@/hooks/farms/useCreateFarm";
+import { useRouter } from "next/navigation";
 export default function CreateFarmForm() {
   const form = useForm<z.infer<typeof createFarmSchema>>({
     resolver: zodResolver(createFarmSchema),
   });
+  const router = useRouter();
   const { workspace, user } = useApp();
-  const { createFarm, status } = useCreateFarm();
+  const { create, status, error } = useCreateFarm();
+  // async function onSubmit(values: z.infer<typeof createFarmSchema>) {
+  //   const { location, ...rest } = values;
+
+  //   const newObj = {
+  //     ...rest,
+  //     address: location.address,
+  //     lat: location.lat,
+  //     lng: location.lng,
+  //     size: +rest.size,
+  //   };
+  //   const obj = {
+  //     userId: user!.id,
+  //     workspaceId: workspace!.id,
+  //     data: {
+  //       ...newObj,
+  //     },
+  //   };
+  //   createFarm(obj, {
+  //     onSuccess: () => {
+  //       toast("Farm created successfully", {
+  //         description: "You can now proceed to managing your farm",
+  //       });
+  //     },
+  //     onError: (err) =>
+  //       toast("Error creating farm", {
+  //         description: err.message,
+  //         duration: 4000,
+  //         closeButton: true,
+  //       }),
+  //   });
+  // }
+
   async function onSubmit(values: z.infer<typeof createFarmSchema>) {
     const { location, ...rest } = values;
 
@@ -36,28 +70,34 @@ export default function CreateFarmForm() {
       address: location.address,
       lat: location.lat,
       lng: location.lng,
+      users: user!.id,
       size: +rest.size,
+      workspaces: workspace!.id,
     };
-    const obj = {
-      userId: user!.id,
-      workspaceId: workspace!.id,
-      data: {
-        ...newObj,
-      },
-    };
-    createFarm(obj, {
-      onSuccess: () => {
-        toast("Farm created successfully", {
-          description: "You can now proceed to managing your farm",
-        });
-      },
-      onError: (err) =>
-        toast("Error creating farm", {
-          description: err.message,
-          duration: 4000,
-          closeButton: true,
-        }),
-    });
+    try {
+      create(newObj, {
+        onSuccess: async () => {
+          toast("Farm created successfully", {
+            description: "You can now manage your farm",
+            duration: 4000,
+            closeButton: true,
+          });
+          router.push(`/user/${workspace!.workspaceId}/farms`);
+        },
+        onError: (err) =>
+          toast("Error creating farm", {
+            description: error?.message || err.message,
+            duration: 4000,
+            closeButton: true,
+          }),
+      });
+    } catch (error) {
+      toast("Error creating farm", {
+        description: (error as Error).message,
+        duration: 4000,
+        closeButton: true,
+      });
+    }
   }
 
   const soil = [

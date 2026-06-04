@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Resolver } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -17,7 +17,6 @@ import {
   CreateCropSelect,
   CreateCropText,
 } from "./CreateCropField";
-import { TbRipple } from "react-icons/tb";
 import { MdSignalWifiStatusbar1Bar } from "react-icons/md";
 import { IoGrid } from "react-icons/io5";
 import { useCreateCrop } from "@/hooks/crops/useCrops";
@@ -25,24 +24,85 @@ import { useApp } from "@/stores/useAppStore";
 import { useParams } from "next/navigation";
 import ButtonLoader from "@/components/layout/ButtonLoader";
 import { toast } from "sonner";
-export default function CreateCropForm() {
-  const form = useForm<z.infer<typeof createCropSchema>>({
-    resolver: zodResolver(createCropSchema),
-  });
+import GeneralLoader from "@/components/loader/GeneralLoader";
+import { useGetFarm } from "@/hooks/farms/useFarm";
+import { useGetFarmFields } from "@/hooks/fields/useFields";
+
+export default function CreateCropFormFetch() {
+  const { workspace, user, ready } = useApp();
   const { farmId } = useParams();
+  const { farms, status, error } = useGetFarm(
+    workspace?.id ?? null,
+    user?.id ?? null,
+  );
+  const {
+    error: fieldErr,
+    fields,
+    status: fieldStat,
+  } = useGetFarmFields(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
+
+  if (!ready) return <GeneralLoader>Loading...</GeneralLoader>;
+  if (!user && ready) return <p>error</p>;
+  if (status === "pending" || fieldStat === "pending")
+    return <GeneralLoader>Loading form...</GeneralLoader>;
+  if (status === "error" || fieldStat === "error")
+    return <p>{error?.message || fieldErr?.message}</p>;
+
+  const farmOptions =
+    farms?.map((f) => ({
+      name: f.farmName,
+      value: f.$id,
+    })) ?? [];
+  const fieldOptions =
+    fields?.map((f) => ({
+      name: f.fieldName,
+      value: f.$id,
+    })) ?? [];
+  return (
+    <CreateCropForm
+      workspaceId={workspace!.id}
+      userId={user!.id}
+      farms={farmOptions}
+      fields={fieldOptions}
+    />
+  );
+}
+
+function CreateCropForm({
+  workspaceId,
+  userId,
+  farms,
+  fields,
+}: {
+  workspaceId: string;
+  userId: string;
+  farms: { name: string; value: string }[];
+  fields: { name: string; value: string }[];
+}) {
+  const form = useForm<z.infer<typeof createCropSchema>>({
+    resolver: zodResolver(createCropSchema) as Resolver<
+      z.infer<typeof createCropSchema>
+    >,
+  });
   const { createCrop, status } = useCreateCrop();
-  const { workspace, user } = useApp();
   async function onSubmit(values: z.infer<typeof createCropSchema>) {
+    const { plantingToHarvest, farm, field, ...val } = values;
     const obj = {
-      userId: user!.id,
-      workspaceId: workspace!.id,
+      userId: userId,
+      workspaceId: workspaceId,
       data: {
-        ...values,
-        plantingToHarvest: {
-          from: values.plantingToHarvest.from.toString(),
-          to: values.plantingToHarvest.to.toString(),
-        },
-        farmId: farmId!.toString(),
+        ...val,
+        plantedDate: plantingToHarvest.from,
+        expectedHarvestDate: plantingToHarvest.to,
+        fields: values.field,
+        areaPlanted: +values.areaPlanted,
+        seedQuantity: +values.seedQuantity,
+        farms: values.farm,
+        expectedYield: +values.expectedYield,
       },
     };
     createCrop(obj, {
@@ -60,59 +120,18 @@ export default function CreateCropForm() {
     });
   }
 
-  const farm = [
-    {
-      value: "greenValley",
-      name: "Green Valley Farm",
-    },
-    {
-      value: "sunrise",
-      name: "Sunrise Farm",
-    },
-    {
-      value: "hilltop",
-      name: "Hilltop Farm ",
-    },
-  ];
-  const soil = [
-    {
-      value: "sandy",
-      name: "Sandy",
-    },
-    {
-      value: "loamy",
-      name: "Loamy",
-    },
-    {
-      value: "clay",
-      name: "Clay",
-    },
-    {
-      value: "silty",
-      name: "Silty",
-    },
-    {
-      value: "peaty",
-      name: "Peaty",
-    },
-    {
-      value: "chalky",
-      name: "Chalky",
-    },
-  ];
-
   const area = [
     {
       name: "acres",
-      value: "acre",
+      value: "acres",
     },
     {
       name: "hectares",
-      value: "ha",
+      value: "hectares",
     },
     {
       name: "square.m",
-      value: "mm",
+      value: "square.m",
     },
   ];
   const seedQuantity = [
@@ -121,8 +140,8 @@ export default function CreateCropForm() {
       value: "kg",
     },
     {
-      name: "g",
-      value: "g",
+      name: "grams",
+      value: "grams",
     },
     {
       name: "bags",
@@ -135,8 +154,8 @@ export default function CreateCropForm() {
       value: "kg",
     },
     {
-      name: "tonnes",
-      value: "tonnes",
+      name: "tons",
+      value: "tons",
     },
     {
       name: "bags",
@@ -169,57 +188,44 @@ export default function CreateCropForm() {
       value: "pivot",
     },
   ];
-  const field = [
-    {
-      name: "Field A",
-      value: "fieldA",
-    },
-    {
-      name: "Field B",
-      value: "fieldB",
-    },
-    {
-      name: "Field C",
-      value: "fieldC",
-    },
-  ];
+
   const stat = [
     {
-      name: "growing",
+      name: "Growing",
       value: "growing",
     },
     {
-      name: "harvested",
+      name: "Harvested",
       value: "harvested",
     },
     {
-      name: "failed",
+      name: "Failed",
       value: "failed",
     },
     {
-      name: "planted",
+      name: "Planted",
       value: "planted",
     },
     {
-      name: "drying",
+      name: "Drying",
       value: "drying",
     },
     {
-      name: "stored",
+      name: "Stored",
       value: "stored",
     },
   ];
   const cropOptions = [
-    "🌽Maize",
-    "🌾Rice",
-    "🥔Yam",
-    "🍅Tomato",
-    "🫑Pepper",
-    "🥔Cassava",
-    "🌾Beans",
-    "🌱Wheat",
-    "🥜Sorghum",
-    "🌾Soyabean",
+    "Maize",
+    "Rice",
+    "Yam",
+    "Tomato",
+    "Pepper",
+    "Cassava",
+    "Beans",
+    "Wheat",
+    "Sorghum",
+    "Soyabean",
   ];
 
   return (
@@ -247,19 +253,11 @@ export default function CreateCropForm() {
               control={form.control}
               label="Select Farm"
               placeholder="Select farm"
-              array={farm}
+              array={farms}
               Icon={PiFarm}
             />
           </div>
           <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
-            <CreateCropSelect
-              name="soilType"
-              control={form.control}
-              label="Soil Type"
-              placeholder="Select soil type"
-              array={soil}
-              Icon={TbRipple}
-            />
             <CreateCropSelect
               name="irrigationType"
               control={form.control}
@@ -267,6 +265,14 @@ export default function CreateCropForm() {
               placeholder="Select irrigation type"
               array={irrigation}
               Icon={ImDroplet}
+            />
+            <CreateCropSelect
+              name="field"
+              control={form.control}
+              label="Select Field"
+              placeholder="Select field"
+              array={fields}
+              Icon={IoGrid}
             />
           </div>
           <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
@@ -278,17 +284,6 @@ export default function CreateCropForm() {
               array={stat}
               Icon={MdSignalWifiStatusbar1Bar}
             />
-            <CreateCropSelect
-              name="field"
-              control={form.control}
-              label="Select Field"
-              placeholder="Select field"
-              array={field}
-              Icon={IoGrid}
-            />
-          </div>
-
-          <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
             <CreateCropInputSelect
               array={seedQuantity}
               control={form.control}
@@ -298,6 +293,9 @@ export default function CreateCropForm() {
               name1="seedQuantity"
               name2="seedUnit"
             />
+          </div>
+
+          <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
             <CreateCropInputSelect
               array={expectedYield}
               control={form.control}
@@ -307,9 +305,6 @@ export default function CreateCropForm() {
               name1="expectedYield"
               name2="yieldUnit"
             />
-          </div>
-
-          <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
             <CreateCropInputSelect
               array={area}
               control={form.control}
@@ -319,19 +314,22 @@ export default function CreateCropForm() {
               name1="areaPlanted"
               name2="areaUnit"
             />
+          </div>
 
+          <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
             <CreateCropDate
               label="Planting Date to Harvest Date"
               name="plantingToHarvest"
               control={form.control}
             />
+            <CreateCropText
+              label="Description (optional)"
+              placeholder="Enter Field description"
+              name="description"
+              control={form.control}
+            />
           </div>
-          <CreateCropText
-            label="Description (optional)"
-            placeholder="Enter Field description"
-            name="description"
-            control={form.control}
-          />
+
           <div className="flex items-center gap-4 relative justify-end">
             <Button
               type="reset"

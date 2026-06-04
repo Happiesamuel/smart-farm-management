@@ -225,46 +225,88 @@ export const createFarmSchema = z.object({
     })
     .optional(),
 });
+
 export const createFieldSchema = z.object({
-  fieldName: z.string({ message: "Field name is required" }).min(4, {
-    message: "Field name must be at least 4 characters.",
-  }),
+  fieldName: z
+    .string({ message: "Field name is required" })
+    .min(4, { message: "Field name must be at least 4 characters." }),
+  fieldImage: z
+    .instanceof(File, { message: "Please upload field image." })
+    .refine((file) => file.size < 3 * 1024 * 1024, {
+      message: "image must be smaller than 3MB.",
+    })
+    .optional(),
   farm: z
     .string({ message: "Please select farm" })
     .min(1, "Please select a farm"),
+
+  workspaceId: z.string().optional(),
+
   size: z.string({ message: "Total size is required" }).min(1, {
     message: "Total size must be at least a characters.",
   }),
-  unit: z.string({ message: "Unit is required" }).min(1, "Please select  unit"),
-  soilType: z
-    .string({ message: "Please select a soil type" })
-    .min(1, "Please select a soil type"),
-  irrigationType: z
-    .string({ message: "Please select a irrigation type" })
-    .min(1, "Please select a irrigation type")
-    .optional(),
-  cropType: comboSchema("Crop type is required"),
-  plantingToHarvest: z
-    .object(
-      {
-        from: z.date({
-          error: "Planting date is required",
-        }),
-        to: z.date({
-          error: "Harvest date is required",
-        }),
-      },
-      { message: "Planting date to Harvest date is required" },
-    )
-    .refine((data) => data.to > data.from, {
-      message: "Harvest date must be after planting date",
-      path: ["to"],
-    }),
 
-  description: z
-    .string({ message: "descripton is required" })
-    .min(10, { message: "description must be at least 10 characters." }),
+  sizeUnit: z.enum(["hectares", "acres", "square.m"], {
+    message: "Please select a valid unit",
+  }),
+
+  soilType: z.enum(["sandy", "loamy", "clay", "silty", "peaty", "chalky"], {
+    message: "Please select a soil type",
+  }),
+
+  irrigationType: z
+    .enum(["drip", "sprinkler", "rain-fed", "manual", "flood", "pivot"])
+    .optional(),
+
+  status: z
+    .enum(["active", "inactive"])
+    .default("active")
+    .transform((val): "active" | "inactive" => val),
+
+  description: z.string().optional(),
 });
+
+// export const createFieldSchema = z.object({
+//   fieldName: z.string({ message: "Field name is required" }).min(4, {
+//     message: "Field name must be at least 4 characters.",
+//   }),
+//   farm: z
+//     .string({ message: "Please select farm" })
+//     .min(1, "Please select a farm"),
+// size: z.string({ message: "Total size is required" }).min(1, {
+//   message: "Total size must be at least a characters.",
+// }),
+//   unit: z.string({ message: "Unit is required" }).min(1, "Please select  unit"),
+//   soilType: z
+//     .string({ message: "Please select a soil type" })
+//     .min(1, "Please select a soil type"),
+//   irrigationType: z
+//     .string({ message: "Please select a irrigation type" })
+//     .min(1, "Please select a irrigation type")
+//     .optional(),
+//   cropType: comboSchema("Crop type is required"),
+//   plantingToHarvest: z
+//     .object(
+//       {
+//         from: z.date({
+//           error: "Planting date is required",
+//         }),
+//         to: z.date({
+//           error: "Harvest date is required",
+//         }),
+//       },
+//       { message: "Planting date to Harvest date is required" },
+//     )
+//     .refine((data) => data.to > data.from, {
+//       message: "Harvest date must be after planting date",
+//       path: ["to"],
+//     }),
+
+//   description: z
+//     .string({ message: "descripton is required" })
+//     .min(10, { message: "description must be at least 10 characters." }),
+// });
+
 export const FarmInformationSchema = z.object({
   farmName: z.string({ message: "Field name is required" }).min(4, {
     message: "Field name must be at least 4 characters.",
@@ -336,65 +378,119 @@ export const createHarvestSchema = z.object({
     .string({ message: "descripton is required" })
     .min(10, { message: "description must be at least 10 characters." }),
 });
+
 export const createCropSchema = z.object({
   cropName: comboSchema("Crop is required"),
+
+  farm: z
+    .string({ message: "Please select farm" })
+    .min(1, "Please select a farm"),
+
+  field: z
+    .string({ message: "Please select field" })
+    .min(1, "Please select a field"),
+
   plantingToHarvest: z
-    .object(
-      {
-        from: z.date({
-          error: "Planting date is required",
-        }),
-        to: z.date({
-          error: "Harvest date is required",
-        }),
-      },
-      { message: "Planting date to Harvest date is required" },
-    )
+    .object({
+      from: z.date({ error: "Planting date is required" }),
+      to: z.date({ error: "Harvest date is required" }),
+    })
     .refine((data) => data.to > data.from, {
       message: "Harvest date must be after planting date",
       path: ["to"],
     }),
+
   irrigationType: z
-    .string({ message: "Please select a irrigation type" })
-    .min(1, "Please select a irrigation type")
+    .enum(["drip", "sprinkler", "rain-fed", "manual", "flood", "pivot"])
     .optional(),
-  farm: z
-    .string({ message: "Please select farm" })
-    .min(1, "Please select a farm"),
-  field: z
-    .string({ message: "Please select field" })
-    .min(1, "Please select a field"),
-  // variety: z
-  //   .string({ message: "Please select variety" })
-  //   .min(1, "Please select variety"),
+
   expectedYield: z.string({ message: "Expected yield is required" }).min(1, {
-    message: "Expected Yield must be at least a characters.",
+    message: "Expected yield must be greater than 0.",
   }),
-  yieldUnit: z
-    .string({ message: "Unit is required" })
-    .min(1, "Please select  unit"),
+
+  yieldUnit: z.enum(["kg", "tons", "bags"], {
+    message: "Please select yield unit",
+  }),
+
   seedQuantity: z.string({ message: "Seed quantity is required" }).min(1, {
-    message: "Seed quantity must be at least a characters.",
+    message: "Seed quantity must be greater than 0.",
   }),
-  seedUnit: z
-    .string({ message: "Unit is required" })
-    .min(1, "Please select  unit"),
+
+  seedUnit: z.enum(["kg", "grams", "bags"], {
+    message: "Please select seed unit",
+  }),
+
   areaPlanted: z.string({ message: "Area planted is required" }).min(1, {
-    message: "Area planted must be at least a characters.",
+    message: "Area planted must be greater than 0.",
   }),
-  areaUnit: z
-    .string({ message: "Unit is required" })
-    .min(1, "Please select  unit"),
+
+  areaUnit: z.enum(["hectares", "acres", "square.m"], {
+    message: "Please select area unit",
+  }),
+
   status: z
-    .string({ message: "Please select a status" })
-    .min(1, "Please select a status"),
-  soilType: z
-    .string({ message: "Please select a soil type" })
-    .min(1, "Please select a soil type"),
-  description: z
-    .string({ message: "descripton is required" })
-    .min(10, { message: "description must be at least 10 characters." }),
+    .enum(["growing", "harvested", "failed", "planted", "drying", "stored"])
+    .default("growing"),
+
+  description: z.string().optional(),
 });
+
+// export const createCropSchema = z.object({
+//   cropName: comboSchema("Crop is required"),
+//   plantingToHarvest: z
+//     .object(
+//       {
+//         from: z.date({
+//           error: "Planting date is required",
+//         }),
+//         to: z.date({
+//           error: "Harvest date is required",
+//         }),
+//       },
+//       { message: "Planting date to Harvest date is required" },
+//     )
+//     .refine((data) => data.to > data.from, {
+//       message: "Harvest date must be after planting date",
+//       path: ["to"],
+//     }),
+//   irrigationType: z
+//     .string({ message: "Please select a irrigation type" })
+//     .min(1, "Please select a irrigation type")
+//     .optional(),
+//   farm: z
+//     .string({ message: "Please select farm" })
+//     .min(1, "Please select a farm"),
+//   field: z
+//     .string({ message: "Please select field" })
+//     .min(1, "Please select a field"),
+//   expectedYield: z.string({ message: "Expected yield is required" }).min(1, {
+//     message: "Expected Yield must be at least a characters.",
+//   }),
+//   yieldUnit: z
+//     .string({ message: "Unit is required" })
+//     .min(1, "Please select  unit"),
+//   seedQuantity: z.string({ message: "Seed quantity is required" }).min(1, {
+//     message: "Seed quantity must be at least a characters.",
+//   }),
+//   seedUnit: z
+//     .string({ message: "Unit is required" })
+//     .min(1, "Please select  unit"),
+//   areaPlanted: z.string({ message: "Area planted is required" }).min(1, {
+//     message: "Area planted must be at least a characters.",
+//   }),
+//   areaUnit: z
+//     .string({ message: "Unit is required" })
+//     .min(1, "Please select  unit"),
+//   status: z
+//     .string({ message: "Please select a status" })
+//     .min(1, "Please select a status"),
+//   soilType: z
+//     .string({ message: "Please select a soil type" })
+//     .min(1, "Please select a soil type"),
+//   description: z
+//     .string({ message: "descripton is required" })
+//     .min(10, { message: "description must be at least 10 characters." }),
+// });
 export const createTaskSchema = z.object({
   taskTitle: z.string({ message: "Task title is required" }).min(4, {
     message: "Task title must be at least 4 characters.",
