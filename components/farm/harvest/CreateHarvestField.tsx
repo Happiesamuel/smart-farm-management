@@ -114,7 +114,7 @@ export function CreateHarvestSelect({
                   </div>
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="max-h-[160px] z-200 bg-[#fff] border border-border text-dark">
+              <SelectContent className="max-h-[160px] z-200 bg-white mt-6 border border-border text-dark">
                 {array.map((select) => (
                   <SelectItem
                     className="cursor-pointer text-sm hover:bg-primary hover:text-white"
@@ -266,44 +266,46 @@ export function CreateHavestDate({ control, name, label }: Dates) {
     <FormField
       control={control}
       name={name}
-      render={({ field }) => (
-        <FormItem className="w-full">
-          <FormLabel className="text-sm text-dark">{label}</FormLabel>
+      render={({ field }) => {
+        return (
+          <FormItem className="w-full">
+            <FormLabel className="text-sm text-dark">{label}</FormLabel>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <FormControl>
-                <Button
-                  variant="outline"
-                  className={`w-full h-9! justify-start text-dark/90 text-left font-normal ${
-                    !field.value && "text-muted-foreground"
-                  }`}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    className={`w-full h-9! justify-start text-dark/90 text-left font-normal ${
+                      !field.value && "text-muted-foreground"
+                    }`}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
 
-                  {field.value ? (
-                    format(field.value as string, "PPP")
-                  ) : (
-                    <span>Pick a date</span>
-                  )}
-                </Button>
-              </FormControl>
-            </PopoverTrigger>
+                    {field.value ? (
+                      format(field.value as string, "PPP")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
 
-            <PopoverContent className="w-auto z-200 p-0">
-              <Calendar
-                mode="single"
-                selected={
-                  field.value ? new Date(field.value as string) : undefined
-                }
-                onSelect={(date) => field.onChange(date?.toISOString())}
-              />
-            </PopoverContent>
-          </Popover>
+              <PopoverContent className="w-auto z-200 p-0">
+                <Calendar
+                  mode="single"
+                  selected={
+                    field.value ? new Date(field.value as string) : undefined
+                  }
+                  onSelect={(date) => field.onChange(date)}
+                />
+              </PopoverContent>
+            </Popover>
 
-          <FormMessage />
-        </FormItem>
-      )}
+            <FormMessage />
+          </FormItem>
+        );
+      }}
     />
   );
 }

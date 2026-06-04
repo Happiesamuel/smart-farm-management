@@ -110,18 +110,18 @@ export interface CropInfo {
   users: string;
 }
 export interface HarvestInfo {
-  cropName: string;
   buyer?: string;
-  date: string;
-  farm: string;
-  field: string;
-  quantity: string;
-  unit: string;
-  status: string;
-  quality: string;
-  amount: string;
-  description: string;
-  farmId: string;
+  harvestDate: string | Date;
+  quantity: number;
+  unit: "kg" | "tons" | "bags";
+  status: "sold" | "stored" | "wasted";
+  quality: "excellent" | "good" | "average" | "poor";
+  totalAmount: number;
+  pricePerUnit: number;
+  description?: string;
+  farms: string;
+  crops: string;
+  fields: string;
   id: string;
   workspaces: string;
   users: string;

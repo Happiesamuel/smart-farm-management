@@ -1,17 +1,16 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Resolver } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 
 import { createHarvestSchema } from "@/lib/schemas";
-import { PiFarm, PiPlant } from "react-icons/pi";
+import { PiFarm } from "react-icons/pi";
 import { FaRegSave } from "react-icons/fa";
 import {
   CreateHarvestAmount,
-  CreateHarvestCombo,
   CreateHarvestInputSelect,
   CreateHarvestSelect,
   CreateHarvestText,
@@ -25,23 +24,109 @@ import { useApp } from "@/stores/useAppStore";
 import { toast } from "sonner";
 import ButtonLoader from "@/components/layout/ButtonLoader";
 import { useCreateHavest } from "@/hooks/harvest/useHarvest";
-export default function CreateHarvestForm() {
+import GeneralLoader from "@/components/loader/GeneralLoader";
+import { useGetFarmFields } from "@/hooks/fields/useFields";
+import { useGetFarm } from "@/hooks/farms/useFarm";
+import { useGetFarmCrops } from "@/hooks/crops/useCrops";
+import { TbPlant2 } from "react-icons/tb";
+
+export default function CreateHarvestFormFetch() {
+  const { workspace, user, ready } = useApp();
+  const { farmId } = useParams();
+  const { farms, status, error } = useGetFarm(
+    workspace?.id ?? null,
+    user?.id ?? null,
+  );
+  const {
+    error: fieldErr,
+    fields,
+    status: fieldStat,
+  } = useGetFarmFields(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
+  const {
+    crops,
+    error: cropErr,
+    status: cropStat,
+  } = useGetFarmCrops(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
+  if (!ready) return <GeneralLoader>Loading...</GeneralLoader>;
+  if (!user && ready) return <p>error</p>;
+  if (status === "pending" || fieldStat === "pending" || cropStat === "pending")
+    return <GeneralLoader>Loading form...</GeneralLoader>;
+  if (status === "error" || fieldStat === "error" || cropStat === "error")
+    return <p>{error?.message || fieldErr?.message || cropErr?.message}</p>;
+
+  console.log(crops);
+
+  const farmOptions =
+    farms?.map((f) => ({
+      name: f.farmName,
+      value: f.$id,
+    })) ?? [];
+  const fieldOptions =
+    fields?.map((f) => ({
+      name: f.fieldName,
+      value: f.$id,
+    })) ?? [];
+  const cropOptions =
+    crops?.map((f) => ({
+      name: f.cropName,
+      value: f.$id,
+    })) ?? [];
+  return (
+    <CreateHarvestForm
+      workspaceId={workspace!.id}
+      userId={user!.id}
+      farms={farmOptions}
+      crops={cropOptions}
+      fields={fieldOptions}
+    />
+  );
+}
+
+function CreateHarvestForm({
+  workspaceId,
+  userId,
+  farms,
+  fields,
+  crops,
+}: {
+  workspaceId: string;
+  userId: string;
+  farms: { name: string; value: string }[];
+  fields: { name: string; value: string }[];
+  crops: { name: string; value: string }[];
+}) {
   const form = useForm<z.infer<typeof createHarvestSchema>>({
-    resolver: zodResolver(createHarvestSchema),
+    resolver: zodResolver(createHarvestSchema) as Resolver<
+      z.infer<typeof createHarvestSchema>
+    >,
   });
 
-  const { farmId } = useParams();
   const { createHarvest, status } = useCreateHavest();
-  const { workspace, user } = useApp();
+
   async function onSubmit(values: z.infer<typeof createHarvestSchema>) {
+    const { farm, field, crop, ...val } = values;
     const obj = {
-      userId: user!.id,
-      workspaceId: workspace!.id,
+      userId: userId,
+      workspaceId: workspaceId,
       data: {
-        ...values,
-        farmId: farmId!.toString(),
+        ...val,
+        fields: values.field,
+        crops: values.crop,
+        totalAmount: +values.totalAmount,
+        pricePerUnit: +values.pricePerUnit,
+        quantity: +values.quantity,
+        farms: values.farm,
       },
     };
+
     createHarvest(obj, {
       onSuccess: () => {
         toast("Harvest created successfully", {
@@ -57,48 +142,18 @@ export default function CreateHarvestForm() {
     });
   }
 
-  const farm = [
-    {
-      value: "greenValley",
-      name: "Green Valley Farm",
-    },
-    {
-      value: "sunrise",
-      name: "Sunrise Farm",
-    },
-    {
-      value: "hilltop",
-      name: "Hilltop Farm ",
-    },
-  ];
-
   const quantity = [
     {
       name: "kg",
       value: "kg",
     },
     {
-      name: "g",
-      value: "g",
+      name: "tons",
+      value: "tons",
     },
     {
       name: "bags",
       value: "bags",
-    },
-  ];
-
-  const field = [
-    {
-      name: "Field A",
-      value: "fieldA",
-    },
-    {
-      name: "Field B",
-      value: "fieldB",
-    },
-    {
-      name: "Field C",
-      value: "fieldC",
     },
   ];
   const stat = [
@@ -107,8 +162,12 @@ export default function CreateHarvestForm() {
       value: "sold",
     },
     {
-      name: "Pending",
-      value: "pending",
+      name: "Stored",
+      value: "stored",
+    },
+    {
+      name: "Wasted",
+      value: "wasted",
     },
   ];
   const quality = [
@@ -120,18 +179,14 @@ export default function CreateHarvestForm() {
       name: "Excellent",
       value: "excellent",
     },
-  ];
-  const cropOptions = [
-    "🌽Maize",
-    "🌾Rice",
-    "🥔Yam",
-    "🍅Tomato",
-    "🫑Pepper",
-    "🥔Cassava",
-    "🌾Beans",
-    "🌱Wheat",
-    "🥜Sorghum",
-    "🌾Soyabean",
+    {
+      name: "Average",
+      value: "average",
+    },
+    {
+      name: "Poor",
+      value: "poor",
+    },
   ];
 
   return (
@@ -145,21 +200,20 @@ export default function CreateHarvestForm() {
             Harvest Information
           </p>
           <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
-            <CreateHarvestCombo
-              Icon={PiPlant}
-              array={cropOptions}
-              label="Crop Name"
-              placeholder1="Select or search crop"
-              placeholder2="Select"
-              name="cropName"
+            <CreateHarvestSelect
+              name="crop"
               control={form.control}
+              label="Select Crop"
+              placeholder="Select crop"
+              array={crops}
+              Icon={TbPlant2}
             />
             <CreateHarvestSelect
               name="farm"
               control={form.control}
               label="Select Farm"
               placeholder="Select farm"
-              array={farm}
+              array={farms}
               Icon={PiFarm}
             />
           </div>
@@ -170,7 +224,7 @@ export default function CreateHarvestForm() {
               control={form.control}
               label="Select Field"
               placeholder="Select field"
-              array={field}
+              array={fields}
               Icon={IoGrid}
             />
             <CreateHarvestSelect
@@ -193,22 +247,6 @@ export default function CreateHarvestForm() {
               name1="quantity"
               name2="unit"
             />
-
-            <CreateHarvestInput
-              control={form.control}
-              label="Buyer's Name (optional)"
-              name={"buyer"}
-              placeholder="Enter buyer's name"
-            />
-          </div>
-
-          <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
-            <CreateHarvestAmount
-              label="Total Amount"
-              placeholder="e.g. 0.00"
-              name="amount"
-              control={form.control}
-            />
             <CreateHarvestSelect
               name="quality"
               control={form.control}
@@ -217,16 +255,39 @@ export default function CreateHarvestForm() {
               array={quality}
             />
           </div>
+
+          <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
+            <CreateHarvestAmount
+              label="Price per Unit"
+              placeholder="e.g. 0.00"
+              name="pricePerUnit"
+              control={form.control}
+            />
+            <CreateHarvestAmount
+              label="Total Amount"
+              placeholder="e.g. 0.00"
+              name="totalAmount"
+              control={form.control}
+            />
+          </div>
+          <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
+            <CreateHarvestInput
+              control={form.control}
+              label="Buyer's Name (optional)"
+              name={"buyer"}
+              placeholder="Enter buyer's name"
+            />
+            <CreateHavestDate
+              label="Harvest Date"
+              name="harvestDate"
+              control={form.control}
+            />
+          </div>
           <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
             <CreateHarvestText
               label="Description (optional)"
               placeholder="Enter Field description"
               name="description"
-              control={form.control}
-            />
-            <CreateHavestDate
-              label="Harvest Date"
-              name="date"
               control={form.control}
             />
           </div>

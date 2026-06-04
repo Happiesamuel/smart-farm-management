@@ -1,4 +1,4 @@
-import CreateHarvestForm from "@/components/farm/harvest/CreateHarvestForm";
+import CreateHarvestFormFetch from "@/components/farm/harvest/CreateHarvestForm";
 import { GiDigDug } from "react-icons/gi";
 
 export default function page() {
@@ -18,7 +18,7 @@ export default function page() {
         </div>
       </div>
 
-      <CreateHarvestForm />
+      <CreateHarvestFormFetch />
     </div>
   );
 }
