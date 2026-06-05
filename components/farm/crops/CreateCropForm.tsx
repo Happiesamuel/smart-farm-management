@@ -21,14 +21,14 @@ import { MdSignalWifiStatusbar1Bar } from "react-icons/md";
 import { IoGrid } from "react-icons/io5";
 import { useCreateCrop } from "@/hooks/crops/useCrops";
 import { useApp } from "@/stores/useAppStore";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import ButtonLoader from "@/components/layout/ButtonLoader";
 import { toast } from "sonner";
 import { FormLoader } from "@/components/loader/GeneralLoader";
 import { useGetFarm } from "@/hooks/farms/useFarm";
-import { useGetFarmFields } from "@/hooks/fields/useFields";
+import { useGetFarmFields, useGetFields } from "@/hooks/fields/useFields";
 
-export default function CreateCropFormFetch() {
+export default function CreateCropFormFetch({ onClose }: { onClose?(): void }) {
   const { workspace, user, ready } = useApp();
   const { farmId } = useParams();
   const { farms, status, error } = useGetFarm(
@@ -44,6 +44,12 @@ export default function CreateCropFormFetch() {
     user?.id ?? null,
     farmId as string,
   );
+  const {
+    error: fieldsErr,
+    fields: fieldss,
+    status: fieldsStat,
+  } = useGetFields(workspace?.id ?? null, user?.id ?? null);
+  const isLoading = farmId ? fieldStat === "pending" : fieldsStat === "pending";
 
   if (!ready)
     return (
@@ -52,31 +58,31 @@ export default function CreateCropFormFetch() {
       </div>
     );
   if (!user && ready) return <p>error</p>;
-  if (status === "pending" || fieldStat === "pending")
+  if (status === "pending" || isLoading)
     return (
       <div className="h-100">
         <FormLoader>Loading form...</FormLoader>
       </div>
     );
-  if (status === "error" || fieldStat === "error")
-    return <p>{error?.message || fieldErr?.message}</p>;
+  const errMssg = fieldErr?.message || fieldsErr?.message;
+  const isErr = farmId ? fieldStat === "error" : fieldsStat === "error";
+  if (status === "error" || isErr) return <p>{error?.message || errMssg}</p>;
 
   const farmOptions =
     farms?.map((f) => ({
       name: f.farmName,
       value: f.$id,
     })) ?? [];
-  const fieldOptions =
-    fields?.map((f) => ({
-      name: f.fieldName,
-      value: f.$id,
-    })) ?? [];
+
   return (
     <CreateCropForm
       workspaceId={workspace!.id}
       userId={user!.id}
       farms={farmOptions}
-      fields={fieldOptions}
+      field={fields}
+      fieldss={fieldss}
+      farmId={farmId as string}
+      onClose={onClose}
     />
   );
 }
@@ -85,18 +91,29 @@ function CreateCropForm({
   workspaceId,
   userId,
   farms,
-  fields,
+  field,
+  fieldss,
+  farmId,
+  onClose,
 }: {
   workspaceId: string;
   userId: string;
+  farmId: string | undefined;
   farms: { name: string; value: string }[];
-  fields: { name: string; value: string }[];
+  field: { [key: string]: string | number }[] | undefined;
+  fieldss: { [key: string]: string | number }[] | undefined;
+  onClose?(): void;
 }) {
   const form = useForm<z.infer<typeof createCropSchema>>({
     resolver: zodResolver(createCropSchema) as Resolver<
       z.infer<typeof createCropSchema>
     >,
+    defaultValues: {
+      farm: farmId ? farmId : "",
+    },
   });
+  const { workspace } = useApp();
+  const router = useRouter();
   const { createCrop, status } = useCreateCrop();
   async function onSubmit(values: z.infer<typeof createCropSchema>) {
     const { plantingToHarvest, farm, field, ...val } = values;
@@ -107,10 +124,10 @@ function CreateCropForm({
         ...val,
         plantedDate: plantingToHarvest.from,
         expectedHarvestDate: plantingToHarvest.to,
-        fields: values.field,
+        fields: field,
         areaPlanted: +values.areaPlanted,
         seedQuantity: +values.seedQuantity,
-        farms: values.farm,
+        farms: farm,
         expectedYield: +values.expectedYield,
       },
     };
@@ -119,6 +136,9 @@ function CreateCropForm({
         toast("Crop created successfully", {
           description: "You can now proceed to managing your crop",
         });
+        return farmId
+          ? router.push(`/user/${workspace?.workspaceId}/farms/${farmId}`)
+          : onClose?.();
       },
       onError: (err) =>
         toast("Error creating crop", {
@@ -128,6 +148,21 @@ function CreateCropForm({
         }),
     });
   }
+
+  const watchedFarmId = form.watch("farm");
+
+  const filteredFields =
+    fieldss?.filter((f) => f.farms === watchedFarmId) ?? [];
+
+  const fields = !farmId
+    ? (filteredFields?.map((f) => ({
+        name: f.fieldName,
+        value: f.$id,
+      })) ?? [])
+    : (field?.map((f) => ({
+        name: f.fieldName,
+        value: f.$id,
+      })) ?? []);
 
   const area = [
     {
@@ -259,11 +294,17 @@ function CreateCropForm({
             />
             <CreateCropSelect
               name="farm"
+              setValue={form.setValue}
               control={form.control}
               label="Select Farm"
-              placeholder="Select farm"
+              placeholder={
+                farmId
+                  ? (farms.find((x) => x.value === farmId)?.name ?? "")
+                  : "Select farm"
+              }
               array={farms}
               Icon={PiFarm}
+              disabled={farmId ? true : false}
             />
           </div>
           <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
@@ -277,10 +318,11 @@ function CreateCropForm({
             />
             <CreateCropSelect
               name="field"
+              key={watchedFarmId}
               control={form.control}
               label="Select Field"
               placeholder="Select field"
-              array={fields}
+              array={fields as { [key: string]: string }[]}
               Icon={IoGrid}
             />
           </div>

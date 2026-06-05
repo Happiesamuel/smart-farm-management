@@ -47,7 +47,10 @@ export const useGetFarmFields = (
   });
   return { fields, error, status };
 };
-export const useGetFields = (workspaceId: string, userId: string) => {
+export const useGetFields = (
+  workspaceId: string | null,
+  userId: string | null,
+) => {
   const {
     data: fields,
     status,
@@ -57,9 +60,10 @@ export const useGetFields = (workspaceId: string, userId: string) => {
     queryFn: () =>
       getDocs({
         collection: "fields",
-        workspaceId,
-        userId,
+        workspaceId: workspaceId as string,
+        userId: userId as string,
       }),
+    enabled: !!workspaceId && !!userId,
   });
   return { fields, error, status };
 };

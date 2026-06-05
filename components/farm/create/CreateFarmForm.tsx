@@ -30,37 +30,6 @@ export default function CreateFarmForm() {
   const router = useRouter();
   const { workspace, user } = useApp();
   const { create, status, error } = useCreateFarm();
-  // async function onSubmit(values: z.infer<typeof createFarmSchema>) {
-  //   const { location, ...rest } = values;
-
-  //   const newObj = {
-  //     ...rest,
-  //     address: location.address,
-  //     lat: location.lat,
-  //     lng: location.lng,
-  //     size: +rest.size,
-  //   };
-  //   const obj = {
-  //     userId: user!.id,
-  //     workspaceId: workspace!.id,
-  //     data: {
-  //       ...newObj,
-  //     },
-  //   };
-  //   createFarm(obj, {
-  //     onSuccess: () => {
-  //       toast("Farm created successfully", {
-  //         description: "You can now proceed to managing your farm",
-  //       });
-  //     },
-  //     onError: (err) =>
-  //       toast("Error creating farm", {
-  //         description: err.message,
-  //         duration: 4000,
-  //         closeButton: true,
-  //       }),
-  //   });
-  // }
 
   async function onSubmit(values: z.infer<typeof createFarmSchema>) {
     const { location, ...rest } = values;
@@ -215,6 +184,7 @@ export default function CreateFarmForm() {
             </Button>
             <Button
               type="submit"
+              disabled={status === "pending"}
               className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
               {status === "pending" ? (

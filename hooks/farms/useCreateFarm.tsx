@@ -6,15 +6,22 @@ import {
   getFarm,
   getFarmInWorkspace,
 } from "@/servers/farm-actions";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useCreateFarm() {
+  const queryClient = useQueryClient();
   const {
     mutate: create,
     status,
     error,
   } = useMutation({
     mutationFn: async (obj: FarmObj) => await createFarm(obj),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["farms", variables.workspaces],
+      });
+    },
   });
 
   return { create, status, error };
