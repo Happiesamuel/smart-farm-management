@@ -165,32 +165,75 @@ export const profileFormSchema = z
     path: ["confirmPassword"],
   });
 
+// export const financeSaleSchema = z.object({
+//   crop: z
+//     .string({ message: "Please select a crop" })
+//     .min(1, "Please select a crop"),
+//   field: z.string({ message: "Field is required" }).min(1, "Field is required"),
+//   farm: z.string({ message: "Farm is required" }).min(1, "Farm is required"),
+//   quantity: z.string({ message: "Quantity is required" }).min(1, {
+//     message: "Quantity must be at least a characters.",
+//   }),
+//   unit: z.string({ message: "Unit is required" }).min(1, "Please select  unit"),
+//   unitPrice: z.string({ message: "Please enter unit price" }).min(2, {
+//     message: "Unit price must be at least 2 characters.",
+//   }),
+//   totalAmount: z.string({ message: "Please enter total amount" }).min(2, {
+//     message: "Total amountt must be at least 2 characters.",
+//   }),
+//   saleDate: z
+//     .string({ message: " Date is required" })
+//     .min(1, "Date is required"),
+//   buyer: z.string({ message: "Please enter buyer's name" }).min(2, {
+//     message: "Buyer's must be at least 2 characters.",
+//   }),
+//   paymentMethod: z
+//     .string({ message: "Please select payment method" })
+//     .min(1, "Please select a payment method"),
+//   notes: z.string().optional(),
+// });
+
 export const financeSaleSchema = z.object({
-  crop: z
-    .string({ message: "Please select a crop" })
-    .min(1, "Please select a crop"),
-  field: z.string({ message: "Field is required" }).min(1, "Field is required"),
-  farm: z.string({ message: "Farm is required" }).min(1, "Farm is required"),
+  harvest: z
+    .string({ message: "Please select harvest" })
+    .min(1, "Harvest is required"),
+  farm: z
+    .string({ message: "Please select farm" })
+    .min(1, "Please select a farm"),
   quantity: z.string({ message: "Quantity is required" }).min(1, {
-    message: "Quantity must be at least a characters.",
+    message: "Quantity must be greater than 0.",
   }),
-  unit: z.string({ message: "Unit is required" }).min(1, "Please select  unit"),
-  unitPrice: z.string({ message: "Please enter unit price" }).min(2, {
-    message: "Unit price must be at least 2 characters.",
+
+  unit: z.enum(["kg", "tons", "bags"], {
+    message: "Please select unit",
   }),
-  totalAmount: z.string({ message: "Please enter total amount" }).min(2, {
-    message: "Total amountt must be at least 2 characters.",
+
+  unitPrice: z.string({ message: "Unit price is required" }).min(1, {
+    message: "Unit price must be greater than 0.",
   }),
-  saleDate: z
-    .string({ message: " Date is required" })
-    .min(1, "Date is required"),
-  buyer: z.string({ message: "Please enter buyer's name" }).min(2, {
-    message: "Buyer's must be at least 2 characters.",
+
+  totalAmount: z.string({ message: "Total amount is required" }).min(1, {
+    message: "Total amount must be greater than 0.",
   }),
-  paymentMethod: z
-    .string({ message: "Please select payment method" })
-    .min(1, "Please select a payment method"),
-  notes: z.string().optional(),
+
+  saleDate: z.date({
+    error: "Sale date is required",
+  }),
+
+  buyer: z
+    .string({ message: "Buyer name is required" })
+    .min(2, { message: "Buyer name must be at least 2 characters." }),
+
+  paymentMethod: z.enum(["cash", "transfer", "card", "mobile-money"], {
+    message: "Please select payment method",
+  }),
+
+  status: z.enum(["completed", "pending", "cancelled"]).default("completed"),
+
+  description: z
+    .string()
+    .min(10, { message: "Description must be at least 10 characters." })
+    .optional(),
 });
 export const createFarmSchema = z.object({
   farmName: z.string({ message: "Farm name is required" }).min(4, {

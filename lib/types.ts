@@ -140,18 +140,17 @@ export interface TaskInfo {
   users: string;
 }
 export interface SalesInfo {
-  crop: string;
-  field: string;
-  farm: string;
-  quantity: string;
-  unit: string;
-  unitPrice: string;
-  totalAmount: string;
-  saleDate: string;
+  quantity: number;
+  unit: "kg" | "tons" | "bags";
+  unitPrice: number;
+  totalAmount: number;
+  saleDate: string | Date;
   buyer: string;
-  paymentMethod: string;
-  notes?: string;
-  farmId: string;
+  description?: string;
+  paymentMethod: "cash" | "transfer" | "card" | "mobile-money";
+  status: "completed" | "pending" | "cancelled";
+  farms: string;
+  harvests: string;
   id: string;
   workspaces: string;
   users: string;

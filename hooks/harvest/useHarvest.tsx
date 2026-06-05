@@ -26,8 +26,8 @@ export const useCreateHavest = () => {
   return { createHarvest, status };
 };
 export const useGetFarmHarvest = (
-  workspaceId: string,
-  userId: string,
+  workspaceId: string | null,
+  userId: string | null,
   farmId: string,
 ) => {
   const {
@@ -39,9 +39,9 @@ export const useGetFarmHarvest = (
     queryFn: () =>
       getFarmDocs({
         collection: "harvests",
-        workspaceId,
-        userId,
-        farmId,
+        workspaceId: workspaceId as string,
+        userId: userId as string,
+        farmId: farmId as string,
       }),
     enabled: !!workspaceId && !!userId && !!farmId,
   });

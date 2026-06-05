@@ -30,6 +30,7 @@ import { IconType } from "react-icons";
 
 import z from "zod";
 import { financeSaleSchema } from "@/lib/schemas";
+import { Textarea } from "@/components/ui/textarea";
 interface Input {
   control: Control<z.infer<typeof financeSaleSchema>>;
   name: FieldPath<z.infer<typeof financeSaleSchema>>;
@@ -41,6 +42,7 @@ interface InputSelect {
   name1: FieldPath<z.infer<typeof financeSaleSchema>>;
   name2: FieldPath<z.infer<typeof financeSaleSchema>>;
   label: string;
+  type?: string;
   placeholder: string;
   placeholder2: string;
   array: { [key: string]: string }[];
@@ -85,7 +87,7 @@ export function FinanceSelect({
                   </div>
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="max-h-[160px] z-200 bg-[#fff] border border-border text-dark">
+              <SelectContent className="max-h-[160px] z-200 bg-white mt-6 border border-border text-dark">
                 {array.map((select) => (
                   <SelectItem
                     className="cursor-pointer text-sm hover:bg-primary hover:text-white"
@@ -113,6 +115,7 @@ export function FinanceInputSelect({
   placeholder,
   placeholder2,
   array,
+  type = "text",
 }: InputSelect) {
   return (
     <div className="space-y-2 w-full">
@@ -125,6 +128,7 @@ export function FinanceInputSelect({
             <FormItem className="flex-1">
               <FormControl>
                 <Input
+                  type={type}
                   className="text-sm h-9 rounded-r-none border-r-0"
                   placeholder={placeholder}
                   {...field}
@@ -229,7 +233,7 @@ export function FinanceDate({ control, name, label }: Dates) {
               <Calendar
                 mode="single"
                 selected={field.value ? new Date(field.value) : undefined}
-                onSelect={(date) => field.onChange(date?.toISOString())}
+                onSelect={(date) => field.onChange(date)}
               />
             </PopoverContent>
           </Popover>
@@ -259,6 +263,31 @@ export default function FinanceInput({
               className="text-sm w-full h-9!"
               placeholder={placeholder}
               {...field}
+            />
+          </FormControl>
+
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+}
+export function FinanceText({ name, label, placeholder, control }: Input) {
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className="w-full">
+          <FormLabel className="text-sm   text-dark">{label}</FormLabel>
+          <FormControl>
+            <Textarea
+              placeholder={placeholder}
+              maxLength={2000}
+              className="resize-none font-normal"
+              {...field}
+              onChange={(e) => field.onChange(e.target.value)}
+              value={typeof field.value === "string" ? field.value : ""}
             />
           </FormControl>
 

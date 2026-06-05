@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Resolver } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -12,9 +12,9 @@ import FinanceInput, {
   FinanceDate,
   FinanceInputSelect,
   FinanceSelect,
+  FinanceText,
 } from "./FinanceField";
 import { IoMdGrid } from "react-icons/io";
-import { PiPlant } from "react-icons/pi";
 import { MdOutlinePayment } from "react-icons/md";
 import { FaRegSave } from "react-icons/fa";
 import { useParams } from "next/navigation";
@@ -22,20 +22,103 @@ import { useApp } from "@/stores/useAppStore";
 import { toast } from "sonner";
 import { useCreateSales } from "@/hooks/sales/useSales";
 import ButtonLoader from "@/components/layout/ButtonLoader";
-export default function FinanceSalesForm() {
-  const form = useForm<z.infer<typeof financeSaleSchema>>({
-    resolver: zodResolver(financeSaleSchema),
-  });
+import { useGetFarm } from "@/hooks/farms/useFarm";
+import { useGetFarmCrops } from "@/hooks/crops/useCrops";
+import { useGetFarmHarvest } from "@/hooks/harvest/useHarvest";
+import { PiPlant } from "react-icons/pi";
+export default function FinanceSalesFormFetch() {
+  const { workspace, user, ready } = useApp();
   const { farmId } = useParams();
+  const { farms, status, error } = useGetFarm(
+    workspace?.id ?? null,
+    user?.id ?? null,
+  );
+  const {
+    crops,
+    error: cropErr,
+    status: cropStat,
+  } = useGetFarmCrops(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
+  const {
+    harvests,
+    error: harvestsErr,
+    status: harvestsStat,
+  } = useGetFarmHarvest(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
+
+  if (!ready) return <p>Loading...</p>;
+  if (!user && ready) return <p>error</p>;
+  if (
+    status === "pending" ||
+    cropStat === "pending" ||
+    harvestsStat === "pending"
+  )
+    return <p>Loading form...</p>;
+  if (status === "error" || cropStat === "error" || harvestsStat === "error")
+    return <p>{error?.message || cropErr?.message || harvestsErr?.message}</p>;
+
+  const farmOptions =
+    farms?.map((f) => ({
+      name: f.farmName,
+      value: f.$id,
+    })) ?? [];
+
+  const cropMap = new Map(crops?.map((c) => [c.$id, c]) ?? []);
+
+  const harvestOptions =
+    harvests?.map((harvest) => {
+      const crop = cropMap.get(harvest.crops);
+
+      return {
+        name: `${crop?.cropName ?? "Unknown"} (${harvest.quantity}${harvest.unit})`,
+        value: harvest.$id,
+      };
+    }) ?? [];
+  return (
+    <FinanceSalesForm
+      workspaceId={workspace!.id}
+      userId={user!.id}
+      farms={farmOptions}
+      harvestedCrops={harvestOptions}
+    />
+  );
+}
+
+function FinanceSalesForm({
+  workspaceId,
+  userId,
+  farms,
+  harvestedCrops,
+}: {
+  workspaceId: string;
+  userId: string;
+  farms: { name: string; value: string }[];
+  harvestedCrops: { name: string; value: string }[];
+}) {
+  const form = useForm<z.infer<typeof financeSaleSchema>>({
+    resolver: zodResolver(financeSaleSchema) as Resolver<
+      z.infer<typeof financeSaleSchema>
+    >,
+  });
   const { createSales, status } = useCreateSales();
-  const { workspace, user } = useApp();
   async function onSubmit(values: z.infer<typeof financeSaleSchema>) {
+    const { farm, harvest, ...val } = values;
     const obj = {
-      userId: user!.id,
-      workspaceId: workspace!.id,
+      userId: userId,
+      workspaceId: workspaceId,
       data: {
-        ...values,
-        farmId: farmId!.toString(),
+        ...val,
+        totalAmount: +values.totalAmount,
+        harvests: values.harvest,
+        unitPrice: +values.unitPrice,
+        quantity: +values.quantity,
+        farms: values.farm,
       },
     };
     createSales(obj, {
@@ -52,52 +135,7 @@ export default function FinanceSalesForm() {
         }),
     });
   }
-  const farm = [
-    {
-      value: "greenValley",
-      name: "Green Valley Farm",
-    },
-    {
-      value: "sunrise",
-      name: "Sunrise Farm",
-    },
-    {
-      value: "hilltop",
-      name: "Hilltop Farm ",
-    },
-  ];
-  const arrCrop = [
-    {
-      name: "Maize",
-      value: "maize",
-    },
-    {
-      name: "Rice",
-      value: "rice",
-    },
-    {
-      name: "Wheat",
-      value: "wheat",
-    },
-  ];
-  const arrField = [
-    {
-      value: "fieldA",
-      name: "Field A ",
-    },
-    {
-      value: "fieldB",
-      name: "Field B ",
-    },
-    {
-      value: "fieldC",
-      name: "Field C ",
-    },
-    {
-      value: "fieldD",
-      name: "Field D ",
-    },
-  ];
+
   const arrQuantity = [
     {
       name: "kg",
@@ -108,8 +146,22 @@ export default function FinanceSalesForm() {
       value: "bags",
     },
     {
-      name: "crates",
-      value: "crates",
+      name: "tons",
+      value: "tons",
+    },
+  ];
+  const stat = [
+    {
+      name: "Completed",
+      value: "completed",
+    },
+    {
+      name: "Pending",
+      value: "pending",
+    },
+    {
+      name: "Cancelled",
+      value: "cancelled",
     },
   ];
   const arrPayment = [
@@ -118,8 +170,16 @@ export default function FinanceSalesForm() {
       value: "cash",
     },
     {
-      name: "Bank Transfer",
-      value: "bankTransfer",
+      name: "Transfer",
+      value: "transfer",
+    },
+    {
+      name: "Card",
+      value: "card",
+    },
+    {
+      name: "Mobile Money",
+      value: "mobile-money",
     },
   ];
   return (
@@ -135,20 +195,20 @@ export default function FinanceSalesForm() {
         >
           <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
             <FinanceSelect
-              name="crop"
+              name="farm"
               control={form.control}
-              label="Crop"
-              placeholder="Select crop"
-              array={arrCrop}
-              Icon={PiPlant}
+              label="Farm"
+              placeholder="Select farm"
+              array={farms}
+              Icon={IoMdGrid}
             />
             <FinanceSelect
-              name="field"
+              name="harvest"
               control={form.control}
-              label="Field"
-              placeholder="Select field"
-              array={arrField}
-              Icon={IoMdGrid}
+              label="Harvested Crop"
+              placeholder="Select crop"
+              array={harvestedCrops}
+              Icon={PiPlant}
             />
           </div>
 
@@ -159,6 +219,7 @@ export default function FinanceSalesForm() {
               label="Quantity"
               placeholder="e.g. 50"
               placeholder2="kg"
+              type="number"
               name1="quantity"
               name2="unit"
             />
@@ -170,19 +231,19 @@ export default function FinanceSalesForm() {
             />
           </div>
           <div className="flex item flex-col md:flex-row justify-between gap-4 md:gap-6">
+            <FinanceSelect
+              name="status"
+              control={form.control}
+              label="Payment Status"
+              placeholder="Select status"
+              array={stat}
+              Icon={IoMdGrid}
+            />
             <FinanceAmount
               label="Total Amount"
               placeholder="e.g. 0.00"
               name="totalAmount"
               control={form.control}
-            />
-            <FinanceSelect
-              name="farm"
-              control={form.control}
-              label="Farm"
-              placeholder="Select farm"
-              array={farm}
-              Icon={IoMdGrid}
             />
           </div>
           <div className="flex item flex-col md:flex-row justify-between gap-4 md:gap-6">
@@ -192,6 +253,7 @@ export default function FinanceSalesForm() {
               name="buyer"
               control={form.control}
             />
+
             <FinanceSelect
               name="paymentMethod"
               control={form.control}
@@ -207,10 +269,10 @@ export default function FinanceSalesForm() {
               name="saleDate"
               control={form.control}
             />
-            <FinanceInput
-              label="Notes (Optional)"
-              placeholder="Add any additonal notes..."
-              name="notes"
+            <FinanceText
+              label="Description (optional)"
+              placeholder="Enter Field description"
+              name="description"
               control={form.control}
             />
           </div>
