@@ -26,6 +26,7 @@ import { useGetFarm } from "@/hooks/farms/useFarm";
 import { useGetFarmCrops } from "@/hooks/crops/useCrops";
 import { useGetFarmHarvest } from "@/hooks/harvest/useHarvest";
 import { PiPlant } from "react-icons/pi";
+import { FormLoader } from "@/components/loader/GeneralLoader";
 export default function FinanceSalesFormFetch() {
   const { workspace, user, ready } = useApp();
   const { farmId } = useParams();
@@ -52,14 +53,23 @@ export default function FinanceSalesFormFetch() {
     farmId as string,
   );
 
-  if (!ready) return <p>Loading...</p>;
+  if (!ready)
+    return (
+      <div className="h-125">
+        <FormLoader>Loading...</FormLoader>
+      </div>
+    );
   if (!user && ready) return <p>error</p>;
   if (
     status === "pending" ||
     cropStat === "pending" ||
     harvestsStat === "pending"
   )
-    return <p>Loading form...</p>;
+    return (
+      <div className="h-125">
+        <FormLoader>Loading form...</FormLoader>
+      </div>
+    );
   if (status === "error" || cropStat === "error" || harvestsStat === "error")
     return <p>{error?.message || cropErr?.message || harvestsErr?.message}</p>;
 
@@ -115,10 +125,10 @@ function FinanceSalesForm({
       data: {
         ...val,
         totalAmount: +values.totalAmount,
-        harvests: values.harvest,
+        harvests: harvest,
         unitPrice: +values.unitPrice,
         quantity: +values.quantity,
-        farms: values.farm,
+        farms: farm,
       },
     };
     createSales(obj, {

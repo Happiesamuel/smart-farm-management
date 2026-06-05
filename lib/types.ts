@@ -156,15 +156,24 @@ export interface SalesInfo {
   users: string;
 }
 export interface ExpenseInfo {
-  category: string;
-  farm: string;
-  amount: string;
-  date: string;
-  paymentMethod: string;
-  notes?: string;
-  description: string;
-  receipt?: File;
-  farmId: string;
+  category:
+    | "labor"
+    | "seeds"
+    | "fertilizer"
+    | "pesticide"
+    | "equipment"
+    | "transport"
+    | "maintenance"
+    | "other";
+  amount: number;
+  expenseDate: string | Date;
+  paymentMethod: "cash" | "transfer" | "card" | "mobile-money";
+  description?: string;
+  status: "paid" | "pending";
+  vendor?: string;
+  farms?: string;
+  crops?: string;
+  fields?: string;
   id: string;
   workspaces: string;
   users: string;

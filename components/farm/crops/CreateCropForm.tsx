@@ -24,7 +24,7 @@ import { useApp } from "@/stores/useAppStore";
 import { useParams } from "next/navigation";
 import ButtonLoader from "@/components/layout/ButtonLoader";
 import { toast } from "sonner";
-import GeneralLoader from "@/components/loader/GeneralLoader";
+import { FormLoader } from "@/components/loader/GeneralLoader";
 import { useGetFarm } from "@/hooks/farms/useFarm";
 import { useGetFarmFields } from "@/hooks/fields/useFields";
 
@@ -45,10 +45,19 @@ export default function CreateCropFormFetch() {
     farmId as string,
   );
 
-  if (!ready) return <GeneralLoader>Loading...</GeneralLoader>;
+  if (!ready)
+    return (
+      <div className="h-100">
+        <FormLoader>Loading...</FormLoader>
+      </div>
+    );
   if (!user && ready) return <p>error</p>;
   if (status === "pending" || fieldStat === "pending")
-    return <GeneralLoader>Loading form...</GeneralLoader>;
+    return (
+      <div className="h-100">
+        <FormLoader>Loading form...</FormLoader>
+      </div>
+    );
   if (status === "error" || fieldStat === "error")
     return <p>{error?.message || fieldErr?.message}</p>;
 

@@ -23,7 +23,7 @@ import ButtonLoader from "@/components/layout/ButtonLoader";
 import { toast } from "sonner";
 import { useApp } from "@/stores/useAppStore";
 import { useGetFarm } from "@/hooks/farms/useFarm";
-import GeneralLoader from "@/components/loader/GeneralLoader";
+import GeneralLoader, { FormLoader } from "@/components/loader/GeneralLoader";
 
 export default function CreateFieldFormFetch() {
   const { workspace, user, ready } = useApp();
@@ -32,10 +32,19 @@ export default function CreateFieldFormFetch() {
     user?.id ?? null,
   );
 
-  if (!ready) return <GeneralLoader>Loading...</GeneralLoader>;
+  if (!ready)
+    return (
+      <div className="h-100">
+        <FormLoader>Loading...</FormLoader>
+      </div>
+    );
   if (!user && ready) return <p>error</p>;
   if (status === "pending")
-    return <GeneralLoader>Loading form...</GeneralLoader>;
+    return (
+      <div className="h-100">
+        <FormLoader>Loading form...</FormLoader>
+      </div>
+    );
   if (status === "error") return <p>{error?.message}</p>;
 
   const farmOptions =
@@ -87,7 +96,7 @@ function CreateFieldForm({
       data: {
         ...val,
         size: +values.size,
-        farms: values.farm,
+        farms: farm,
       },
     };
     createField(obj, {

@@ -24,7 +24,7 @@ import { useApp } from "@/stores/useAppStore";
 import { toast } from "sonner";
 import ButtonLoader from "@/components/layout/ButtonLoader";
 import { useCreateHavest } from "@/hooks/harvest/useHarvest";
-import GeneralLoader from "@/components/loader/GeneralLoader";
+import GeneralLoader, { FormLoader } from "@/components/loader/GeneralLoader";
 import { useGetFarmFields } from "@/hooks/fields/useFields";
 import { useGetFarm } from "@/hooks/farms/useFarm";
 import { useGetFarmCrops } from "@/hooks/crops/useCrops";
@@ -55,14 +55,21 @@ export default function CreateHarvestFormFetch() {
     user?.id ?? null,
     farmId as string,
   );
-  if (!ready) return <GeneralLoader>Loading...</GeneralLoader>;
+  if (!ready)
+    return (
+      <div className="h-100">
+        <FormLoader>Loading...</FormLoader>
+      </div>
+    );
   if (!user && ready) return <p>error</p>;
   if (status === "pending" || fieldStat === "pending" || cropStat === "pending")
-    return <GeneralLoader>Loading form...</GeneralLoader>;
+    return (
+      <div className="h-100">
+        <FormLoader>Loading form...</FormLoader>
+      </div>
+    );
   if (status === "error" || fieldStat === "error" || cropStat === "error")
     return <p>{error?.message || fieldErr?.message || cropErr?.message}</p>;
-
-  console.log(crops);
 
   const farmOptions =
     farms?.map((f) => ({

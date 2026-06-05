@@ -637,41 +637,87 @@ export const noteSchema = z.object({
     .string({ message: "descripton is required" })
     .min(10, { message: "description must be at least 10 characters." }),
 });
+
 export const financeExpenseSchema = z.object({
-  category: z
-    .string({ message: "Please select a category" })
-    .min(1, "Please select a category"),
-  farm: z
-    .string({ message: "Please select a farm" })
-    .min(1, "Please select a farm"),
+  category: z.enum(
+    [
+      "labor",
+      "seeds",
+      "fertilizer",
+      "pesticide",
+      "equipment",
+      "transport",
+      "maintenance",
+      "other",
+    ],
+    {
+      message: "Please select a category",
+    },
+  ),
 
-  amount: z.string({ message: "Please enter total amount" }).min(2, {
-    message: "Total amountt must be at least 2 characters.",
+  // Optional relationships (VERY IMPORTANT)
+  farm: z.string().optional(),
+  field: z.string().optional(),
+  crop: z.string().optional(),
+
+  amount: z.string({ message: "Amount is required" }).min(1, {
+    message: "Amount must be greater than 0.",
   }),
-  date: z.string({ message: " Date is required" }).min(1, "Date is required"),
 
-  paymentMethod: z
-    .string({ message: "Please select payment method" })
-    .min(1, "Please select a payment method"),
-  notes: z.string().optional(),
+  expenseDate: z.date({
+    error: "Expense date is required",
+  }),
+
+  paymentMethod: z.enum(["cash", "transfer", "card", "mobile-money"], {
+    message: "Please select payment method",
+  }),
+
+  status: z.enum(["paid", "pending"]).default("paid"),
+
+  vendor: z.string().optional(), // who you paid
+
   description: z
-    .string({ message: "descripton is required" })
-    .min(10, { message: "description must be at least 10 characters." }),
-  receipt: z
-    .any()
-    .refine((file) => !file || file.size <= 5 * 1024 * 1024, {
-      message: "Max file size is 5MB",
+    .string()
+    .min(10, {
+      message: "Description must be at least 10 characters.",
     })
-    .refine(
-      (file) =>
-        !file ||
-        ["image/jpeg", "image/png", "application/pdf"].includes(file.type),
-      {
-        message: "Only JPG, PNG or PDF allowed",
-      },
-    )
     .optional(),
 });
+// export const financeExpenseSchema = z.object({
+//   category: z
+//     .string({ message: "Please select a category" })
+//     .min(1, "Please select a category"),
+//   farm: z
+//     .string({ message: "Please select a farm" })
+//     .min(1, "Please select a farm"),
+
+//   amount: z.string({ message: "Please enter total amount" }).min(2, {
+//     message: "Total amountt must be at least 2 characters.",
+//   }),
+//   date: z.string({ message: " Date is required" }).min(1, "Date is required"),
+
+//   paymentMethod: z
+//     .string({ message: "Please select payment method" })
+//     .min(1, "Please select a payment method"),
+//   notes: z.string().optional(),
+//   description: z
+//     .string({ message: "descripton is required" })
+//     .min(10, { message: "description must be at least 10 characters." }),
+//   receipt: z
+//     .any()
+//     .refine((file) => !file || file.size <= 5 * 1024 * 1024, {
+//       message: "Max file size is 5MB",
+//     })
+//     .refine(
+//       (file) =>
+//         !file ||
+//         ["image/jpeg", "image/png", "application/pdf"].includes(file.type),
+//       {
+//         message: "Only JPG, PNG or PDF allowed",
+//       },
+//     )
+//     .optional(),
+// });
 function comboSchema(message: string) {
   return z.string({ message: message });
   // return z.object(

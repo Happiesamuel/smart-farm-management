@@ -79,7 +79,7 @@ export function FinanceSelect({
                   </div>
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="max-h-[160px] z-200 bg-[#fff] border border-border text-dark">
+              <SelectContent className="max-h-[160px] z-200 bg-white mt-6 border border-border text-dark">
                 {array.map((select) => (
                   <SelectItem
                     className="cursor-pointer text-sm hover:bg-primary hover:text-white"
@@ -160,7 +160,7 @@ export function FinanceDate({ control, name, label }: Dates) {
               <Calendar
                 mode="single"
                 selected={field.value ? new Date(field.value) : undefined}
-                onSelect={(date) => field.onChange(date?.toISOString())}
+                onSelect={(date) => field.onChange(date)}
               />
             </PopoverContent>
           </Popover>
@@ -225,64 +225,64 @@ export function FinanceText({ name, label, placeholder, control }: Input) {
   );
 }
 
-export function FinanceUpload({
-  control,
-}: {
-  control: Control<z.infer<typeof financeExpenseSchema>>;
-}) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
+// export function FinanceUpload({
+//   control,
+// }: {
+//   control: Control<z.infer<typeof financeExpenseSchema>>;
+// }) {
+//   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  return (
-    <FormField
-      control={control}
-      name="receipt"
-      render={({ field }) => (
-        <FormItem className="w-full">
-          <FormLabel className="text-sm text-dark">
-            Receipt (Optional)
-          </FormLabel>
+//   return (
+//     <FormField
+//       control={control}
+//       name="receipt"
+//       render={({ field }) => (
+//         <FormItem className="w-full">
+//           <FormLabel className="text-sm text-dark">
+//             Receipt (Optional)
+//           </FormLabel>
 
-          <FormControl>
-            <div
-              onClick={() => inputRef.current?.click()}
-              className="border border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition"
-            >
-              <input
-                type="file"
-                ref={inputRef}
-                className="hidden"
-                accept=".jpg,.jpeg,.png,.pdf"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  field.onChange(file);
-                }}
-              />
+//           <FormControl>
+//             <div
+//               onClick={() => inputRef.current?.click()}
+//               className="border border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition"
+//             >
+//               <input
+//                 type="file"
+//                 ref={inputRef}
+//                 className="hidden"
+//                 accept=".jpg,.jpeg,.png,.pdf"
+//                 onChange={(e) => {
+//                   const file = e.target.files?.[0];
+//                   field.onChange(file);
+//                 }}
+//               />
 
-              {/* Icon */}
-              <div className="flex flex-col items-center justify-center gap-2">
-                <Upload className="w-6 h-6 text-gray-500" />
+//               {/* Icon */}
+//               <div className="flex flex-col items-center justify-center gap-2">
+//                 <Upload className="w-6 h-6 text-gray-500" />
 
-                <p className="text-sm font-medium text-gray-700">
-                  Upload receipt
-                </p>
+//                 <p className="text-sm font-medium text-gray-700">
+//                   Upload receipt
+//                 </p>
 
-                <p className="text-xs text-gray-500">
-                  JPG, PNG or PDF (Max 5MB)
-                </p>
-              </div>
+//                 <p className="text-xs text-gray-500">
+//                   JPG, PNG or PDF (Max 5MB)
+//                 </p>
+//               </div>
 
-              {/* Show selected file */}
-              {field.value && (
-                <p className="mt-3 text-xs text-green-600">
-                  {field.value.name}
-                </p>
-              )}
-            </div>
-          </FormControl>
+//               {/* Show selected file */}
+//               {field.value && (
+//                 <p className="mt-3 text-xs text-green-600">
+//                   {field.value.name}
+//                 </p>
+//               )}
+//             </div>
+//           </FormControl>
 
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-}
+//           <FormMessage />
+//         </FormItem>
+//       )}
+//     />
+//   );
+// }

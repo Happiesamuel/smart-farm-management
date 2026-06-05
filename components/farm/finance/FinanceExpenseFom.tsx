@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Resolver } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -12,7 +12,6 @@ import FinanceInput, {
   FinanceDate,
   FinanceSelect,
   FinanceText,
-  FinanceUpload,
 } from "./FinanceExpenseField";
 
 import { MdOutlinePayment } from "react-icons/md";
@@ -22,20 +21,110 @@ import { useParams } from "next/navigation";
 import ButtonLoader from "@/components/layout/ButtonLoader";
 import { toast } from "sonner";
 import { useCreateExpenses } from "@/hooks/expense/useExpense";
-export default function FinanceExpenseFom() {
-  const form = useForm<z.infer<typeof financeExpenseSchema>>({
-    resolver: zodResolver(financeExpenseSchema),
-  });
+import { useGetFarmCrops } from "@/hooks/crops/useCrops";
+import { useGetFarm } from "@/hooks/farms/useFarm";
+import { useGetFarmFields } from "@/hooks/fields/useFields";
+import { FormLoader } from "@/components/loader/GeneralLoader";
+
+export default function FinanceExpenseFormFetch() {
+  const { workspace, user, ready } = useApp();
   const { farmId } = useParams();
+  const { farms, status, error } = useGetFarm(
+    workspace?.id ?? null,
+    user?.id ?? null,
+  );
+  const {
+    error: fieldErr,
+    fields,
+    status: fieldStat,
+  } = useGetFarmFields(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
+  const {
+    crops,
+    error: cropErr,
+    status: cropStat,
+  } = useGetFarmCrops(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
+
+  if (!ready)
+    return (
+      <div className="h-125">
+        <FormLoader>Loading...</FormLoader>
+      </div>
+    );
+  if (!user && ready) return <p>error</p>;
+  if (status === "pending" || cropStat === "pending" || fieldStat === "pending")
+    return (
+      <div className="h-125">
+        <FormLoader>Loading form...</FormLoader>
+      </div>
+    );
+  if (status === "error" || cropStat === "error" || fieldStat === "error")
+    return <p>{error?.message || cropErr?.message || fieldErr?.message}</p>;
+
+  const farmOptions =
+    farms?.map((f) => ({
+      name: f.farmName,
+      value: f.$id,
+    })) ?? [];
+
+  const fieldOptions =
+    fields?.map((f) => ({
+      name: f.fieldName,
+      value: f.$id,
+    })) ?? [];
+  const cropOptions =
+    crops?.map((f) => ({
+      name: f.cropName,
+      value: f.$id,
+    })) ?? [];
+  return (
+    <FinanceExpenseFom
+      workspaceId={workspace!.id}
+      userId={user!.id}
+      farms={farmOptions}
+      fields={fieldOptions}
+      crops={cropOptions}
+    />
+  );
+}
+
+function FinanceExpenseFom({
+  workspaceId,
+  userId,
+  farms,
+  fields,
+  crops,
+}: {
+  workspaceId: string;
+  userId: string;
+  farms: { name: string; value: string }[];
+  fields: { name: string; value: string }[];
+  crops: { name: string; value: string }[];
+}) {
+  const form = useForm<z.infer<typeof financeExpenseSchema>>({
+    resolver: zodResolver(financeExpenseSchema) as Resolver<
+      z.infer<typeof financeExpenseSchema>
+    >,
+  });
   const { createExpense, status } = useCreateExpenses();
-  const { workspace, user } = useApp();
   async function onSubmit(values: z.infer<typeof financeExpenseSchema>) {
+    const { farm, field, crop, ...val } = values;
     const obj = {
-      userId: user!.id,
-      workspaceId: workspace!.id,
+      userId: userId,
+      workspaceId: workspaceId,
       data: {
-        ...values,
-        farmId: farmId!.toString(),
+        ...val,
+        amount: +values.amount,
+        crops: crop,
+        farms: farm,
+        fields: field,
       },
     };
     createExpense(obj, {
@@ -59,8 +148,8 @@ export default function FinanceExpenseFom() {
       value: "fertilizer",
     },
     {
-      name: "Labour",
-      value: "labour",
+      name: "Labor",
+      value: "labor",
     },
     {
       name: "Seeds",
@@ -70,19 +159,32 @@ export default function FinanceExpenseFom() {
       name: "Transport",
       value: "transport",
     },
+    {
+      name: "Pesticide",
+      value: "pesticide",
+    },
+    {
+      name: "Equipment",
+      value: "equipment",
+    },
+    {
+      name: "Maintenance",
+      value: "maintenance",
+    },
+    {
+      name: "Other",
+      value: "other",
+    },
   ];
-  const farm = [
+
+  const stat = [
     {
-      value: "greenValley",
-      name: "Green Valley Farm",
+      name: "Paid",
+      value: "paid",
     },
     {
-      value: "sunrise",
-      name: "Sunrise Farm",
-    },
-    {
-      value: "hilltop",
-      name: "Hilltop Farm ",
+      name: "Pending",
+      value: "pending",
     },
   ];
   const arrPayment = [
@@ -91,8 +193,16 @@ export default function FinanceExpenseFom() {
       value: "cash",
     },
     {
-      name: "Bank Transfer",
-      value: "bankTransfer",
+      name: "Transfer",
+      value: "transfer",
+    },
+    {
+      name: "Card",
+      value: "card",
+    },
+    {
+      name: "Mobile Money",
+      value: "mobile-money",
     },
   ];
   return (
@@ -118,13 +228,31 @@ export default function FinanceExpenseFom() {
             <FinanceSelect
               name="farm"
               control={form.control}
-              label="Farm"
+              label="Farm (optional)"
               placeholder="Select farm"
-              array={farm}
+              array={farms}
               Icon={AiOutlineTag}
             />
           </div>
 
+          <div className="flex item justify-between flex-col md:flex-row gap-4 md:gap-6">
+            <FinanceSelect
+              name="field"
+              control={form.control}
+              label="Field (optional)"
+              placeholder="Select field"
+              array={fields}
+              Icon={AiOutlineTag}
+            />
+            <FinanceSelect
+              name="crop"
+              control={form.control}
+              label="Crop (optional)"
+              placeholder="Select crop"
+              array={crops}
+              Icon={AiOutlineTag}
+            />
+          </div>
           <div className="flex item justify-between flex-col md:flex-row gap-4 md:gap-6">
             <FinanceSelect
               name="paymentMethod"
@@ -134,6 +262,23 @@ export default function FinanceExpenseFom() {
               array={arrPayment}
               Icon={MdOutlinePayment}
             />
+            <FinanceSelect
+              name="status"
+              control={form.control}
+              label="Payment status"
+              placeholder="Select payment status"
+              array={stat}
+              Icon={MdOutlinePayment}
+            />
+          </div>
+
+          <div className="flex items-start justify-between flex-col md:flex-row gap-4 md:gap-6">
+            <FinanceInput
+              label="Vendor (optional)"
+              placeholder="e.g. John Doe"
+              name="vendor"
+              control={form.control}
+            />
             <FinanceAmount
               label="Amount"
               placeholder="e.g. 5000"
@@ -141,22 +286,16 @@ export default function FinanceExpenseFom() {
               control={form.control}
             />
           </div>
-
           <div className="flex items-start justify-between flex-col md:flex-row gap-4 md:gap-6">
-            <FinanceText
-              label="Description"
-              placeholder="Enter expense description"
-              name="description"
+            <FinanceDate
+              label="Date"
+              name="expenseDate"
               control={form.control}
             />
-            <FinanceUpload control={form.control} />
-          </div>
-          <div className="flex items-start justify-between flex-col md:flex-row gap-4 md:gap-6">
-            <FinanceDate label="Date" name="date" control={form.control} />
-            <FinanceInput
-              label="Notes (Optional)"
-              placeholder="Add any additonal notes..."
-              name="notes"
+            <FinanceText
+              label="Description (optional)"
+              placeholder="Enter expense description"
+              name="description"
               control={form.control}
             />
           </div>
@@ -169,6 +308,7 @@ export default function FinanceExpenseFom() {
             </Button>
             <Button
               type="submit"
+              disabled={status === "pending"}
               className="text-white bg-red-600 rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
               {status === "pending" ? (
