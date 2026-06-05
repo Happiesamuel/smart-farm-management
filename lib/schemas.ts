@@ -283,8 +283,6 @@ export const createFieldSchema = z.object({
     .string({ message: "Please select farm" })
     .min(1, "Please select a farm"),
 
-  workspaceId: z.string().optional(),
-
   size: z.string({ message: "Total size is required" }).min(1, {
     message: "Total size must be at least a characters.",
   }),
