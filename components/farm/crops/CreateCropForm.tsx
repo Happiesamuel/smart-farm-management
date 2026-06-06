@@ -30,7 +30,7 @@ import { useGetFarmFields, useGetFields } from "@/hooks/fields/useFields";
 
 export default function CreateCropFormFetch({ onClose }: { onClose?(): void }) {
   const { workspace, user, ready } = useApp();
-  const { farmId } = useParams();
+  const { farmId: x } = useParams();
   const { farms, status, error } = useGetFarm(
     workspace?.id ?? null,
     user?.id ?? null,
@@ -39,17 +39,13 @@ export default function CreateCropFormFetch({ onClose }: { onClose?(): void }) {
     error: fieldErr,
     fields,
     status: fieldStat,
-  } = useGetFarmFields(
-    workspace?.id ?? null,
-    user?.id ?? null,
-    farmId as string,
-  );
+  } = useGetFarmFields(workspace?.id ?? null, user?.id ?? null, x as string);
   const {
     error: fieldsErr,
     fields: fieldss,
     status: fieldsStat,
   } = useGetFields(workspace?.id ?? null, user?.id ?? null);
-  const isLoading = farmId ? fieldStat === "pending" : fieldsStat === "pending";
+  const isLoading = x ? fieldStat === "pending" : fieldsStat === "pending";
 
   if (!ready)
     return (
@@ -65,9 +61,9 @@ export default function CreateCropFormFetch({ onClose }: { onClose?(): void }) {
       </div>
     );
   const errMssg = fieldErr?.message || fieldsErr?.message;
-  const isErr = farmId ? fieldStat === "error" : fieldsStat === "error";
+  const isErr = x ? fieldStat === "error" : fieldsStat === "error";
   if (status === "error" || isErr) return <p>{error?.message || errMssg}</p>;
-
+  const farmId = farms?.find((y) => y.$id === x)?.$id ?? undefined;
   const farmOptions =
     farms?.map((f) => ({
       name: f.farmName,
@@ -112,6 +108,7 @@ function CreateCropForm({
       farm: farmId ? farmId : "",
     },
   });
+  const { farmId: id } = useParams();
   const { workspace } = useApp();
   const router = useRouter();
   const { createCrop, status } = useCreateCrop();
@@ -302,7 +299,7 @@ function CreateCropForm({
                   ? (farms.find((x) => x.value === farmId)?.name ?? "")
                   : "Select farm"
               }
-              array={farms}
+              array={farmId || id ? [] : farms}
               Icon={PiFarm}
               disabled={farmId ? true : false}
             />

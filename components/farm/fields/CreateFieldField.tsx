@@ -65,11 +65,6 @@ interface InputSelect {
   type?: string;
   array: { [key: string]: string }[];
 }
-interface Dates {
-  control: Control<z.infer<typeof createFieldSchema>>;
-  name: FieldPath<z.infer<typeof createFieldSchema>>;
-  label: string;
-}
 
 interface Select {
   control: Control<z.infer<typeof createFieldSchema>>;
@@ -78,6 +73,7 @@ interface Select {
   placeholder: string;
   array: { [key: string]: string }[];
   Icon: IconType;
+  disabled?: boolean;
 }
 
 export function CreateFieldSelect({
@@ -87,6 +83,7 @@ export function CreateFieldSelect({
   placeholder,
   Icon,
   array,
+  disabled,
 }: Select) {
   return (
     <FormField
@@ -100,7 +97,10 @@ export function CreateFieldSelect({
           <div className="w-full flex justify-center items-center min-w-[2px]">
             <Select onValueChange={field.onChange}>
               <FormControl>
-                <SelectTrigger className="cursor-pointer h-9! w-full  bg-transparent  focus-visible:outline-primary rounded-[8px] p-3 text-sm  focus:ring text-dark ring-green-500  data-[placeholder]:text-gray-500 ">
+                <SelectTrigger
+                  disabled={disabled}
+                  className="cursor-pointer h-9! w-full  bg-transparent  focus-visible:outline-primary rounded-[8px] p-3 text-sm  focus:ring text-dark ring-green-500  data-[placeholder]:text-gray-500 "
+                >
                   <div className="flex items-center  gap-2">
                     {Icon && <Icon className="text-primary-green" />}
                     <SelectValue placeholder={placeholder} className="" />

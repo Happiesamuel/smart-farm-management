@@ -23,7 +23,8 @@ import ButtonLoader from "@/components/layout/ButtonLoader";
 import { toast } from "sonner";
 import { useApp } from "@/stores/useAppStore";
 import { useGetFarm } from "@/hooks/farms/useFarm";
-import GeneralLoader, { FormLoader } from "@/components/loader/GeneralLoader";
+import { FormLoader } from "@/components/loader/GeneralLoader";
+import { useParams } from "next/navigation";
 
 export default function CreateFieldFormFetch() {
   const { workspace, user, ready } = useApp();
@@ -31,7 +32,7 @@ export default function CreateFieldFormFetch() {
     workspace?.id ?? null,
     user?.id ?? null,
   );
-
+  const { farmId: x } = useParams();
   if (!ready)
     return (
       <div className="h-100">
@@ -47,14 +48,16 @@ export default function CreateFieldFormFetch() {
     );
   if (status === "error") return <p>{error?.message}</p>;
 
+  const farmId = farms?.find((y) => y.$id === x)?.$id ?? undefined;
+
   const farmOptions =
     farms?.map((f) => ({
       name: f.farmName,
       value: f.$id,
     })) ?? [];
-
   return (
     <CreateFieldForm
+      farmId={farmId as string}
       workspaceId={workspace!.id}
       userId={user!.id}
       farms={farmOptions}
@@ -65,10 +68,12 @@ export default function CreateFieldFormFetch() {
 function CreateFieldForm({
   workspaceId,
   userId,
+  farmId,
   farms,
 }: {
   workspaceId: string;
   userId: string;
+  farmId: string;
   farms: { name: string; value: string }[];
 }) {
   const { createField, status } = useCreateField();
@@ -78,14 +83,7 @@ function CreateFieldForm({
       z.infer<typeof createFieldSchema>
     >,
     defaultValues: {
-      fieldName: "",
-      farm: "",
-      size: "0",
-      sizeUnit: "hectares",
-      soilType: "loamy",
-      irrigationType: undefined,
-      status: "active",
-      description: "",
+      farm: farmId ? farmId : "",
     },
   });
   async function onSubmit(values: z.infer<typeof createFieldSchema>) {
@@ -215,8 +213,13 @@ function CreateFieldForm({
               name="farm"
               control={form.control}
               label="Select Farm"
-              placeholder="Select farm"
-              array={farms}
+              placeholder={
+                farmId
+                  ? (farms.find((x) => x.value === farmId)?.name ?? "")
+                  : "Select farm"
+              }
+              disabled={farmId ? true : false}
+              array={[]}
               Icon={PiFarm}
             />
           </div>
