@@ -48,7 +48,10 @@ export const useGetFarmCrops = (
   return { crops, error, status };
 };
 
-export const useGetCrops = (workspaceId: string, userId: string) => {
+export const useGetCrops = (
+  workspaceId: string | null,
+  userId: string | null,
+) => {
   const {
     data: crops,
     status,
@@ -58,9 +61,10 @@ export const useGetCrops = (workspaceId: string, userId: string) => {
     queryFn: () =>
       getDocs({
         collection: "crops",
-        workspaceId,
-        userId,
+        workspaceId: workspaceId as string,
+        userId: userId as string,
       }),
+    enabled: !!workspaceId && !!userId,
   });
   return { crops, error, status };
 };

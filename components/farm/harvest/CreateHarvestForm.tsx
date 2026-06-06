@@ -24,15 +24,15 @@ import { useApp } from "@/stores/useAppStore";
 import { toast } from "sonner";
 import ButtonLoader from "@/components/layout/ButtonLoader";
 import { useCreateHavest } from "@/hooks/harvest/useHarvest";
-import GeneralLoader, { FormLoader } from "@/components/loader/GeneralLoader";
-import { useGetFarmFields } from "@/hooks/fields/useFields";
+import { FormLoader } from "@/components/loader/GeneralLoader";
+import { useGetFarmFields, useGetFields } from "@/hooks/fields/useFields";
 import { useGetFarm } from "@/hooks/farms/useFarm";
-import { useGetFarmCrops } from "@/hooks/crops/useCrops";
+import { useGetCrops, useGetFarmCrops } from "@/hooks/crops/useCrops";
 import { TbPlant2 } from "react-icons/tb";
 
 export default function CreateHarvestFormFetch() {
   const { workspace, user, ready } = useApp();
-  const { farmId } = useParams();
+  const { farmId: x } = useParams();
   const { farms, status, error } = useGetFarm(
     workspace?.id ?? null,
     user?.id ?? null,
@@ -41,20 +41,27 @@ export default function CreateHarvestFormFetch() {
     error: fieldErr,
     fields,
     status: fieldStat,
-  } = useGetFarmFields(
-    workspace?.id ?? null,
-    user?.id ?? null,
-    farmId as string,
-  );
+  } = useGetFarmFields(workspace?.id ?? null, user?.id ?? null, x as string);
+
+  const {
+    error: fieldsErr,
+    fields: fieldss,
+    status: fieldsStat,
+  } = useGetFields(workspace?.id ?? null, user?.id ?? null);
+  const {
+    error: cropsErr,
+    crops: cropss,
+    status: cropsStat,
+  } = useGetCrops(workspace?.id ?? null, user?.id ?? null);
+
   const {
     crops,
     error: cropErr,
     status: cropStat,
-  } = useGetFarmCrops(
-    workspace?.id ?? null,
-    user?.id ?? null,
-    farmId as string,
-  );
+  } = useGetFarmCrops(workspace?.id ?? null, user?.id ?? null, x as string);
+  const isLoading = x
+    ? fieldStat === "pending" || cropStat === "pending"
+    : cropsStat === "pending" || fieldsStat === "pending";
   if (!ready)
     return (
       <div className="h-100">
@@ -62,37 +69,38 @@ export default function CreateHarvestFormFetch() {
       </div>
     );
   if (!user && ready) return <p>error</p>;
-  if (status === "pending" || fieldStat === "pending" || cropStat === "pending")
+  if (status === "pending" || isLoading)
     return (
       <div className="h-100">
         <FormLoader>Loading form...</FormLoader>
       </div>
     );
-  if (status === "error" || fieldStat === "error" || cropStat === "error")
-    return <p>{error?.message || fieldErr?.message || cropErr?.message}</p>;
-
+  const errMssg =
+    fieldErr?.message ||
+    cropErr?.message ||
+    fieldsErr?.message ||
+    cropsErr?.message === "error";
+  const isErr = x
+    ? fieldStat === "error" || cropStat === "error"
+    : cropsStat === "error" || fieldsStat === "error";
+  if (status === "error" || isErr) return <p>{error?.message || errMssg}</p>;
+  const farmId = farms?.find((y) => y.$id === x)?.$id ?? undefined;
   const farmOptions =
     farms?.map((f) => ({
       name: f.farmName,
       value: f.$id,
     })) ?? [];
-  const fieldOptions =
-    fields?.map((f) => ({
-      name: f.fieldName,
-      value: f.$id,
-    })) ?? [];
-  const cropOptions =
-    crops?.map((f) => ({
-      name: f.cropName,
-      value: f.$id,
-    })) ?? [];
+
   return (
     <CreateHarvestForm
       workspaceId={workspace!.id}
       userId={user!.id}
       farms={farmOptions}
-      crops={cropOptions}
-      fields={fieldOptions}
+      field={fields}
+      crop={crops}
+      fieldss={fieldss}
+      cropss={cropss}
+      farmId={farmId as string}
     />
   );
 }
@@ -101,22 +109,54 @@ function CreateHarvestForm({
   workspaceId,
   userId,
   farms,
-  fields,
-  crops,
+  fieldss,
+  cropss,
+  crop,
+  field,
+  farmId,
 }: {
   workspaceId: string;
   userId: string;
   farms: { name: string; value: string }[];
-  fields: { name: string; value: string }[];
-  crops: { name: string; value: string }[];
+  field: { [key: string]: string | number }[] | undefined;
+  fieldss: { [key: string]: string | number }[] | undefined;
+  cropss: { [key: string]: string | number }[] | undefined;
+  crop: { [key: string]: string | number }[] | undefined;
+  farmId: string;
 }) {
   const form = useForm<z.infer<typeof createHarvestSchema>>({
     resolver: zodResolver(createHarvestSchema) as Resolver<
       z.infer<typeof createHarvestSchema>
     >,
+    defaultValues: {
+      farm: farmId ? farmId : "",
+    },
   });
 
   const { createHarvest, status } = useCreateHavest();
+  const { farmId: id } = useParams();
+
+  const watchedFarmId = form.watch("farm");
+  const watchedFieldId = form.watch("field");
+  const filteredFields =
+    fieldss?.filter((f) => f.farms === watchedFarmId) ?? [];
+  const filteredCrops =
+    cropss?.filter((f) => f.fields === watchedFieldId) ?? [];
+
+  const fields = !farmId
+    ? (filteredFields?.map((f) => ({
+        name: f.fieldName,
+        value: f.$id,
+      })) ?? [])
+    : (field?.map((f) => ({
+        name: f.fieldName,
+        value: f.$id,
+      })) ?? []);
+  const crops =
+    filteredCrops?.map((f) => ({
+      name: f.cropName,
+      value: f.$id,
+    })) ?? [];
 
   async function onSubmit(values: z.infer<typeof createHarvestSchema>) {
     const { farm, field, crop, ...val } = values;
@@ -125,12 +165,12 @@ function CreateHarvestForm({
       workspaceId: workspaceId,
       data: {
         ...val,
-        fields: values.field,
-        crops: values.crop,
+        fields: field,
+        crops: crop,
         totalAmount: +values.totalAmount,
         pricePerUnit: +values.pricePerUnit,
         quantity: +values.quantity,
-        farms: values.farm,
+        farms: farm,
       },
     };
 
@@ -208,32 +248,42 @@ function CreateHarvestForm({
           </p>
           <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
             <CreateHarvestSelect
+              name="farm"
+              control={form.control}
+              label="Select Farm"
+              placeholder={
+                farmId
+                  ? (farms.find((x) => x.value === farmId)?.name ?? "")
+                  : "Select farm"
+              }
+              setValue={form.setValue}
+              array={farmId || id ? [] : farms}
+              disabled={farmId ? true : false}
+              Icon={PiFarm}
+            />
+            <CreateHarvestSelect
+              name="field"
+              control={form.control}
+              key={watchedFarmId}
+              label="Select Field"
+              placeholder="Select field"
+              setValue={form.setValue}
+              array={fields as { [key: string]: string }[]}
+              Icon={IoGrid}
+            />
+          </div>
+
+          <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
+            <CreateHarvestSelect
               name="crop"
               control={form.control}
               label="Select Crop"
               placeholder="Select crop"
-              array={crops}
+              key={watchedFieldId}
+              array={crops as { [key: string]: string }[]}
               Icon={TbPlant2}
             />
-            <CreateHarvestSelect
-              name="farm"
-              control={form.control}
-              label="Select Farm"
-              placeholder="Select farm"
-              array={farms}
-              Icon={PiFarm}
-            />
-          </div>
 
-          <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
-            <CreateHarvestSelect
-              name="field"
-              control={form.control}
-              label="Select Field"
-              placeholder="Select field"
-              array={fields}
-              Icon={IoGrid}
-            />
             <CreateHarvestSelect
               name="status"
               control={form.control}
