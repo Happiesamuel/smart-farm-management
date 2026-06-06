@@ -21,14 +21,18 @@ import { useParams } from "next/navigation";
 import ButtonLoader from "@/components/layout/ButtonLoader";
 import { toast } from "sonner";
 import { useCreateExpenses } from "@/hooks/expense/useExpense";
-import { useGetFarmCrops } from "@/hooks/crops/useCrops";
+import { useGetCrops, useGetFarmCrops } from "@/hooks/crops/useCrops";
 import { useGetFarm } from "@/hooks/farms/useFarm";
-import { useGetFarmFields } from "@/hooks/fields/useFields";
+import { useGetFarmFields, useGetFields } from "@/hooks/fields/useFields";
 import { FormLoader } from "@/components/loader/GeneralLoader";
 
-export default function FinanceExpenseFormFetch() {
+export default function FinanceExpenseFormFetch({
+  onClose,
+}: {
+  onClose?(): void;
+}) {
   const { workspace, user, ready } = useApp();
-  const { farmId } = useParams();
+  const { farmId: x } = useParams();
   const { farms, status, error } = useGetFarm(
     workspace?.id ?? null,
     user?.id ?? null,
@@ -37,21 +41,25 @@ export default function FinanceExpenseFormFetch() {
     error: fieldErr,
     fields,
     status: fieldStat,
-  } = useGetFarmFields(
-    workspace?.id ?? null,
-    user?.id ?? null,
-    farmId as string,
-  );
+  } = useGetFarmFields(workspace?.id ?? null, user?.id ?? null, x as string);
   const {
     crops,
     error: cropErr,
     status: cropStat,
-  } = useGetFarmCrops(
-    workspace?.id ?? null,
-    user?.id ?? null,
-    farmId as string,
-  );
-
+  } = useGetFarmCrops(workspace?.id ?? null, user?.id ?? null, x as string);
+  const {
+    error: fieldsErr,
+    fields: fieldss,
+    status: fieldsStat,
+  } = useGetFields(workspace?.id ?? null, user?.id ?? null);
+  const {
+    error: cropsErr,
+    crops: cropss,
+    status: cropsStat,
+  } = useGetCrops(workspace?.id ?? null, user?.id ?? null);
+  const isLoading = x
+    ? fieldStat === "pending" || cropStat === "pending"
+    : cropsStat === "pending" || fieldsStat === "pending";
   if (!ready)
     return (
       <div className="h-125">
@@ -59,38 +67,39 @@ export default function FinanceExpenseFormFetch() {
       </div>
     );
   if (!user && ready) return <p>error</p>;
-  if (status === "pending" || cropStat === "pending" || fieldStat === "pending")
+  if (status === "pending" || isLoading)
     return (
       <div className="h-125">
         <FormLoader>Loading form...</FormLoader>
       </div>
     );
-  if (status === "error" || cropStat === "error" || fieldStat === "error")
-    return <p>{error?.message || cropErr?.message || fieldErr?.message}</p>;
-
+  const errMssg =
+    fieldErr?.message ||
+    cropErr?.message ||
+    fieldsErr?.message ||
+    cropsErr?.message === "error";
+  const isErr = x
+    ? fieldStat === "error" || cropStat === "error"
+    : cropsStat === "error" || fieldsStat === "error";
+  if (status === "error" || isErr) return <p>{error?.message || errMssg}</p>;
+  const farmId = farms?.find((y) => y.$id === x)?.$id ?? undefined;
   const farmOptions =
     farms?.map((f) => ({
       name: f.farmName,
       value: f.$id,
     })) ?? [];
 
-  const fieldOptions =
-    fields?.map((f) => ({
-      name: f.fieldName,
-      value: f.$id,
-    })) ?? [];
-  const cropOptions =
-    crops?.map((f) => ({
-      name: f.cropName,
-      value: f.$id,
-    })) ?? [];
   return (
     <FinanceExpenseFom
       workspaceId={workspace!.id}
       userId={user!.id}
+      farmId={farmId as string}
       farms={farmOptions}
-      fields={fieldOptions}
-      crops={cropOptions}
+      field={fields}
+      crop={crops}
+      fieldss={fieldss}
+      cropss={cropss}
+      onClose={onClose}
     />
   );
 }
@@ -99,21 +108,53 @@ function FinanceExpenseFom({
   workspaceId,
   userId,
   farms,
-  fields,
-  crops,
+  fieldss,
+  cropss,
+  field,
+  crop,
+  farmId,
+  onClose,
 }: {
   workspaceId: string;
   userId: string;
+  farmId: string;
   farms: { name: string; value: string }[];
-  fields: { name: string; value: string }[];
-  crops: { name: string; value: string }[];
+  field: { [key: string]: string | number }[] | undefined;
+  fieldss: { [key: string]: string | number }[] | undefined;
+  cropss: { [key: string]: string | number }[] | undefined;
+  crop: { [key: string]: string | number }[] | undefined;
+  onClose?(): void;
 }) {
   const form = useForm<z.infer<typeof financeExpenseSchema>>({
     resolver: zodResolver(financeExpenseSchema) as Resolver<
       z.infer<typeof financeExpenseSchema>
     >,
+    defaultValues: {
+      farm: farmId ? farmId : "",
+    },
   });
+  const { farmId: id } = useParams();
   const { createExpense, status } = useCreateExpenses();
+  const watchedFarmId = form.watch("farm");
+  const watchedFieldId = form.watch("field");
+  const filteredFields =
+    fieldss?.filter((f) => f.farms === watchedFarmId) ?? [];
+  const filteredCrops =
+    cropss?.filter((f) => f.fields === watchedFieldId) ?? [];
+  const fields = !farmId
+    ? (filteredFields?.map((f) => ({
+        name: f.fieldName,
+        value: f.$id,
+      })) ?? [])
+    : (field?.map((f) => ({
+        name: f.fieldName,
+        value: f.$id,
+      })) ?? []);
+  const crops =
+    filteredCrops?.map((f) => ({
+      name: f.cropName,
+      value: f.$id,
+    })) ?? [];
   async function onSubmit(values: z.infer<typeof financeExpenseSchema>) {
     const { farm, field, crop, ...val } = values;
     const obj = {
@@ -132,6 +173,7 @@ function FinanceExpenseFom({
         toast("Expenses created successfully", {
           description: "You can now proceed to managing your task",
         });
+        onClose?.();
       },
       onError: (err) =>
         toast("Error creating expenses", {
@@ -229,8 +271,14 @@ function FinanceExpenseFom({
               name="farm"
               control={form.control}
               label="Farm (optional)"
-              placeholder="Select farm"
-              array={farms}
+              placeholder={
+                farmId
+                  ? (farms.find((x) => x.value === farmId)?.name ?? "")
+                  : "Select farm"
+              }
+              setValue={form.setValue}
+              array={farmId || id ? [] : farms}
+              disabled={farmId ? true : false}
               Icon={AiOutlineTag}
             />
           </div>
@@ -241,7 +289,9 @@ function FinanceExpenseFom({
               control={form.control}
               label="Field (optional)"
               placeholder="Select field"
-              array={fields}
+              key={watchedFarmId}
+              setValue={form.setValue}
+              array={fields as { [key: string]: string }[]}
               Icon={AiOutlineTag}
             />
             <FinanceSelect
@@ -249,7 +299,8 @@ function FinanceExpenseFom({
               control={form.control}
               label="Crop (optional)"
               placeholder="Select crop"
-              array={crops}
+              key={watchedFieldId}
+              array={crops as { [key: string]: string }[]}
               Icon={AiOutlineTag}
             />
           </div>

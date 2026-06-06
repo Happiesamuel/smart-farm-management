@@ -315,6 +315,7 @@ export function CreateHavestDate({ control, name, label }: Dates) {
                     field.value ? new Date(field.value as string) : undefined
                   }
                   onSelect={(date) => field.onChange(date)}
+                  disabled={(date) => date > new Date()}
                 />
               </PopoverContent>
             </Popover>

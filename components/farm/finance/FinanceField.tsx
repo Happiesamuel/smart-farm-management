@@ -247,6 +247,7 @@ export function FinanceDate({ control, name, label }: Dates) {
                 mode="single"
                 selected={field.value ? new Date(field.value) : undefined}
                 onSelect={(date) => field.onChange(date)}
+                disabled={(date) => date > new Date()}
               />
             </PopoverContent>
           </Popover>

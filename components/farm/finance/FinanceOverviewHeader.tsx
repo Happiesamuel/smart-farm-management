@@ -5,9 +5,9 @@ import FinanceCalendar from "./FinanceCalendar";
 import { CiFilter } from "react-icons/ci";
 import { FiShoppingCart } from "react-icons/fi";
 import { GrMoney } from "react-icons/gr";
-import FinanceExpenseFom from "./FinanceExpenseFom";
 import { FinanceModal } from "@/components/modals/FinanceModal";
 import FinanceSalesFormFetch from "./FinanceSalesForm";
+import FinanceExpenseFormFetch from "./FinanceExpenseFom";
 export default function FinanceOverviewHeader() {
   const [type, setType] = useState("sales");
   const [open, setOpen] = useState(false);
@@ -73,7 +73,7 @@ export default function FinanceOverviewHeader() {
           {type === "sales" ? (
             <FinanceSalesFormFetch onClose={() => setOpen(false)} />
           ) : (
-            <FinanceExpenseFom />
+            <FinanceExpenseFormFetch onClose={() => setOpen(false)} />
           )}
         </FinanceModal>
       </div>
