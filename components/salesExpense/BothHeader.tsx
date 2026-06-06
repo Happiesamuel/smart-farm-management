@@ -5,8 +5,8 @@ import { FiDownload, FiShoppingCart } from "react-icons/fi";
 import { GoPlus } from "react-icons/go";
 import { FinanceModal } from "../modals/FinanceModal";
 import { GrMoney } from "react-icons/gr";
-import FinanceSalesForm from "../farm/finance/FinanceSalesForm";
 import FinanceExpenseFom from "../farm/finance/FinanceExpenseFom";
+import FinanceSalesFormFetch from "../farm/finance/FinanceSalesForm";
 
 export default function BothHeader({ type }: { type: string }) {
   const [open, setOpen] = useState(false);
@@ -45,7 +45,11 @@ export default function BothHeader({ type }: { type: string }) {
           open={open}
           onClose={() => setOpen(false)}
         >
-          {type === "sales" ? <FinanceSalesForm /> : <FinanceExpenseFom />}
+          {type === "sales" ? (
+            <FinanceSalesFormFetch onClose={() => setOpen(false)} />
+          ) : (
+            <FinanceExpenseFom />
+          )}
         </FinanceModal>
 
         <Button className="bg-transparent border border-dark/15 w-[48%] sm:w-fit cursor-pointer text-dark/90 rounded-sm">

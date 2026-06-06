@@ -23,13 +23,17 @@ import { toast } from "sonner";
 import { useCreateSales } from "@/hooks/sales/useSales";
 import ButtonLoader from "@/components/layout/ButtonLoader";
 import { useGetFarm } from "@/hooks/farms/useFarm";
-import { useGetFarmCrops } from "@/hooks/crops/useCrops";
-import { useGetFarmHarvest } from "@/hooks/harvest/useHarvest";
+import { useGetCrops, useGetFarmCrops } from "@/hooks/crops/useCrops";
+import { useGetFarmHarvest, useGetHarvest } from "@/hooks/harvest/useHarvest";
 import { PiPlant } from "react-icons/pi";
 import { FormLoader } from "@/components/loader/GeneralLoader";
-export default function FinanceSalesFormFetch() {
+export default function FinanceSalesFormFetch({
+  onClose,
+}: {
+  onClose?(): void;
+}) {
   const { workspace, user, ready } = useApp();
-  const { farmId } = useParams();
+  const { farmId: x } = useParams();
   const { farms, status, error } = useGetFarm(
     workspace?.id ?? null,
     user?.id ?? null,
@@ -38,21 +42,26 @@ export default function FinanceSalesFormFetch() {
     crops,
     error: cropErr,
     status: cropStat,
-  } = useGetFarmCrops(
-    workspace?.id ?? null,
-    user?.id ?? null,
-    farmId as string,
-  );
+  } = useGetFarmCrops(workspace?.id ?? null, user?.id ?? null, x as string);
   const {
     harvests,
     error: harvestsErr,
     status: harvestsStat,
-  } = useGetFarmHarvest(
-    workspace?.id ?? null,
-    user?.id ?? null,
-    farmId as string,
-  );
+  } = useGetFarmHarvest(workspace?.id ?? null, user?.id ?? null, x as string);
+  const {
+    error: cropsErr,
+    crops: cropss,
+    status: cropsStat,
+  } = useGetCrops(workspace?.id ?? null, user?.id ?? null);
+  const {
+    harvests: harvestss,
+    error: harvestErr,
+    status: harvestStat,
+  } = useGetHarvest(workspace?.id ?? null, user?.id ?? null);
 
+  const isLoading = x
+    ? cropStat === "pending" || harvestsStat === "pending"
+    : cropsStat === "pending" || harvestStat === "pending";
   if (!ready)
     return (
       <div className="h-125">
@@ -60,42 +69,40 @@ export default function FinanceSalesFormFetch() {
       </div>
     );
   if (!user && ready) return <p>error</p>;
-  if (
-    status === "pending" ||
-    cropStat === "pending" ||
-    harvestsStat === "pending"
-  )
+  if (status === "pending" || isLoading)
     return (
       <div className="h-125">
         <FormLoader>Loading form...</FormLoader>
       </div>
     );
-  if (status === "error" || cropStat === "error" || harvestsStat === "error")
-    return <p>{error?.message || cropErr?.message || harvestsErr?.message}</p>;
 
+  const errMssg =
+    cropErr?.message ||
+    cropsErr?.message ||
+    harvestErr?.message ||
+    harvestsErr?.message === "error";
+  const isErr = x
+    ? cropStat === "error" || harvestsStat === "error"
+    : cropsStat === "error" || harvestStat === "error";
+  if (status === "error" || isErr) return <p>{error?.message || errMssg}</p>;
+  const farmId = farms?.find((y) => y.$id === x)?.$id ?? undefined;
   const farmOptions =
     farms?.map((f) => ({
       name: f.farmName,
       value: f.$id,
     })) ?? [];
 
-  const cropMap = new Map(crops?.map((c) => [c.$id, c]) ?? []);
-
-  const harvestOptions =
-    harvests?.map((harvest) => {
-      const crop = cropMap.get(harvest.crops);
-
-      return {
-        name: `${crop?.cropName ?? "Unknown"} (${harvest.quantity}${harvest.unit})`,
-        value: harvest.$id,
-      };
-    }) ?? [];
   return (
     <FinanceSalesForm
       workspaceId={workspace!.id}
       userId={user!.id}
       farms={farmOptions}
-      harvestedCrops={harvestOptions}
+      crop={crops}
+      harvest={harvests}
+      cropss={cropss}
+      harvestss={harvestss}
+      farmId={farmId as string}
+      onClose={onClose}
     />
   );
 }
@@ -104,19 +111,51 @@ function FinanceSalesForm({
   workspaceId,
   userId,
   farms,
-  harvestedCrops,
+  harvest,
+  harvestss,
+  crop,
+  cropss,
+  farmId,
+  onClose,
 }: {
   workspaceId: string;
   userId: string;
   farms: { name: string; value: string }[];
-  harvestedCrops: { name: string; value: string }[];
+  harvest: { [key: string]: string | number }[] | undefined;
+  harvestss: { [key: string]: string | number }[] | undefined;
+  cropss: { [key: string]: string | number }[] | undefined;
+  crop: { [key: string]: string | number }[] | undefined;
+  farmId: string;
+  onClose?(): void;
 }) {
   const form = useForm<z.infer<typeof financeSaleSchema>>({
     resolver: zodResolver(financeSaleSchema) as Resolver<
       z.infer<typeof financeSaleSchema>
     >,
+    defaultValues: {
+      farm: farmId ? farmId : "",
+    },
   });
+  const { farmId: id } = useParams();
   const { createSales, status } = useCreateSales();
+  const watchedFarmId = form.watch("farm");
+
+  const filteredHarvests =
+    harvestss?.filter((f) => f.farms === watchedFarmId) ?? [];
+  const cropMap = farmId
+    ? new Map(crop?.map((c) => [c.$id, c]) ?? [])
+    : new Map(cropss?.map((c) => [c.$id, c]) ?? []);
+  const h = farmId ? harvest : filteredHarvests;
+  const harvestOptions =
+    h?.map((harvest) => {
+      const crop = cropMap.get(harvest.crops);
+
+      return {
+        name: `${crop?.cropName ?? "Unknown"} (${harvest.quantity}${harvest.unit})`,
+        value: harvest.$id,
+      };
+    }) ?? [];
+
   async function onSubmit(values: z.infer<typeof financeSaleSchema>) {
     const { farm, harvest, ...val } = values;
     const obj = {
@@ -136,6 +175,7 @@ function FinanceSalesForm({
         toast("Sales created successfully", {
           description: "You can now proceed to managing your task",
         });
+        onClose?.();
       },
       onError: (err) =>
         toast("Error creating sales", {
@@ -208,16 +248,23 @@ function FinanceSalesForm({
               name="farm"
               control={form.control}
               label="Farm"
-              placeholder="Select farm"
-              array={farms}
+              placeholder={
+                farmId
+                  ? (farms.find((x) => x.value === farmId)?.name ?? "")
+                  : "Select farm"
+              }
+              setValue={form.setValue}
+              array={farmId || id ? [] : farms}
+              disabled={farmId ? true : false}
               Icon={IoMdGrid}
             />
             <FinanceSelect
               name="harvest"
               control={form.control}
               label="Harvested Crop"
+              key={watchedFarmId}
               placeholder="Select crop"
-              array={harvestedCrops}
+              array={harvestOptions as { [key: string]: string }[]}
               Icon={PiPlant}
             />
           </div>

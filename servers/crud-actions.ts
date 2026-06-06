@@ -129,6 +129,7 @@ export const getFarmDocs = async ({
   userId: string;
   farmId: string;
 }) => {
+  console.log(userId, farmId);
   await validateWorkspaceAccess({ userId, workspaceId });
   const { database } = await createAdminClient();
   const res = await database.listDocuments(

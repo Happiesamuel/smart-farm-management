@@ -4,7 +4,7 @@ import { GoPlus } from "react-icons/go";
 import { FinanceModal } from "../modals/FinanceModal";
 import { useState } from "react";
 import { GiDigDug } from "react-icons/gi";
-import CreateHarvestForm from "../farm/harvest/CreateHarvestForm";
+import CreateHarvestFormFetch from "../farm/harvest/CreateHarvestForm";
 export default function HarvestHeader() {
   const [open, setOpen] = useState(false);
   return (
@@ -28,7 +28,7 @@ export default function HarvestHeader() {
         open={open}
         onClose={() => setOpen(false)}
       >
-        <CreateHarvestForm />
+        <CreateHarvestFormFetch onClose={() => setOpen(false)} />
       </FinanceModal>
       {/* expprt haest button */}
     </div>

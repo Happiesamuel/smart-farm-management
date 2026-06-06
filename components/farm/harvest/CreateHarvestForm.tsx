@@ -19,7 +19,7 @@ import {
 import { MdSignalWifiStatusbar1Bar } from "react-icons/md";
 import { IoGrid } from "react-icons/io5";
 import CreateHarvestInput from "./CreateHarvestField";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useApp } from "@/stores/useAppStore";
 import { toast } from "sonner";
 import ButtonLoader from "@/components/layout/ButtonLoader";
@@ -30,7 +30,11 @@ import { useGetFarm } from "@/hooks/farms/useFarm";
 import { useGetCrops, useGetFarmCrops } from "@/hooks/crops/useCrops";
 import { TbPlant2 } from "react-icons/tb";
 
-export default function CreateHarvestFormFetch() {
+export default function CreateHarvestFormFetch({
+  onClose,
+}: {
+  onClose?(): void;
+}) {
   const { workspace, user, ready } = useApp();
   const { farmId: x } = useParams();
   const { farms, status, error } = useGetFarm(
@@ -101,6 +105,7 @@ export default function CreateHarvestFormFetch() {
       fieldss={fieldss}
       cropss={cropss}
       farmId={farmId as string}
+      onClose={onClose}
     />
   );
 }
@@ -114,6 +119,7 @@ function CreateHarvestForm({
   crop,
   field,
   farmId,
+  onClose,
 }: {
   workspaceId: string;
   userId: string;
@@ -123,6 +129,7 @@ function CreateHarvestForm({
   cropss: { [key: string]: string | number }[] | undefined;
   crop: { [key: string]: string | number }[] | undefined;
   farmId: string;
+  onClose?(): void;
 }) {
   const form = useForm<z.infer<typeof createHarvestSchema>>({
     resolver: zodResolver(createHarvestSchema) as Resolver<
@@ -135,7 +142,8 @@ function CreateHarvestForm({
 
   const { createHarvest, status } = useCreateHavest();
   const { farmId: id } = useParams();
-
+  const { workspace } = useApp();
+  const router = useRouter();
   const watchedFarmId = form.watch("farm");
   const watchedFieldId = form.watch("field");
   const filteredFields =
@@ -179,6 +187,9 @@ function CreateHarvestForm({
         toast("Harvest created successfully", {
           description: "You can now proceed to managing your crop",
         });
+        return farmId
+          ? router.push(`/user/${workspace?.workspaceId}/farms/${farmId}`)
+          : onClose?.();
       },
       onError: (err) =>
         toast("Error creating harvest", {

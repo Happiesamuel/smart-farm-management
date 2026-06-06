@@ -25,7 +25,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { Control, FieldPath } from "react-hook-form";
+import { Control, FieldPath, UseFormSetValue } from "react-hook-form";
 import { IconType } from "react-icons";
 
 import z from "zod";
@@ -54,6 +54,8 @@ interface Select {
   placeholder: string;
   array: { [key: string]: string }[];
   Icon: IconType;
+  setValue?: UseFormSetValue<z.infer<typeof financeSaleSchema>>;
+  disabled?: boolean;
 }
 interface Dates {
   control: Control<z.infer<typeof financeSaleSchema>>;
@@ -67,6 +69,8 @@ export function FinanceSelect({
   placeholder,
   Icon,
   array,
+  setValue,
+  disabled,
 }: Select) {
   return (
     <FormField
@@ -78,9 +82,18 @@ export function FinanceSelect({
             {label}
           </FormLabel>
           <div className="w-full flex justify-center items-center min-w-[2px]">
-            <Select onValueChange={field.onChange}>
+            <Select
+              onValueChange={(val) => {
+                if (name === "farm" && setValue) {
+                  setValue("farm", val);
+                } else return field.onChange(val);
+              }}
+            >
               <FormControl>
-                <SelectTrigger className="cursor-pointer h-9! w-full  bg-transparent  focus-visible:outline-primary rounded-[8px] p-3 text-sm  focus:ring text-dark ring-green-500  data-[placeholder]:text-gray-500 ">
+                <SelectTrigger
+                  disabled={disabled}
+                  className="cursor-pointer h-9! w-full  bg-transparent  focus-visible:outline-primary rounded-[8px] p-3 text-sm  focus:ring text-dark ring-green-500  data-[placeholder]:text-gray-500 "
+                >
                   <div className="flex items-center  gap-2">
                     {Icon && <Icon className="text-primary-green" />}
                     <SelectValue placeholder={placeholder} className="" />

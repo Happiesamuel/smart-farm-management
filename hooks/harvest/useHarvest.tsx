@@ -48,7 +48,10 @@ export const useGetFarmHarvest = (
   return { harvests, error, status };
 };
 
-export const useGetHarvest = (workspaceId: string, userId: string) => {
+export const useGetHarvest = (
+  workspaceId: string | null,
+  userId: string | null,
+) => {
   const {
     data: harvests,
     status,
@@ -58,8 +61,8 @@ export const useGetHarvest = (workspaceId: string, userId: string) => {
     queryFn: () =>
       getDocs({
         collection: "harvests",
-        workspaceId,
-        userId,
+        workspaceId: workspaceId as string,
+        userId: userId as string,
       }),
   });
   return { harvests, error, status };
