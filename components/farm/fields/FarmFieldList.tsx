@@ -138,7 +138,7 @@ export default function FarmFieldList({
           </div>
         ))}
       </div>
-      <Paginate />
+      <Paginate totalPages={6} />
     </div>
   );
 }
