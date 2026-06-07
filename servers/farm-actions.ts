@@ -3,7 +3,7 @@ import { ID, Query } from "appwrite";
 import { createAdminClient } from "./appwrite";
 import { appwriteConfig } from "./appwrite-client";
 import { FarmObj } from "@/lib/types";
-import { uploadImage } from "@/lib/functions";
+import { formatLocation, uploadImage } from "@/lib/functions";
 import { validateWorkspaceAccess } from "./crud-actions";
 
 export async function createFarm(obj: FarmObj) {
@@ -125,50 +125,90 @@ export const getFarmsWithStats = async ({
 
   const { database } = await createAdminClient();
 
-  const [farmsRes, fieldsRes, cropsRes, salesRes] = await Promise.all([
+  const [farmsRes, fieldsRes, cropsRes, harvestRes] = await Promise.all([
     database.listDocuments(appwriteConfig.databaseId, "farms", [
-      Query.equal("workspaceId", workspaceId),
+      Query.equal("workspaces", workspaceId),
     ]),
     database.listDocuments(appwriteConfig.databaseId, "fields", [
-      Query.equal("workspaceId", workspaceId),
+      Query.equal("workspaces", workspaceId),
     ]),
     database.listDocuments(appwriteConfig.databaseId, "crops", [
-      Query.equal("workspaceId", workspaceId),
+      Query.equal("workspaces", workspaceId),
     ]),
-    database.listDocuments(appwriteConfig.databaseId, "sales", [
-      Query.equal("workspaceId", workspaceId),
+    database.listDocuments(appwriteConfig.databaseId, "harvests", [
+      Query.equal("workspaces", workspaceId),
     ]),
   ]);
 
   const farms = farmsRes.documents;
   const fields = fieldsRes.documents;
   const crops = cropsRes.documents;
-  const sales = salesRes.documents;
+  const harvests = harvestRes.documents;
 
-  // 🔥 map farms with computed stats
   const farmsWithStats = farms.map((farm) => {
-    const farmFields = fields.filter((f) => f.farmId === farm.$id);
+    const farmFields = fields.filter((f) => f.farms === farm.$id);
 
-    const farmCrops = crops.filter((c) => c.farmId === farm.$id);
+    const farmCrops = crops.filter((c) => c.farms === farm.$id);
 
-    const farmSales = sales.filter((s) => s.farmId === farm.$id);
-
-    const totalRevenue = farmSales.reduce(
-      (sum: number, s) => sum + (s.revenue || 0),
-      0,
-    );
+    const farmHarvests = harvests.filter((s) => s.farms === farm.$id);
 
     return {
       id: farm.$id,
-      name: farm.name,
-      image: farm.image, // optional
-      location: farm.location,
+      name: farm.farmName,
+      image: farm.farmImage,
+      location: formatLocation(farm.address),
       totalFields: farmFields.length,
       totalCrops: farmCrops.length,
-      revenue: `₦${totalRevenue.toLocaleString()}`,
-      status: farm.status || "Active",
+      totalHarvest: farmHarvests.length,
+      status: farm.status || "active",
     };
   });
 
   return farmsWithStats;
+};
+
+export const getAllFarmStats = async ({
+  workspaceId,
+  userId,
+}: {
+  workspaceId: string;
+  userId: string;
+}) => {
+  const { database } = await createAdminClient();
+
+  // 🔐 validate access
+  await validateWorkspaceAccess({ workspaceId, userId });
+
+  // 🚀 Fetch all in parallel
+  const [farmsRes, fieldsRes, cropsRes, salesRes] = await Promise.all([
+    database.listDocuments(appwriteConfig.databaseId, "farms", [
+      Query.equal("workspaces", workspaceId),
+    ]),
+    database.listDocuments(appwriteConfig.databaseId, "fields", [
+      Query.equal("workspaces", workspaceId),
+    ]),
+    database.listDocuments(appwriteConfig.databaseId, "crops", [
+      Query.equal("workspaces", workspaceId),
+    ]),
+    database.listDocuments(appwriteConfig.databaseId, "sales", [
+      Query.equal("workspaces", workspaceId),
+    ]),
+  ]);
+
+  // 📊 Calculate totals
+  const totalFarms = farmsRes.total;
+  const totalFields = fieldsRes.total;
+  const totalCrops = cropsRes.total;
+
+  const totalRevenue = salesRes.documents.reduce(
+    (acc, sale) => acc + (sale.totalAmount || 0),
+    0,
+  );
+
+  return {
+    totalFarms,
+    totalFields,
+    totalCrops,
+    totalRevenue,
+  };
 };

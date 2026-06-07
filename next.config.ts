@@ -28,6 +28,11 @@ const nextConfig: NextConfig = {
         hostname: "cdn.weatherapi.com",
         port: "",
       },
+      {
+        protocol: "https",
+        hostname: "fra.cloud.appwrite.io",
+        port: "",
+      },
     ],
     unoptimized: false,
   },

@@ -1,33 +1,52 @@
+"use client";
+import { useGetAllFarmStats } from "@/hooks/farms/useFarm";
+import { useApp } from "@/stores/useAppStore";
 import React from "react";
 import { GiMoneyStack } from "react-icons/gi";
 import { MdOutlineWater } from "react-icons/md";
 import { PiFarm, PiPlant } from "react-icons/pi";
+import { Skeleton } from "../ui/skeleton";
 
 export default function FarmAverage() {
+  const { workspace, user, ready } = useApp();
+  const { data, status } = useGetAllFarmStats(
+    workspace?.id ?? null,
+    user?.id ?? null,
+  );
+
+  if (status === "pending" || !ready)
+    return (
+      <div className="grid grid-cols-2 py-4 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-30 w-full bg-zinc-200/80" />
+        ))}
+      </div>
+    );
+
   const stats = [
     {
-      num: 6,
+      num: data?.totalFarms ?? 0,
       name: "Total Farms",
       icon: <PiFarm className="text-2xl" />,
       bg: "bg-green-50",
       border: "border-green-200",
     },
     {
-      num: 24,
+      num: data?.totalFields ?? 0,
       name: "Total Fields",
       icon: <MdOutlineWater className="text-2xl" />,
       bg: "bg-emerald-50",
       border: "border-emerald-200",
     },
     {
-      num: 18,
+      num: data?.totalCrops ?? 0,
       name: "Total Crops",
       icon: <PiPlant className="text-2xl" />,
       bg: "bg-yellow-50",
       border: "border-yellow-200",
     },
     {
-      num: "₦250,000",
+      num: `₦${(data?.totalRevenue ?? 0).toLocaleString()}`,
       name: "Total Revenue",
       icon: <GiMoneyStack className="text-2xl" />,
       bg: "bg-blue-50",

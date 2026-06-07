@@ -43,7 +43,7 @@ export interface WorkspaceMemberObj {
 }
 
 export interface FarmObj {
-  description: string;
+  description?: string;
   farmName: string;
   farmImage?: string | File;
   address: string;

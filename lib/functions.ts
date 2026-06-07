@@ -29,3 +29,21 @@ export async function uploadImage(file: File) {
     throw error;
   }
 }
+
+export function formatLocation(address?: string) {
+  if (!address) return "Unknown location";
+
+  const parts = address.split(",").map((p) => p.trim());
+
+  if (parts.length >= 3) {
+    // Normal case
+    return `${parts[1]}, ${parts[2]}`;
+  }
+
+  if (parts.length === 2) {
+    // Short address like Abuja Mosque
+    return parts[0]; // 👈 use name instead of "Nigeria"
+  }
+
+  return parts[0];
+}

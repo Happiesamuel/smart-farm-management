@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { ChangeEvent } from "react";
 import { Input } from "../ui/input";
 import { IoSearch } from "react-icons/io5";
 import {
@@ -9,33 +9,46 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-export default function FarmFilter() {
-  const [location, setLocation] = useState("");
-  const locations = [
-    { id: 1, name: "Kano", value: "kano" },
-    { id: 2, name: "Abuja", value: "abuja" },
-    { id: 3, name: "Enugu", value: "enugu" },
-  ];
+export default function FarmFilter({
+  handleSearch,
+  handleLocation,
+  locations,
+  val,
+  location,
+}: {
+  handleLocation: (e: string) => void;
+  handleSearch: (e: string) => void;
+  val: string;
+  location: string;
+  locations: { id: number; name: string; value: string }[];
+}) {
   return (
     <div className="flex flex-col gap-2 sm:flex-row items-center justify-between">
       <div className="flex w-full sm:w-[35%] items-center border border-border gap-2 rounded-lg px-2">
         <IoSearch />
         <Input
+          onChange={(e: ChangeEvent<HTMLInputElement, HTMLInputElement>) => {
+            handleSearch(e.target.value);
+          }}
+          value={val}
           placeholder="Search Farms..."
           className="border-none p-0 group focus-visible:none shadow-none"
         />
       </div>
 
-      <Select onValueChange={(e) => setLocation(e)} defaultValue={location}>
-        <SelectTrigger className="text-dark border w-full sm:w-[130px]  border-border bg-white rounded-lg">
+      <Select
+        onValueChange={(val) => handleLocation(val === location ? "" : val)}
+        defaultValue={location}
+      >
+        <SelectTrigger className="text-dark border w-full sm:w-[200px]  border-border bg-white rounded-lg">
           <SelectValue placeholder="All Locations" className="text-dark" />
         </SelectTrigger>
-        <SelectContent className="bg-white border-border text-zinc-400">
+        <SelectContent className="h-[200px] z-[200] mt-6 bg-white mx border-border text-zinc-400">
           {locations.map((x) => (
             <SelectItem
               key={x.id}
               value={x.value}
-              className="hover:bg-zinc-900 transition-all duration-500 cursor-pointer"
+              className="hover:bg-zinc-900 text-dark/90 transition-all duration-500 cursor-pointer"
             >
               {x.name}
             </SelectItem>

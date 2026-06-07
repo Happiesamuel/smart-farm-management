@@ -19,7 +19,12 @@ export function useCreateFarm() {
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["farms", variables.workspaces],
+        queryKey: [
+          "farms-with-stats",
+          "farms",
+          "all-farm-stats",
+          variables.workspaces,
+        ],
       });
     },
   });

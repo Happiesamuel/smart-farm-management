@@ -252,8 +252,9 @@ export const createFarmSchema = z.object({
     { message: "Location is required" },
   ),
   description: z
-    .string({ message: "descripton is required" })
-    .min(10, { message: "description must be at least 10 characters." }),
+    .string()
+    .min(10, { message: "description must be at least 10 characters." })
+    .optional(),
 
   soilType: z
     .string({ message: "Please select a soil type" })
