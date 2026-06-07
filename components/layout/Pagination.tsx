@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/pagination";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function Paginate({ totalPages }: { totalPages: number }) {
+export default function Paginate({ totalPages }: { totalPages?: number }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const currentPage = Number(searchParams.get("page") || 1);
