@@ -27,8 +27,8 @@ export const useCreateSales = () => {
 };
 
 export const useGetFarmSales = (
-  workspaceId: string,
-  userId: string,
+  workspaceId: string|null,
+  userId: string|null,
   farmId: string,
 ) => {
   const {
@@ -40,8 +40,8 @@ export const useGetFarmSales = (
     queryFn: () =>
       getFarmDocs({
         collection: "sales",
-        workspaceId,
-        userId,
+        workspaceId:workspaceId as string,
+        userId:userId as string,
         farmId,
       }),
     enabled: !!workspaceId && !!userId && !!farmId,

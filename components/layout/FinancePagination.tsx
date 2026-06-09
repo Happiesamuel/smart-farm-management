@@ -1,48 +1,81 @@
+"use client";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useSearchParams } from "next/navigation";
 
-export default function FinancePagination({ type }: { type: string }) {
+interface FinancePaginationProps {
+  type: string;
+  total: number;
+  pageSize?: number;
+  pageKey?: string; // 👈 allows multiple paginations on same page e.g "salesPage" "expensePage"
+}
+
+export default function FinancePagination({
+  type,
+  total,
+  pageSize = 5,
+  pageKey = "page",
+}: FinancePaginationProps) {
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get(pageKey) || 1);
+  const totalPages = Math.ceil(total / pageSize);
+
+  const from = (currentPage - 1) * pageSize + 1;
+  const to = Math.min(currentPage * pageSize, total);
+
+  function getPageUrl(page: number) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(pageKey, String(page));
+    return `?${params.toString()}`;
+  }
+
+  if (totalPages <= 1) return null;
+
   return (
     <div className="flex items-center justify-between px-2 py-3 text-xs text-gray-500 border-t gap-1">
-      <p className="w-full">Showing 1 to 5 of 24 {type}</p>
-      <Pagination className="w-full justify-end ">
-        <PaginationContent className=" gap-1 sm:gap-3">
+      <p className="w-full whitespace-nowrap">
+        Showing {from} to {to} of {total} {type}
+      </p>
+      <Pagination className="w-full justify-end">
+        <PaginationContent className="gap-1 sm:gap-3">
           <PaginationItem>
             <PaginationPrevious
-              size={"sm"}
+              size="sm"
               className="border text-zinc-700 border-zinc-300"
-              href="#"
+              href={currentPage > 1 ? getPageUrl(currentPage - 1) : "#"}
+              aria-disabled={currentPage === 1}
             />
           </PaginationItem>
-          <PaginationItem>
-            <PaginationLink
-              size={"sm"}
-              href="#"
-              isActive
-              className="bg-primary-green text-white"
-            >
-              1
-            </PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink size={"sm"} className="text-zinc-700" href="#">
-              2
-            </PaginationLink>
-          </PaginationItem>
 
-          <PaginationItem>{/* <PaginationEllipsis /> */}</PaginationItem>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <PaginationItem key={page}>
+              <PaginationLink
+                size="sm"
+                href={getPageUrl(page)}
+                isActive={page === currentPage}
+                className={
+                  page === currentPage
+                    ? "bg-primary-green text-white"
+                    : "text-zinc-700"
+                }
+              >
+                {page}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+
           <PaginationItem>
             <PaginationNext
-              size={"sm"}
+              size="sm"
               className="border text-zinc-700 border-zinc-300"
-              href="#"
+              href={currentPage < totalPages ? getPageUrl(currentPage + 1) : "#"}
+              aria-disabled={currentPage === totalPages}
             />
           </PaginationItem>
         </PaginationContent>

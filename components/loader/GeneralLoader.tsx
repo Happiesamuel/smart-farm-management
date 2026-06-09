@@ -22,3 +22,14 @@ export function FormLoader({ children }: { children: string }) {
     </div>
   );
 }
+export function NoResult({ children }: { children: string }) {
+  return (
+    <div className="flex flex-col h-full justify-center items-center">
+      <div className=" text-3xl ">🌿</div>
+
+      <p className="mt-2 text-sm font-semibold text-center text-primary-green ">
+        {children}
+      </p>
+    </div>
+  );
+}
