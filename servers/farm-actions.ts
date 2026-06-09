@@ -212,3 +212,23 @@ export const getAllFarmStats = async ({
     totalRevenue,
   };
 };
+export const getSingleFarmDocs = async ({
+  collection,
+  workspaceId,
+  userId,
+  farmId,
+}: {
+  collection: string;
+  workspaceId: string;
+  userId: string;
+  farmId: string;
+}) => {
+  await validateWorkspaceAccess({ userId, workspaceId });
+  const { database } = await createAdminClient();
+  const res = await database.listDocuments(
+    appwriteConfig.databaseId,
+    collection,
+    [Query.equal("workspaces", workspaceId), Query.equal("$id", farmId)],
+  );
+  return res.documents.at(0);
+};

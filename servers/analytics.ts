@@ -173,3 +173,111 @@ export const getDashboardStats = async ({
     },
   };
 };
+
+export const getFarmFinanceStats = async ({
+  workspaceId,
+  farmId,
+  userId,
+}: {
+  workspaceId: string;
+  farmId: string;
+  userId: string;
+}) => {
+  const { database } = await createAdminClient();
+
+  await validateWorkspaceAccess({ workspaceId, userId });
+
+  // 📅 Date ranges
+  const now = new Date();
+
+  const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+
+  // 🚀 Fetch sales & expenses
+  const [salesRes, expensesRes] = await Promise.all([
+    database.listDocuments(appwriteConfig.databaseId, "sales", [
+      Query.equal("workspaces", workspaceId),
+      Query.equal("farms", farmId),
+    ]),
+    database.listDocuments(appwriteConfig.databaseId, "expenses", [
+      Query.equal("workspaces", workspaceId),
+      Query.equal("farms", farmId),
+    ]),
+  ]);
+
+  // 🔢 TOTALS (ALL TIME)
+  const totalRevenue = salesRes.documents.reduce(
+    (acc, s) => acc + (s.totalAmount || 0),
+    0,
+  );
+
+  const totalExpenses = expensesRes.documents.reduce(
+    (acc, e) => acc + (e.amount || 0),
+    0,
+  );
+
+  const profit = totalRevenue - totalExpenses;
+
+  const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
+
+  // 📊 THIS MONTH
+  const thisMonthRevenue = salesRes.documents
+    .filter((s) => new Date(s.saleDate) >= startOfThisMonth)
+    .reduce((acc, s) => acc + (s.totalAmount || 0), 0);
+
+  const thisMonthExpenses = expensesRes.documents
+    .filter((e) => new Date(e.expenseDate) >= startOfThisMonth)
+    .reduce((acc, e) => acc + (e.amount || 0), 0);
+
+  // 📊 LAST MONTH
+  const lastMonthRevenue = salesRes.documents
+    .filter(
+      (s) =>
+        new Date(s.saleDate) >= startOfLastMonth &&
+        new Date(s.saleDate) <= endOfLastMonth,
+    )
+    .reduce((acc, s) => acc + (s.totalAmount || 0), 0);
+
+  const lastMonthExpenses = expensesRes.documents
+    .filter(
+      (e) =>
+        new Date(e.expenseDate) >= startOfLastMonth &&
+        new Date(e.expenseDate) <= endOfLastMonth,
+    )
+    .reduce((acc, e) => acc + (e.amount || 0), 0);
+
+  // 📈 % CHANGE CALC
+  const calcChange = (current: number, prev: number) => {
+    if (prev === 0) return current > 0 ? 100 : 0;
+    return ((current - prev) / prev) * 100;
+  };
+
+  const revenueChange = calcChange(thisMonthRevenue, lastMonthRevenue);
+  const expenseChange = calcChange(thisMonthExpenses, lastMonthExpenses);
+
+  const thisMonthProfit = thisMonthRevenue - thisMonthExpenses;
+  const lastMonthProfit = lastMonthRevenue - lastMonthExpenses;
+
+  const profitChange = calcChange(thisMonthProfit, lastMonthProfit);
+
+  const thisMonthMargin =
+    thisMonthRevenue > 0 ? (thisMonthProfit / thisMonthRevenue) * 100 : 0;
+
+  const lastMonthMargin =
+    lastMonthRevenue > 0 ? (lastMonthProfit / lastMonthRevenue) * 100 : 0;
+
+  const marginChange = calcChange(thisMonthMargin, lastMonthMargin);
+
+  return {
+    totalRevenue,
+    totalExpenses,
+    profit,
+    margin,
+
+    revenueChange,
+    expenseChange,
+    profitChange,
+    marginChange,
+  };
+};

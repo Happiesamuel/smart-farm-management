@@ -1,7 +1,12 @@
 "use client";
 import { FarmInfo } from "@/lib/types";
+import { getFarmFinanceStats } from "@/servers/analytics";
 import { createDoc, getDocs } from "@/servers/crud-actions";
-import { getAllFarmStats, getFarmsWithStats } from "@/servers/farm-actions";
+import {
+  getAllFarmStats,
+  getFarmsWithStats,
+  getSingleFarmDocs,
+} from "@/servers/farm-actions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateFarm = () => {
@@ -51,6 +56,28 @@ export const useGetFarm = (
   });
   return { farms, error, status };
 };
+export const useGetSingleFarm = (
+  workspaceId: string | null,
+  userId: string | null,
+  farmId: string,
+) => {
+  const {
+    data: farm,
+    status,
+    error,
+  } = useQuery({
+    queryKey: ["farms", workspaceId, farmId],
+    queryFn: () =>
+      getSingleFarmDocs({
+        collection: "farms",
+        workspaceId: workspaceId as string,
+        userId: userId as string,
+        farmId,
+      }),
+    enabled: !!workspaceId && !!userId && !!farmId,
+  });
+  return { farm, error, status };
+};
 
 export const useGetFarmsWithStats = (
   workspaceId: string | null,
@@ -88,6 +115,23 @@ export const useGetAllFarmStats = (
         userId: userId as string,
       }),
     enabled: !!workspaceId && !!userId,
+  });
+  return { data, status, error };
+};
+export const useGetFarmFinanceStats = (
+  workspaceId: string | null,
+  farmId: string,
+  userId: string | null,
+) => {
+  const { data, status, error } = useQuery({
+    queryKey: ["farm-finance", workspaceId, farmId],
+    queryFn: () =>
+      getFarmFinanceStats({
+        workspaceId: workspaceId as string,
+        farmId,
+        userId: userId as string,
+      }),
+    enabled: !!workspaceId && !!farmId && !!userId,
   });
   return { data, status, error };
 };
