@@ -8,9 +8,15 @@ import { GrMoney } from "react-icons/gr";
 import { FinanceModal } from "@/components/modals/FinanceModal";
 import FinanceSalesFormFetch from "./FinanceSalesForm";
 import FinanceExpenseFormFetch from "./FinanceExpenseFom";
+import { useRouter, useSearchParams } from "next/navigation";
 export default function FinanceOverviewHeader() {
-  const [type, setType] = useState("sales");
+    const searchParams = useSearchParams();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+
+  const type = searchParams.get("type") || "sales";
+
+
   const rec = [
     {
       slug: "sales",
@@ -21,9 +27,16 @@ export default function FinanceOverviewHeader() {
       name: "Expense Records",
     },
   ];
-  function handleChangeType(rec: string) {
-    setType(rec);
+    function handleChangeType(slug: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("type", slug);
+    params.set("salesPage", "1");
+    params.set("expensePage", "1");
+    router.push(`?${params.toString()}`);
   }
+  // function handleChangeType(rec: string) {
+  //   setType(rec);
+  // }
   return (
     <div className="flex gap-2 flex-col sm:flex-row items-center p-2 justify-between border-border border-b">
       <div className="flex items-center gap-4">
@@ -45,7 +58,20 @@ export default function FinanceOverviewHeader() {
           <CiFilter />
           <p>Filter</p>
         </Button>
-
+{(searchParams.get("from") || searchParams.get("to")) && (
+  <Button
+    variant="outline"
+    className="text-red-500 rounded border-red-200 w-full sm:w-fit"
+    onClick={() => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("from");
+      params.delete("to");
+      router.push(`?${params.toString()}`);
+    }}
+  >
+    Clear dates
+  </Button>
+)}
         <Button
           onClick={() => setOpen(true)}
           className="bg-primary-green w-full sm:w-fit cursor-pointer text-white rounded"

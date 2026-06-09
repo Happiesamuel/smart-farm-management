@@ -4,6 +4,7 @@ import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
 import { useGetFarmCrops } from "@/hooks/crops/useCrops";
 import { useGetFarmHarvest } from "@/hooks/harvest/useHarvest";
 import { useGetFarmSales } from "@/hooks/sales/useSales";
+import { useFinanceFilters } from "@/hooks/useFinanceFilters";
 import { useApp } from "@/stores/useAppStore";
 import { useParams, useSearchParams } from "next/navigation";
 import { FaEye, FaEllipsisV } from "react-icons/fa";
@@ -27,6 +28,7 @@ export default function FinanceSalesTable() {
 const {farmId}=useParams()
 const searchParams = useSearchParams()
 const {workspace,user,ready}=useApp()
+const { filterByDate } = useFinanceFilters();
 const {sales,status,error} = useGetFarmSales(workspace?.id??null,user?.id??null,farmId as string)
 const {harvests,status:harStat,error:harErr} = useGetFarmHarvest(workspace?.id??null,user?.id??null,farmId as string)
 const {crops,status:cropStat,error:cropErr} = useGetFarmCrops(workspace?.id??null,user?.id??null,farmId as string)
@@ -94,7 +96,8 @@ const salesArr =
 
 const PAGE_SIZE = 5;
 const currentPage = Number(searchParams.get("salesPage") || 1);
-const paginatedSales = salesArr.slice(
+const filtered = filterByDate(salesArr ?? []);
+const paginatedSales = filtered.slice(  
   (currentPage - 1) * PAGE_SIZE,
   currentPage * PAGE_SIZE,
 );
@@ -243,7 +246,7 @@ const paginatedSales = salesArr.slice(
         ))}
       </div> 
 
-    <FinancePagination type="sales" total={salesArr.length} pageKey="salesPage" />
+    <FinancePagination type="sales"  total={filtered.length} pageKey="salesPage" />
     </div>
   );
 }
