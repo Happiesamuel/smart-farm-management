@@ -1,7 +1,6 @@
 "use client";
 import FarmCrops from "@/components/farm/crops/FarmCrops";
 import FarmIdHeader from "@/components/farm/FarmIdHeader";
-import FarmTab from "@/components/farm/FarmTab";
 import FarmFields from "@/components/farm/fields/FarmFields";
 import FarmFinance from "@/components/farm/finance/FarmFinance";
 import FarmHarvest from "@/components/farm/harvest/FarmHarvest";
@@ -25,7 +24,7 @@ export default function Page() {
   return (
     <div className="pt-18 px-2 sm:px-4  pb-16 lg:pb-4">
       <FarmIdHeader />
-      <FarmTab />
+    
       <main>{tabs[tab]}</main>
     </div>
   );

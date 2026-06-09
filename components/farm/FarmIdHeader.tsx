@@ -9,6 +9,8 @@ import { useParams } from "next/navigation";
 import { useGetSingleFarm } from "@/hooks/farms/useFarm";
 import { useApp } from "@/stores/useAppStore";
 import { formatLocation } from "@/lib/functions";
+import { FormLoader, NoResult } from "../loader/GeneralLoader";
+import FarmTab from "./FarmTab";
 export default function FarmIdHeader() {
   const { workspaceId, farmId } = useParams();
   const { user, workspace, ready } = useApp();
@@ -17,8 +19,12 @@ export default function FarmIdHeader() {
     user?.id ?? null,
     farmId as string,
   );
-  if (status === "pending" && !ready) return <p>loading...</p>;
-  if (error) return <p>{error.message}</p>;
+  if (status === "pending" || !ready) return <div className="h-[150px]">
+    <FormLoader>Loading farm...</FormLoader>
+  </div>;
+  if (error) return <div className="h-[150px]">
+    <NoResult>{error.message}</NoResult>;
+    </div>
   const arrSize = [
     {
       name: "acres",
@@ -35,7 +41,7 @@ export default function FarmIdHeader() {
   ];
     
   return (
-
+<>
     <div className="space-y-4">
       <div className=" flex items-center gap-3 text-sm text-zinc-500 font-normal">
         <Link
@@ -91,5 +97,7 @@ export default function FarmIdHeader() {
         </div>
       </div>
     </div>
+  <FarmTab />
+</>
   );
 }
