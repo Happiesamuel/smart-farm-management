@@ -26,8 +26,8 @@ export const useCreateExpenses = () => {
   return { createExpense, status };
 };
 export const useGetFarmExpenses = (
-  workspaceId: string,
-  userId: string,
+  workspaceId: string|null,
+  userId: string|null,
   farmId: string,
 ) => {
   const {
@@ -39,8 +39,8 @@ export const useGetFarmExpenses = (
     queryFn: () =>
       getFarmDocs({
         collection: "expenses",
-        workspaceId,
-        userId,
+        workspaceId:workspaceId as string,
+        userId:userId as string,
         farmId,
       }),
     enabled: !!workspaceId && !!userId && !!farmId,

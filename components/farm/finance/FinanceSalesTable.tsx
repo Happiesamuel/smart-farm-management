@@ -41,7 +41,7 @@ const isLoading =
   harStat === "pending" ||
   cropStat === "pending";
 
-if (isLoading) return <div className="h-70"><FormLoader>Loading data...</FormLoader></div>;
+if (isLoading) return <div className="h-70"><FormLoader>Loading sales data...</FormLoader></div>;
 
 const errorMessage =
  error?.message || harErr?.message || cropErr?.message;
@@ -103,13 +103,15 @@ const paginatedSales = filtered.slice(
 );
 
   return (
-    <div className=" px-4  overflow-hidden">
+    <div className=" px-4 md:h-[340px] overflow-hidden">
       {/* Title */}
       <div className="py-2.5  font-semibold text-base text-dark">
         Sales Records
       </div>
 
       {/* Desktop Table */}
+
+      { !filtered.length   ? <div className="h-70"><NoResult>No sale found!</NoResult></div>: <>
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm ">
           <thead className=" bg-zinc-200/50 border rounded-t-2xl border-border text-gray-600">
@@ -205,9 +207,7 @@ const paginatedSales = filtered.slice(
           </tbody>
         </table>
       </div>
-
-      {/* Mobile Cards */}
-     <div className="md:hidden space-y-3 p-4">
+         <div className="md:hidden space-y-3 p-4">
         {paginatedSales.map((s) => (
           <div key={s.id} className="border rounded-lg p-4 shadow-sm">
             <div className="flex justify-between">
@@ -244,7 +244,10 @@ const paginatedSales = filtered.slice(
          </div>
           </div>
         ))}
-      </div> 
+      </div> </>
+}
+      {/* Mobile Cards */}
+  
 
     <FinancePagination type="sales"  total={filtered.length} pageKey="salesPage" />
     </div>

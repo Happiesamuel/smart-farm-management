@@ -1,3 +1,4 @@
+'use clients'
 import { FaEye, FaEllipsisV } from "react-icons/fa";
 
 const sales = [
@@ -115,6 +116,9 @@ const statusStyles: Record<string, string> = {
 };
 
 export default function ExpenseTable() {
+
+
+  
   return (
     <div className="  overflow-hidden">
       {/* Desktop Table */}

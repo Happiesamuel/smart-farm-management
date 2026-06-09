@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { GoPlus } from "react-icons/go";
 import FinanceCalendar from "./FinanceCalendar";
-import { CiFilter } from "react-icons/ci";
 import { FiShoppingCart } from "react-icons/fi";
 import { GrMoney } from "react-icons/gr";
 import { FinanceModal } from "@/components/modals/FinanceModal";
@@ -34,9 +33,7 @@ export default function FinanceOverviewHeader() {
     params.set("expensePage", "1");
     router.push(`?${params.toString()}`);
   }
-  // function handleChangeType(rec: string) {
-  //   setType(rec);
-  // }
+
   return (
     <div className="flex gap-2 flex-col sm:flex-row items-center p-2 justify-between border-border border-b">
       <div className="flex items-center gap-4">
@@ -54,10 +51,7 @@ export default function FinanceOverviewHeader() {
       <div className="flex flex-col w-full sm:w-fit   sm:flex-row items-center gap-2 sm:gap-4">
         <FinanceCalendar />
 
-        <Button className="bg-white w-full sm:w-fit cursor-pointer text-dark border border-border rounded">
-          <CiFilter />
-          <p>Filter</p>
-        </Button>
+  
 {(searchParams.get("from") || searchParams.get("to")) && (
   <Button
     variant="outline"

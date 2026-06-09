@@ -47,3 +47,27 @@ export function formatLocation(address?: string) {
 
   return parts[0];
 }
+
+export const filterByDate = (data: {[key:string]:string|number}[], type: "week" | "month" | "year", dateKey: string) => {
+  const now = new Date();
+
+  return data.filter((item) => {
+    const d = new Date(item[dateKey]);
+
+    if (type === "week") {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(now.getDate() - 7);
+      return d >= oneWeekAgo;
+    }
+
+    if (type === "month") {
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }
+
+    if (type === "year") {
+      return d.getFullYear() === now.getFullYear();
+    }
+
+    return true;
+  });
+};
