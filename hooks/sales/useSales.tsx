@@ -49,7 +49,7 @@ export const useGetFarmSales = (
   return { sales, error, status };
 };
 
-export const useGetSales = (workspaceId: string, userId: string) => {
+export const useGetSales = (workspaceId: string|null, userId: string|null) => {
   const {
     data: sales,
     status,
@@ -59,8 +59,8 @@ export const useGetSales = (workspaceId: string, userId: string) => {
     queryFn: () =>
       getDocs({
         collection: "sales",
-        workspaceId,
-        userId,
+        workspaceId:workspaceId as string,
+        userId:userId as string,
       }),
   });
   return { sales, error, status };

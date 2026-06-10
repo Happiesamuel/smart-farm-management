@@ -8,53 +8,54 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { useState } from "react";
+import { Dispatch, SetStateAction} from "react";
+import { getTotal } from "@/lib/functions";
 
 export const description = "A donut chart with text";
 
 const chartConfig = {
   value: { label: "Value" },
-  Paid: { label: "Paid" },
-  Pending: { label: "Pending" },
 } satisfies ChartConfig;
 
 export function BothPieChart({
   type,
-  data,
+  data,val,setVal
 }: {
   data: { food: string; value: number; fill: string; exp: string }[];
-  type: string;
+  type: string;val:string,setVal:Dispatch<SetStateAction<"year" | "month">>
 }) {
-  const [val, setVal] = useState("year");
+
 
   const year = [
     { id: 1, value: "year", name: "This Year" },
     { id: 2, value: "month", name: "This Month" },
+    
   ];
+
+  const total = getTotal(data);
   return (
-    <div className="w-full gap-0 p-4 flex-1 relative bg-transparent rounded-non   flex flex-col  h-[300px] shrink-0">
+    <div className="w-full gap-0 p-4 flex-1 relative bg-transparent rounded-non   flex flex-col  h-[360px] shrink-0">
       <div className="pb-0 shrink-0">
         <div className="flex justify-between mb-2 gap-2 items-center">
           <h3 className="text-dark font-semibold text-sm">
             {type === "sale" ? "Sales" : "Expenses"} Overview
           </h3>
-          <Select onValueChange={(e) => setVal(e)} defaultValue={val}>
+          <Select onValueChange={(e:"year" | "month") => setVal(e)} defaultValue={val}>
             <SelectTrigger className="text-dark  border border-border bg-white rounded-lg">
               <SelectValue placeholder="This Year" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-border text-zinc-400">
+            <SelectContent className="bg-white border-border mt-6 text-zinc-400">
               {year.map((x) => (
                 <SelectItem
                   key={x.id}
                   value={x.value.toString()}
-                  className="hover:bg-zinc-900 transition-all duration-500 cursor-pointer"
+                  className="hover:bg-zinc-900 text-dark/90 transition-all duration-500 cursor-pointer"
                 >
                   {x.name}
                 </SelectItem>
@@ -68,7 +69,7 @@ export function BothPieChart({
         <div className="flex  flex-col items-center h-full">
           {/* LEFT → PIE CHART */}
           <div className="w-full h-full">
-            <ChartContainer config={chartConfig} className="w-full h-full">
+            <ChartContainer config={chartConfig} className="w-full h-[220px] xl:h-[180px]">
               <PieChart>
                 <ChartTooltip
                   cursor={false}
@@ -100,7 +101,7 @@ export function BothPieChart({
                               dy="-0.3em"
                               className="text-sm font-semibold"
                             >
-                              ₦620,000
+  ₦{total.toLocaleString()}
                             </tspan>
 
                             <tspan

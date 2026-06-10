@@ -305,7 +305,10 @@ export const createFieldSchema = z.object({
     .default("active")
     .transform((val): "active" | "inactive" => val),
 
-  description: z.string().optional(),
+  description: z
+    .string()
+    .min(10, { message: "description must be at least 10 characters." })
+    .optional(),
 });
 
 // export const createFieldSchema = z.object({

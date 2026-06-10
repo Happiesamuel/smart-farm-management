@@ -49,44 +49,18 @@ export default function page() {
 
   const crops = [
     "All Crops",
-    "🌽Maize",
-    "🌾Rice",
-    "🥔Yam",
-    "🍅Tomato",
-    "🫑Pepper",
-    "🥔Cassava",
-    "🌾Beans",
-    "🌱Wheat",
-    "🥜Sorghum",
-    "🌾Soyabean",
+    "Maize",
+    "Rice",
+    "Yam",
+    "Tomato",
+    "Pepper",
+    "Cassava",
+    "Beans",
+    "Wheat",
+    "Sorghum",
+    "Soyabean",
   ];
 
-  const arr = [
-    {
-      name: "Maize",
-      value: "₦100,000",
-    },
-    {
-      name: "Rice",
-      value: "₦90,000",
-    },
-    {
-      name: "Tomatoes",
-      value: "₦80,000",
-    },
-    {
-      name: "Pepper",
-      value: "₦70,000",
-    },
-    {
-      name: "Cabbage",
-      value: "₦40,000",
-    },
-  ];
-  const data = [
-    { food: "Paid", value: 65, fill: "#3d8d54", exp: "₦248,000" },
-    { food: "Pending", value: 25, fill: "#e3a133", exp: "₦155,000" },
-  ];
 
   return (
     <div className="pt-18 px-2 sm:px-4 pb-8">
@@ -95,7 +69,7 @@ export default function page() {
 
       <div className="grid xl:h-[600px] mt-4 grid-cols-1 xl:grid-cols-[1fr_15rem] border border-border rounded-md">
         <BothTable type="sale" arrayOne={crops} />
-        <BothOverView type="sale" data={data} arr={arr} />
+        <BothOverView type="sale" />
       </div>
     </div>
   );

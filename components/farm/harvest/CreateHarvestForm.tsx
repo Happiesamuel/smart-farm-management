@@ -188,7 +188,7 @@ function CreateHarvestForm({
           description: "You can now proceed to managing your crop",
         });
         return farmId
-          ? router.push(`/user/${workspace?.workspaceId}/farms/${farmId}`)
+          ? router.push(`/user/${workspace?.workspaceId}/farms/${farmId}?tab=harvests`)
           : onClose?.();
       },
       onError: (err) =>

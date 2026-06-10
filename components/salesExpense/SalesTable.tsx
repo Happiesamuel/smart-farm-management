@@ -1,144 +1,123 @@
+'use client'
 import { FaEye, FaEllipsisV } from "react-icons/fa";
+import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
+import { useGetCrops,} from "@/hooks/crops/useCrops";
+import {  useGetHarvest } from "@/hooks/harvest/useHarvest";
+import {  useGetSales } from "@/hooks/sales/useSales";
+import { useFinanceFilters } from "@/hooks/useFinanceFilters";
+import { useApp } from "@/stores/useAppStore";
+import {  usePathname, useSearchParams } from "next/navigation";
+import { useGetFarm } from "@/hooks/farms/useFarm";
+import BothPagination from "./BothPagination";
 
-const sales = [
-  {
-    id: "inv-128",
-    date: "May 25, 2025",
-    crop: "Maize",
-    farm: "Green Valley Farm",
-    quantity: "500",
-    unit: "kg",
-    unitPrice: "₦1,000",
-    total: "₦50,000",
-    payment: "Bank Transfer",
-    status: "Paid",
-  },
-  {
-    id: "inv-127",
-    date: "May 20, 2025",
-    crop: "Rice",
-    farm: "Sunrise Farm",
-    quantity: "30",
-    unit: "bags",
-    unitPrice: "₦1,000",
-    total: "₦30,000",
-    payment: "Cash",
-    status: "Paid",
-  },
-  {
-    id: "inv-126",
-    date: "May 15, 2025",
-    crop: "Tomatoes",
-    farm: "Golden Arces Farm",
-    quantity: "20",
-    unit: "crates",
-    unitPrice: "₦1,000",
-    total: "₦20,000",
-    payment: "Bank Transfer",
-    status: "Paid",
-  },
-  {
-    id: "inv-125",
-    date: "May 10, 2025",
-    crop: "Pepper",
-    farm: "Riverbend Farm",
-    quantity: "15",
-    unit: "crates",
-    unitPrice: "₦800",
-    total: "₦12,000",
-    payment: "Cash",
-    status: "Pending",
-  },
-  {
-    id: "inv-124",
-    date: "May 05, 2025",
-    crop: "Cabbage",
-    farm: "Golden Arces Farm",
-    quantity: "40",
-    unit: "heads",
-    unitPrice: "₦500",
-    total: "₦20,000",
-    payment: "Bank Transfer",
-    status: "Paid",
-  },
-  {
-    id: "inv-123",
-    date: "May 10, 2025",
-    crop: "Pepper",
-    farm: "Riverbend Farm",
-    quantity: "15",
-    unit: "crates",
-    unitPrice: "₦800",
-    total: "₦12,000",
-    payment: "Cash",
-    status: "Pending",
-  },
-  {
-    id: "inv-122",
-    date: "May 05, 2025",
-    crop: "Cabbage",
-    farm: "Golden Arces Farm",
-    quantity: "40",
-    unit: "heads",
-    unitPrice: "₦500",
-    total: "₦20,000",
-    payment: "Bank Transfer",
-    status: "Paid",
-  },
-  {
-    id: "inv-121",
-    date: "May 05, 2025",
-    crop: "Cabbage",
-    farm: "Golden Arces Farm",
-    quantity: "40",
-    unit: "heads",
-    unitPrice: "₦500",
-    total: "₦20,000",
-    payment: "Bank Transfer",
-    status: "Paid",
-  },
-  {
-    id: "inv-120",
-    date: "May 05, 2025",
-    crop: "Cabbage",
-    farm: "Golden Arces Farm",
-    quantity: "40",
-    unit: "heads",
-    unitPrice: "₦500",
-    total: "₦20,000",
-    payment: "Bank Transfer",
-    status: "Paid",
-  },
-  {
-    id: "inv-119",
-    date: "May 05, 2025",
-    crop: "Cabbage",
-    farm: "Golden Arces Farm",
-    quantity: "40",
-    unit: "heads",
-    unitPrice: "₦500",
-    total: "₦20,000",
-    payment: "Bank Transfer",
-    status: "Paid",
-  },
-];
-
-//10 result per page
 const paymentStyles: Record<string, string> = {
-  "Bank Transfer": "bg-green-100 text-green-700",
+  Transfer: "bg-green-100 text-green-700",
   Cash: "bg-blue-100 text-blue-700",
+  Card:'bg-purple-100 text-purple-700',
+  'Mobile Money':'bg-amber-100 text-amber-700'
 };
 
 const statusStyles: Record<string, string> = {
   Paid: "bg-green-100 text-green-700",
-  Pending: "bg-[#fff1dd] text-[#de852c]",
+  Cancelled: "bg-red-100 text-red-700",
+  Pending: "bg-amber-100 text-amber-700",
 };
 
-export default function SalesTable() {
+export default function SalesTable({type}:{type:string}) {
+
+const searchParams = useSearchParams()
+const {workspace,user,ready}=useApp()
+const { filterByDate } = useFinanceFilters();
+const {sales,status,error} = useGetSales(workspace?.id??null,user?.id??null)
+const {farms,status:farmStat,error:farmErr} = useGetFarm(workspace?.id??null,user?.id??null)
+const {harvests,status:harStat,error:harErr} = useGetHarvest(workspace?.id??null,user?.id??null)
+const {crops,status:cropStat,error:cropErr} = useGetCrops(workspace?.id??null,user?.id??null)
+  const pathname = usePathname();
+const slug = pathname.split('/').at(3);
+if (!ready) return <div className="h-110"><FormLoader>Loading app...</FormLoader></div>;
+
+if (!user || !workspace) return <div className="h-110"><NoResult>Unauthorised</NoResult></div>
+
+const isLoading =
+  status === "pending" ||
+  harStat === "pending" ||
+  cropStat === "pending"||farmStat==='pending';
+
+if (isLoading) return <div className="h-110"><FormLoader>Loading sales data...</FormLoader></div>;
+
+const errorMessage =
+ error?.message || harErr?.message || cropErr?.message||farmErr?.message;
+
+if (errorMessage) return <div className="h-110"><NoResult>{errorMessage}</NoResult></div>;
+
+if (!sales?.length) return <div className="h-110"><NoResult>No sales found!</NoResult></div>;
+
+
+
+const harvestMap = new Map(
+  harvests?.map((h) => [h.$id, h])
+);
+
+const cropMap = new Map(
+  crops?.map((c) => [c.$id, c])
+);
+const farmMap = new Map(
+  farms?.map((f) => [f.$id, f])
+);
+
+const salesArr =
+  sales?.map((sale, index) => {
+    const harvest = harvestMap.get(sale.harvests);
+    const crop = cropMap.get(harvest?.crops);
+    const farm = farmMap.get(sale?.farms);
+
+    return {
+   id: sale.$id? `INV-${sale.$id}` : `INV-${index + 1}`,
+
+      date: new Date(sale.saleDate).toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }),
+
+      crop: crop?.cropName ?? "Unknown Crop",
+      
+farm:farm?.farmName ?? "Unknown Farm",
+      buyer: sale.buyer,
+
+      quantity:sale.quantity ,
+      unit:sale.unit,
+
+      unitPrice: `₦${sale.unitPrice.toLocaleString()}`,
+
+      total: `₦${sale.totalAmount.toLocaleString()}`,
+
+      payment:
+        sale.paymentMethod === "transfer"
+          ? "Transfer":   sale.paymentMethod === "card" ?'Card':   sale.paymentMethod === "cash"?'Cash'
+          : 'Mobile Money',
+
+      status:
+        sale.status === "completed" ? "Paid" :  sale.status === "cancelled" ? 'Cancelled' : "Pending",
+    };
+  }) ?? [];
+
+const PAGE_SIZE = 10;
+const currentPage = Number(searchParams.get(`${slug}Page`) || 1);
+const filtered = filterByDate(salesArr ?? []);
+const paginatedSales = filtered.slice(  
+  (currentPage - 1) * PAGE_SIZE,
+  currentPage * PAGE_SIZE,
+);
+
+
+
+
   return (
+    <>
     <div className="  overflow-hidden">
       {/* Desktop Table */}
-      <div className="block overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm ">
           <thead className=" bg-zinc-200/50 border rounded-t-2xl border-border text-gray-600">
             <tr className="text-left ">
@@ -161,7 +140,7 @@ export default function SalesTable() {
           </thead>
 
           <tbody>
-            {sales.map((s) => (
+            {paginatedSales.map((s) => (
               <tr key={s.id} className="border-t hover:bg-gray-50">
                 <td
                   title={s.date}
@@ -249,40 +228,46 @@ export default function SalesTable() {
       </div>
 
       {/* Mobile Cards */}
-      {/* <div className="md:hidden space-y-3 p-4">
-        {sales.map((s) => (
+      <div className="md:hidden space-y-3 p-4">
+        {paginatedSales.map((s) => (
           <div key={s.id} className="border rounded-lg p-4 shadow-sm">
             <div className="flex justify-between">
               <span className="text-sm text-gray-500">{s.date}</span>
               <span
-                className={`text-[13px] px-2 py-1 6ounded-full ${statusStyles[s.status]}`}
+                className={`text-[13px] px-2 py-1 rounded-md ${statusStyles[s.status]}`}
               >
                 {s.status}
               </span>
             </div>
 
             <div className="flex items-center gap-2 font-medium mt-2">
-              {s.emoji} {s.crop}
+             {s.crop}
             </div>
 
             <p className="text-sm mt-1">{s.farm}</p>
 
-            <div className="text-[13px] text-gray-600 mt-2">Qty: {s.quantity}</div>
+<div className="flex items-center gap-3">
+              <div className="text-[13px] text-gray-600 mt-2">Qty: {s.quantity}</div>
 
             <div className="text-[13px] text-gray-600">Unit: {s.unitPrice}</div>
+</div>
 
-            <div className="font-semibold mt-2">{s.total}</div>
+  <div className="flex items-center gap-3">
+              <div className="font-semibold mt-2">{s.total}</div>
 
             <div className="mt-2">
               <span
-                className={`text-[13px] px-2 py-1 6ounded-full ${paymentStyles[s.payment]}`}
+                className={`text-[13px] px-2 py-1 rounded-md ${paymentStyles[s.payment]}`}
               >
                 {s.payment}
               </span>
             </div>
+  </div>
           </div>
         ))}
-      </div> */}
+      </div>
     </div>
+    <BothPagination type={type} total={filtered.length} pageSize={PAGE_SIZE} pageKey={`${slug}Page`} />
+    </>
   );
 }

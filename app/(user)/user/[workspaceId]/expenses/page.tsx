@@ -58,32 +58,7 @@ export default function page() {
     "Transport",
   ];
 
-  const arr = [
-    {
-      name: "Labour",
-      value: "₦100,000",
-    },
-    {
-      name: "Fertilizer",
-      value: "₦90,000",
-    },
-    {
-      name: "Fuel",
-      value: "₦80,000",
-    },
-    {
-      name: "Seeds",
-      value: "₦70,000",
-    },
-    {
-      name: "Pesticides",
-      value: "₦40,000",
-    },
-  ];
-  const data = [
-    { food: "Paid", value: 85, fill: "#3d8d54", exp: "₦248,000" },
-    { food: "Pending", value: 15, fill: "#e3a133", exp: "₦155,000" },
-  ];
+
 
   return (
     <div className="pt-18 px-2 sm:px-4 pb-8">
@@ -91,7 +66,7 @@ export default function page() {
       <BothBoxes stats={stats} />
       <div className="grid h-fit lg:h-[600px] mt-4 grid-cols-1 xl:grid-cols-[1fr_15rem] border border-border rounded-md">
         <BothTable type="expense" arrayOne={categories} />
-        <BothOverView type="expense" data={data} arr={arr} />
+        <BothOverView type="expense"  />
       </div>
     </div>
   );

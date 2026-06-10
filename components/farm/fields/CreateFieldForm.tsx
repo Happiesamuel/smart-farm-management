@@ -24,7 +24,7 @@ import { toast } from "sonner";
 import { useApp } from "@/stores/useAppStore";
 import { useGetFarm } from "@/hooks/farms/useFarm";
 import { FormLoader } from "@/components/loader/GeneralLoader";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function CreateFieldFormFetch() {
   const { workspace, user, ready } = useApp();
@@ -77,7 +77,8 @@ function CreateFieldForm({
   farms: { name: string; value: string }[];
 }) {
   const { createField, status } = useCreateField();
-
+  const {workspace}=useApp()
+const router = useRouter()
   const form = useForm<z.infer<typeof createFieldSchema>>({
     resolver: zodResolver(createFieldSchema) as Resolver<
       z.infer<typeof createFieldSchema>
@@ -102,6 +103,7 @@ function CreateFieldForm({
         toast("Field created successfully", {
           description: "You can now proceed to managing your field",
         });
+router.push(`/user/${workspace?.workspaceId}/farms/${farmId}`)
       },
       onError: (err) =>
         toast("Error creating field", {

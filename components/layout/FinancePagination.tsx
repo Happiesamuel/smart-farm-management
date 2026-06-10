@@ -13,7 +13,7 @@ interface FinancePaginationProps {
   type: string;
   total: number;
   pageSize?: number;
-  pageKey?: string; // 👈 allows multiple paginations on same page e.g "salesPage" "expensePage"
+  pageKey?: string; 
 }
 
 export default function FinancePagination({

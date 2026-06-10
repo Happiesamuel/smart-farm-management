@@ -11,7 +11,7 @@ import FinanceExpenseFormFetch from "../farm/finance/FinanceExpenseFom";
 export default function BothHeader({ type }: { type: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="pb-5 flex gap-3 md:flex-row flex-col md:items-center justify-between">
+    <div className="pb-5 flex gap-3 sm:flex-row flex-col sm:items-center justify-between">
       <div className=" space-y-1">
         <h6 className="text-dark font-semibold  text-2xl">
           {type === "sales" ? "Sales" : "Expenses"}

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -6,25 +5,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-
+import { useSearchParams, useRouter } from "next/navigation";
 export default function BothSelect({
-  array,
+  array,type
 }: {
-  array: { [key: string]: string }[];
+  array: { [key: string]: string }[];type:string
 }) {
-  const [val, setVal] = useState("all");
+    const searchParams = useSearchParams();
+  const router = useRouter();
+  const farm = searchParams.get("farm") || "all";
+
+  function handleChange(val: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (val && val !== "all") {
+      params.set("farm", val);
+    } else {
+      params.delete("farm");
+    }
+    params.set(type, "1");
+    router.push(`?${params.toString()}`);
+  }
 
   return (
-    <Select onValueChange={(e) => setVal(e)} defaultValue={val}>
+    <Select value={farm} onValueChange={handleChange}>
       <SelectTrigger className="text-dark w-full md:w-full border border-border bg-white rounded-lg">
         <SelectValue placeholder="All Farms" />
       </SelectTrigger>
-      <SelectContent className="bg-white border-border text-zinc-400">
+      <SelectContent className="bg-white max-h-[200px]! mt-6 border-border text-zinc-400">
         {array.map((x) => (
           <SelectItem
             key={x.value}
             value={x.value.toString()}
-            className="hover:bg-zinc-900 transition-all duration-500 cursor-pointer"
+            className="hover:bg-zinc-900 text-dark/90 transition-all duration-500 cursor-pointer"
           >
             {x.name}
           </SelectItem>
@@ -33,3 +45,4 @@ export default function BothSelect({
     </Select>
   );
 }
+

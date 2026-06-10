@@ -47,7 +47,7 @@ export const useGetFarmExpenses = (
   });
   return { expenses, error, status };
 };
-export const useGetExpenses = (workspaceId: string, userId: string) => {
+export const useGetExpenses = (workspaceId: string|null, userId: string|null) => {
   const {
     data: expenses,
     status,
@@ -57,9 +57,10 @@ export const useGetExpenses = (workspaceId: string, userId: string) => {
     queryFn: () =>
       getDocs({
         collection: "expenses",
-        workspaceId,
-        userId,
+        workspaceId:workspaceId as string,
+        userId:userId as string,
       }),
+      enabled: !!workspaceId && !!userId ,
   });
   return { expenses, error, status };
 };

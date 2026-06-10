@@ -18,7 +18,7 @@ export default function FarmCropsFilter() {
   const [field, setField] = useState("all");
   const [stat, setStat] = useState("all");
   const { workspaceId } = useParams();
-
+const {farmId} = useParams()
   const fields = [
     { id: 1, name: "All Fields", value: "all" },
     { id: 2, name: "Field B", value: "fieldA" },
@@ -78,7 +78,7 @@ export default function FarmCropsFilter() {
 
       <Button className="bg-primary-green w-full sm:w-fit cursor-pointer text-white">
         <Link
-          href={`/user/${workspaceId}/farms/1/add-crop`}
+          href={`/user/${workspaceId}/farms/${farmId}/add-crop`}
           className="flex items-center gap-1"
         >
           <GoPlus />
