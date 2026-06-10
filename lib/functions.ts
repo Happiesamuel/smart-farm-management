@@ -79,7 +79,8 @@ export const filterByDate = (data: {[key:string]:string|number}[], type: "week" 
   const now = new Date();
 
   return data.filter((item) => {
-    const d = new Date(item[dateKey]);
+ const d = new Date(item[dateKey]);
+
 
     if (type === "week") {
       const oneWeekAgo = new Date();
@@ -98,6 +99,35 @@ export const filterByDate = (data: {[key:string]:string|number}[], type: "week" 
     return true;
   });
 };
+
+export const filterByStatDate = (data: {[key:string]:string|number}[], type: "week" | "month" | "year") => {
+  const now = new Date();
+
+  return data.filter((item) => {
+     const rawDate = item.saleDate || item.date|| item.expenseDate;
+    if (!rawDate) return false;
+
+    const d = new Date(rawDate);
+
+
+    if (type === "week") {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(now.getDate() - 7);
+      return d >= oneWeekAgo;
+    }
+
+    if (type === "month") {
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }
+
+    if (type === "year") {
+      return d.getFullYear() === now.getFullYear();
+    }
+
+    return true;
+  });
+};
+
 
 export const getTopCropsAllFarms = ({
   sales,
@@ -236,3 +266,4 @@ export const getTotal = (data: { exp: string }[]) =>
     (sum, d) => sum + Number(d.exp.replace(/[₦,]/g, "")),
     0
   );
+
