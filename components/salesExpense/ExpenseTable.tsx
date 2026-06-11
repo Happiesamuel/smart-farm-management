@@ -33,21 +33,21 @@ const {farms,status:farmStat,error:farmErr} = useGetFarm(workspace?.id??null,use
  const slug = pathname.split('/').at(3);
 
 
-if (!ready) return <div className="h-70"><FormLoader>Loading app...</FormLoader></div>;
+if (!ready) return <div className="h-110"><FormLoader>Loading app...</FormLoader></div>;
 
-if (!user || !workspace) return <div className="h-70"><NoResult>Unauthorised</NoResult></div>
+if (!user || !workspace) return <div className="h-110"><NoResult>Unauthorised</NoResult></div>
 
 const isLoading =
   status === "pending" ||farmStat==='pending'
 
-if (isLoading) return <div className="h-70"><FormLoader>Loading expense data...</FormLoader></div>;
+if (isLoading) return <div className="h-110"><FormLoader>Loading expense data...</FormLoader></div>;
 
 const errorMessage =
  error?.message  || farmErr?.message
 
-if (errorMessage) return <div className="h-70"><NoResult>{errorMessage}</NoResult></div>;
+if (errorMessage) return <div className="h-110"><NoResult>{errorMessage}</NoResult></div>;
 
-if (!expenses?.length) return <div className="h-70"><NoResult>No expense found!</NoResult></div>;
+if (!expenses?.length) return <div className="h-110"><NoResult>No expense found!</NoResult></div>;
 
 
 
@@ -110,6 +110,7 @@ console.log(expenses)
     
     <div className="  overflow-hidden">
       {/* Desktop Table */}
+        { !filtered.length   ? <div className="h-100"><NoResult>No expense found!</NoResult></div> : <> 
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm ">
           <thead className=" bg-zinc-200/50 border rounded-t-2xl border-border text-gray-600">
@@ -243,7 +244,7 @@ console.log(expenses)
           </div>
         ))}
       </div>
-
+</>}
     </div>
     <BothPagination type={type} total={filtered.length} pageSize={PAGE_SIZE} pageKey={`${slug}Page`}/>
     </>

@@ -117,6 +117,7 @@ const paginatedSales = filtered.slice(
     <>
     <div className="  overflow-hidden">
       {/* Desktop Table */}
+      { !filtered.length   ? <div className="h-100"><NoResult>No sales found!</NoResult></div> : <> 
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm ">
           <thead className=" bg-zinc-200/50 border rounded-t-2xl border-border text-gray-600">
@@ -265,7 +266,7 @@ const paginatedSales = filtered.slice(
   </div>
           </div>
         ))}
-      </div>
+      </div></>}
     </div>
     <BothPagination type={type} total={filtered.length} pageSize={PAGE_SIZE} pageKey={`${slug}Page`} />
     </>
