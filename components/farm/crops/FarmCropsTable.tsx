@@ -437,7 +437,7 @@ export default function FarmCropsTable() {
       </div>
 
       <CropPagination
-        total={cropArr.length}
+        total={filtered.length}
         pageSize={PAGE_SIZE}
         pageKey={`cropPage`}
       />

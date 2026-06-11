@@ -13,6 +13,36 @@ import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { GoPlus } from "react-icons/go";
 import { IoSearch } from "react-icons/io5";
 
+const status = [
+  {
+    name: "All Status",
+    value: "all",
+  },
+  {
+    name: "Growing",
+    value: "growing",
+  },
+  {
+    name: "Harvested",
+    value: "harvested",
+  },
+  {
+    name: "Failed",
+    value: "failed",
+  },
+  {
+    name: "Planted",
+    value: "planted",
+  },
+  {
+    name: "Drying",
+    value: "drying",
+  },
+  {
+    name: "Stored",
+    value: "stored",
+  },
+];
 export default function FarmCropsFilter({
   fields,
 }: {
@@ -21,41 +51,10 @@ export default function FarmCropsFilter({
   const { workspaceId } = useParams();
   const { farmId } = useParams();
 
-  const status = [
-    {
-      name: "All Status",
-      value: "all",
-    },
-    {
-      name: "Growing",
-      value: "growing",
-    },
-    {
-      name: "Harvested",
-      value: "harvested",
-    },
-    {
-      name: "Failed",
-      value: "failed",
-    },
-    {
-      name: "Planted",
-      value: "planted",
-    },
-    {
-      name: "Drying",
-      value: "drying",
-    },
-    {
-      name: "Stored",
-      value: "stored",
-    },
-  ];
-
   const searchParams = useSearchParams();
   const router = useRouter();
   const field = searchParams.get("field") || "all";
-  const stat = searchParams.get("field") || "all";
+  const stat = searchParams.get("status") || "all";
   function handleFieldChange(val: string) {
     const params = new URLSearchParams(searchParams.toString());
     if (val && val !== "all") {

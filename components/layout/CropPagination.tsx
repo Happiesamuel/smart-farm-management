@@ -9,7 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 interface FinancePaginationProps {
   type?: string;
   total: number;
@@ -26,17 +26,19 @@ export default function CropPagination({
   children,
 }: FinancePaginationProps) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const currentPage = Number(searchParams.get(pageKey) || 1);
   const totalPages = Math.ceil(total / pageSize);
 
   const from = (currentPage - 1) * pageSize + 1;
   const to = Math.min(currentPage * pageSize, total);
 
-  function getPageUrl(page: number) {
+  function goToPage(page: number) {
     const params = new URLSearchParams(searchParams.toString());
     params.set(pageKey, String(page));
-    return `?${params.toString()}`;
+    router.push(`?${params.toString()}`, { scroll: false });
   }
+
   if (totalPages <= 1) return null;
   return (
     <div className="flex sm:flex-row flex-col items-center justify-between mt-4">
@@ -47,7 +49,7 @@ export default function CropPagination({
             <PaginationPrevious
               size="sm"
               className="border text-zinc-700 border-zinc-300"
-              href={currentPage > 1 ? getPageUrl(currentPage - 1) : "#"}
+              onClick={() => currentPage > 1 && goToPage(currentPage - 1)}
               aria-disabled={currentPage === 1}
             />
           </PaginationItem>
@@ -56,7 +58,7 @@ export default function CropPagination({
             <PaginationItem key={page}>
               <PaginationLink
                 size="sm"
-                href={getPageUrl(page)}
+                onClick={() => goToPage(page)}
                 isActive={page === currentPage}
                 className={
                   page === currentPage
@@ -73,8 +75,8 @@ export default function CropPagination({
             <PaginationNext
               size="sm"
               className="border text-zinc-700 border-zinc-300"
-              href={
-                currentPage < totalPages ? getPageUrl(currentPage + 1) : "#"
+              onClick={() =>
+                currentPage < totalPages && goToPage(currentPage + 1)
               }
               aria-disabled={currentPage === totalPages}
             />
