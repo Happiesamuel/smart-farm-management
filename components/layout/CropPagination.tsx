@@ -9,37 +9,74 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-export default function CropPagination({ children }: { children?: ReactNode }) {
+import { useSearchParams } from "next/navigation";
+interface FinancePaginationProps {
+  type?: string;
+  total: number;
+  pageSize?: number;
+  pageKey?: string;
+  children?: ReactNode;
+}
+
+export default function CropPagination({
+  type,
+  total,
+  pageSize = 5,
+  pageKey = "page",
+  children,
+}: FinancePaginationProps) {
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get(pageKey) || 1);
+  const totalPages = Math.ceil(total / pageSize);
+
+  const from = (currentPage - 1) * pageSize + 1;
+  const to = Math.min(currentPage * pageSize, total);
+
+  function getPageUrl(page: number) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(pageKey, String(page));
+    return `?${params.toString()}`;
+  }
+  if (totalPages <= 1) return null;
   return (
-    <div className="flex sm:flex-row flex-col items-center justify-between">
+    <div className="flex sm:flex-row flex-col items-center justify-between mt-4">
       {children}
-      <Pagination className="w-full justify-end pt-8">
-        <PaginationContent className=" gap-3">
+      <Pagination className="w-full justify-end">
+        <PaginationContent className="gap-1 sm:gap-3">
           <PaginationItem>
             <PaginationPrevious
+              size="sm"
               className="border text-zinc-700 border-zinc-300"
-              href="#"
+              href={currentPage > 1 ? getPageUrl(currentPage - 1) : "#"}
+              aria-disabled={currentPage === 1}
             />
           </PaginationItem>
-          <PaginationItem>
-            <PaginationLink
-              href="#"
-              isActive
-              className="bg-primary-green text-white"
-            >
-              1
-            </PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink className="text-zinc-700" href="#">
-              2
-            </PaginationLink>
-          </PaginationItem>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <PaginationItem key={page}>
+              <PaginationLink
+                size="sm"
+                href={getPageUrl(page)}
+                isActive={page === currentPage}
+                className={
+                  page === currentPage
+                    ? "bg-primary-green text-white"
+                    : "text-zinc-700"
+                }
+              >
+                {page}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
 
           <PaginationItem>
             <PaginationNext
+              size="sm"
               className="border text-zinc-700 border-zinc-300"
-              href="#"
+              href={
+                currentPage < totalPages ? getPageUrl(currentPage + 1) : "#"
+              }
+              aria-disabled={currentPage === totalPages}
             />
           </PaginationItem>
         </PaginationContent>

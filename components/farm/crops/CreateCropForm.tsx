@@ -134,7 +134,9 @@ function CreateCropForm({
           description: "You can now proceed to managing your crop",
         });
         return farmId
-          ? router.push(`/user/${workspace?.workspaceId}/farms/${farmId}?tab=crops`)
+          ? router.push(
+              `/user/${workspace?.workspaceId}/farms/${farmId}?tab=crops`,
+            )
           : onClose?.();
       },
       onError: (err) =>
@@ -227,6 +229,29 @@ function CreateCropForm({
     {
       name: "Pivot",
       value: "pivot",
+    },
+  ];
+
+  const growth = [
+    {
+      name: "Seedling",
+      value: "seedling",
+    },
+    {
+      name: "Vegetative",
+      value: "vegetative",
+    },
+    {
+      name: "Flowering",
+      value: "flowering",
+    },
+    {
+      name: "Fruiting",
+      value: "fruiting",
+    },
+    {
+      name: "Harvesting",
+      value: "harvesting",
     },
   ];
 
@@ -332,14 +357,13 @@ function CreateCropForm({
               array={stat}
               Icon={MdSignalWifiStatusbar1Bar}
             />
-            <CreateCropInputSelect
-              array={seedQuantity}
+            <CreateCropSelect
+              name="growthStage"
               control={form.control}
-              label="Seed Quantity"
-              placeholder="e.g. 100"
-              placeholder2="bags"
-              name1="seedQuantity"
-              name2="seedUnit"
+              label="Growth Stage"
+              placeholder="Select growth stage"
+              array={growth}
+              Icon={MdSignalWifiStatusbar1Bar}
             />
           </div>
 
@@ -354,6 +378,18 @@ function CreateCropForm({
               name2="yieldUnit"
             />
             <CreateCropInputSelect
+              array={seedQuantity}
+              control={form.control}
+              label="Seed Quantity"
+              placeholder="e.g. 100"
+              placeholder2="bags"
+              name1="seedQuantity"
+              name2="seedUnit"
+            />
+          </div>
+
+          <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
+            <CreateCropInputSelect
               array={area}
               control={form.control}
               label="Area Planted"
@@ -362,14 +398,14 @@ function CreateCropForm({
               name1="areaPlanted"
               name2="areaUnit"
             />
-          </div>
 
-          <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
             <CreateCropDate
               label="Planting Date to Harvest Date"
               name="plantingToHarvest"
               control={form.control}
             />
+          </div>
+          <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
             <CreateCropText
               label="Description (optional)"
               placeholder="Enter Field description"

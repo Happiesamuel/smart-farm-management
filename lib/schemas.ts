@@ -520,6 +520,9 @@ export const createCropSchema = z.object({
   status: z
     .enum(["growing", "harvested", "failed", "planted", "drying", "stored"])
     .default("growing"),
+  growthStage: z
+    .enum(["seedling", "vegetative", "flowering", "fruiting", "harvesting"])
+    .default("seedling"),
 
   description: z.string().optional(),
 });

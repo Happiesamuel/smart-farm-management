@@ -3,7 +3,9 @@ import BothHeader from "@/components/salesExpense/BothHeader";
 import BothOverView from "@/components/salesExpense/BothOverView";
 import BothTable from "@/components/salesExpense/BothTable";
 
-
+export const metadata = {
+  title: "Sales",
+};
 export default function page() {
 
 

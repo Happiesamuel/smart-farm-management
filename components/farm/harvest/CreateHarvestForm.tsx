@@ -161,10 +161,18 @@ function CreateHarvestForm({
         value: f.$id,
       })) ?? []);
   const crops =
-    filteredCrops?.map((f) => ({
-      name: f.cropName,
-      value: f.$id,
-    })) ?? [];
+    filteredCrops
+      ?.filter(
+        (x) =>
+          x.status === "harvested" ||
+          x.status === "stored" ||
+          x.status === "drying" ||
+          x.growthStage === "harvesting",
+      )
+      .map((f) => ({
+        name: f.cropName,
+        value: f.$id,
+      })) ?? [];
 
   async function onSubmit(values: z.infer<typeof createHarvestSchema>) {
     const { farm, field, crop, ...val } = values;
@@ -188,7 +196,9 @@ function CreateHarvestForm({
           description: "You can now proceed to managing your crop",
         });
         return farmId
-          ? router.push(`/user/${workspace?.workspaceId}/farms/${farmId}?tab=harvests`)
+          ? router.push(
+              `/user/${workspace?.workspaceId}/farms/${farmId}?tab=harvests`,
+            )
           : onClose?.();
       },
       onError: (err) =>
@@ -288,8 +298,8 @@ function CreateHarvestForm({
             <CreateHarvestSelect
               name="crop"
               control={form.control}
-              label="Select Crop"
-              placeholder="Select crop"
+              label="Select Harvested Crop"
+              placeholder="Select harvested crop"
               key={watchedFieldId}
               array={crops as { [key: string]: string }[]}
               Icon={TbPlant2}

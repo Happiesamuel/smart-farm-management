@@ -3,6 +3,9 @@ import BothHeader from "@/components/salesExpense/BothHeader";
 import BothBoxes from "@/components/salesExpense/BothBoxes";
 import BothTable from "@/components/salesExpense/BothTable";
 import BothOverView from "@/components/salesExpense/BothOverView";
+export const metadata = {
+  title: "Expenses",
+};
 export default function page() {
 
   const categories = [

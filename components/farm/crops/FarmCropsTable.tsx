@@ -1,192 +1,446 @@
+import CropPagination from "@/components/layout/CropPagination";
+import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
+import { useGetFarmCrops } from "@/hooks/crops/useCrops";
+import { useGetFarmFields } from "@/hooks/fields/useFields";
+import { useGetFarmHarvest } from "@/hooks/harvest/useHarvest";
+import { getProgressColor } from "@/lib/functions";
+import { useApp } from "@/stores/useAppStore";
+import { useParams, useSearchParams } from "next/navigation";
 import { FaEye, FaEllipsisV } from "react-icons/fa";
-
-interface Crops {
-  id: number;
-  name: string;
-  emoji: string;
-  field: string;
-  status: string;
-  planted: string;
-  harvest: string;
-  progress: number;
-}
-// type Status = "Growing" | "Pending" | "Inactive";
-const crops: Crops[] = [
-  {
-    id: 1,
-    name: "Maize",
-    emoji: "🌽",
-    field: "Field A",
-    status: "Growing",
-    planted: "Jan 02, 2025",
-    harvest: "Apr 10, 2025",
-    progress: 70,
-  },
-  {
-    id: 2,
-    name: "Rice",
-    emoji: "🌾",
-    field: "Field B",
-    status: "Growing",
-    planted: "Feb 01, 2025",
-    harvest: "May 20, 2025",
-    progress: 60,
-  },
-  {
-    id: 3,
-    name: "Tomatoes",
-    emoji: "🍅",
-    field: "Field C",
-    status: "Growing",
-    planted: "Feb 15, 2025",
-    harvest: "May 10, 2025",
-    progress: 40,
-  },
-  {
-    id: 4,
-    name: "Pepper",
-    emoji: "🫑",
-    field: "Field C",
-    status: "Growing",
-    planted: "Feb 20, 2025",
-    harvest: "May 25, 2025",
-    progress: 30,
-  },
-  {
-    id: 5,
-    name: "Cabbage",
-    emoji: "🥬",
-    field: "Field A",
-    status: "Pending",
-    planted: "Mar 01, 2025",
-    harvest: "Jun 10, 2025",
-    progress: 10,
-  },
-  {
-    id: 6,
-    name: "Yam",
-    emoji: "🥔",
-    field: "Field D",
-    status: "Inactive",
-    planted: "Dec 10, 2024",
-    harvest: "Mar 15, 2025",
-    progress: 0,
-  },
-];
+import FarmCropsFilter from "./FarmCropsFilter";
+import { useCropFilter } from "@/hooks/useCropFilter";
 
 const statusStyles: Record<string, string> = {
   Growing: "bg-green-100 text-green-700",
-  Pending: "bg-yellow-100 text-yellow-700",
-  Inactive: "bg-gray-100 text-gray-600",
+  Harvested: "bg-blue-100 text-blue-700",
+  Failed: "bg-red-100 text-red-700",
+  Planted: "bg-lime-100 text-lime-700",
+  Drying: "bg-orange-100 text-orange-700",
+  Stored: "bg-purple-100 text-purple-700",
+
+  Seedling: "bg-emerald-100 text-emerald-700",
+  Vegetative: "bg-teal-100 text-teal-700",
+  Flowering: "bg-pink-100 text-pink-700",
+  Fruiting: "bg-amber-100 text-amber-700",
+  Harvesting: "bg-cyan-100 text-cyan-700",
 };
+const NOW = Date.now();
 
 export default function FarmCropsTable() {
+  const { farmId } = useParams();
+  const searchParams = useSearchParams();
+  const { filterCrop } = useCropFilter();
+  const { workspace, user, ready } = useApp();
+  const { crops, status, error } = useGetFarmCrops(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
+  const {
+    fields,
+    status: fieldStat,
+    error: fieldErr,
+  } = useGetFarmFields(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
+
+  const {
+    harvests,
+    status: harvestStat,
+    error: harvestErr,
+  } = useGetFarmHarvest(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
+
+  if (!ready)
+    return (
+      <div className="h-70">
+        <FormLoader>Loading app...</FormLoader>
+      </div>
+    );
+
+  if (!user || !workspace)
+    return (
+      <div className="h-70">
+        <NoResult>Unauthorised</NoResult>
+      </div>
+    );
+
+  const isLoading =
+    status === "pending" ||
+    fieldStat === "pending" ||
+    harvestStat === "pending";
+
+  if (isLoading)
+    return (
+      <div className="h-70">
+        <FormLoader>Loading crop data...</FormLoader>
+      </div>
+    );
+
+  const errorMessage =
+    error?.message || fieldErr?.message || harvestErr?.message;
+
+  if (errorMessage)
+    return (
+      <div className="h-70">
+        <NoResult>{errorMessage}</NoResult>
+      </div>
+    );
+
+  if (!crops?.length)
+    return (
+      <div className="h-70">
+        <NoResult>No crop found!</NoResult>
+      </div>
+    );
+  const stageProgressMap: Record<string, number> = {
+    seedling: 10,
+    vegetative: 30,
+    flowering: 60,
+    fruiting: 80,
+    harvesting: 90,
+  };
+  const fieldMap = new Map(fields?.map((f) => [f.$id, f]));
+  const cropArr =
+    crops?.map((crop) => {
+      const field = fieldMap.get(crop.fields);
+
+      const cropHarvests = harvests?.filter((h) => h.crops === crop.$id) ?? [];
+
+      const harvestedQty = cropHarvests.reduce(
+        (acc, h) => acc + (h.quantity || 0),
+        0,
+      );
+
+      const expectedYield = Number(crop.expectedYield || 0);
+
+      let progress = 0;
+
+      // ✅ 1. Completed crop
+      if (crop.status === "harvested") {
+        progress = 100;
+      } else if (crop.growthStage) {
+        progress = stageProgressMap[crop.growthStage];
+      }
+
+      // ✅ 2. Harvest-based progress (REAL WORLD)
+      else if (harvestedQty > 0 && expectedYield > 0) {
+        progress = Math.min(
+          Math.round((harvestedQty / expectedYield) * 100),
+          100,
+        );
+      }
+
+      // ✅ 3. Time-based fallback
+      else {
+        const start = new Date(crop.plantedDate).getTime();
+        const end = new Date(crop.expectedHarvestDate).getTime();
+        const now = NOW;
+
+        if (now <= start) progress = 0;
+        else if (now >= end) progress = 100;
+        else progress = Math.round(((now - start) / (end - start)) * 100);
+      }
+
+      return {
+        id: crop.$id,
+        name: crop.cropName,
+        field: field?.fieldName ?? "Unknown Field",
+
+        areaPlanted: crop.areaPlanted,
+        areaUnit: crop.areaUnit,
+
+        plantedDate: new Date(crop.plantedDate).toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+
+        expectedHarvestDate: new Date(
+          crop.expectedHarvestDate,
+        ).toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+
+        expectedYield: crop.expectedYield,
+        yieldUnit: crop.yieldUnit,
+
+        irrigationType:
+          crop.irrigationType?.slice(0, 1).toUpperCase() +
+            crop.irrigationType?.slice(1) || "-",
+        seedQuantity: crop.seedQuantity,
+        seedUnit: crop.seedUnit,
+
+        status: crop.status.slice(0, 1).toUpperCase() + crop.status.slice(1),
+        growthStage:
+          crop.growthStage?.slice(0, 1).toUpperCase() +
+            crop.growthStage?.slice(1) || "-",
+        progress,
+
+        harvestedQty,
+      };
+    }) ?? [];
+
+  const PAGE_SIZE = 10;
+  const currentPage = Number(searchParams.get("cropPage") || 1);
+  const filtered = filterCrop(cropArr ?? []);
+  const paginatedCrop = filtered.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+  const allFields = fields?.length
+    ? [
+        { name: "All Fields", value: "all" },
+        ...fields?.map((x) => {
+          return {
+            name: x.fieldName,
+            value: x.fieldName.split(" ").join("+"),
+          };
+        }),
+      ]
+    : [];
   return (
-    <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full text-sm">
-          {/* Header */}
-          <thead className="bg-gray-50 text-gray-600">
-            <tr className="text-left ">
-              <th className="p-4">Crop</th>
-              <th className="p-4">Field</th>
-              <th className="p-4">Status</th>
-              <th className="p-4">Planted Date</th>
-              <th className="p-4">Expected Harvest</th>
-              <th className="p-4">Progress</th>
-              <th className="p-4 text-right">Action</th>
-            </tr>
-          </thead>
+    <>
+      <FarmCropsFilter fields={allFields} />
+      <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+        {!filtered.length ? (
+          <div className="h-100">
+            <NoResult>No crop found!</NoResult>
+          </div>
+        ) : (
+          <>
+            <div className="hidden md:block overflow-x-auto no-scroll">
+              <table className="w-full text-sm">
+                {/* Header */}
+                <thead className="bg-gray-50 text-gray-600">
+                  <tr className="text-left ">
+                    <th title="Crop" className="p-4 truncate max-w-full">
+                      Crop
+                    </th>
+                    <th title="Field" className="p-4 truncate max-w-full">
+                      Field
+                    </th>
+                    <th title="Irrigation" className="p-4 truncate max-w-full">
+                      Irrigation
+                    </th>
+                    <th
+                      title="Area Planted"
+                      className="p-4 truncate max-w-full"
+                    >
+                      Area Planted
+                    </th>
+                    <th title="Status" className="p-4 truncate max-w-full">
+                      Status
+                    </th>
+                    <th
+                      title="Growth Stage"
+                      className="p-4 truncate max-w-full"
+                    >
+                      Growth Stage
+                    </th>
+                    <th
+                      title="Seed Quantity"
+                      className="p-4 truncate max-w-full"
+                    >
+                      Seed Quantity
+                    </th>
+                    <th
+                      title="Expected Yield"
+                      className="p-4 truncate max-w-full"
+                    >
+                      Expected Yield
+                    </th>
+                    <th
+                      title="Planted Date"
+                      className="p-4 truncate max-w-full"
+                    >
+                      Planted Date
+                    </th>
+                    <th
+                      title="Expected Harvest"
+                      className="p-4 truncate max-w-full"
+                    >
+                      Expected Harvest
+                    </th>
+                    <th title="Progress" className="p-4 truncate max-w-full">
+                      Progress
+                    </th>
+                    <th
+                      title="Action"
+                      className="p-4 truncate max-w-full text-right"
+                    >
+                      Action
+                    </th>
+                  </tr>
+                </thead>
 
-          {/* Body */}
-          <tbody>
-            {crops.map((crop) => (
-              <tr
-                key={crop.id}
-                className="border-t hover:bg-gray-50 transition"
-              >
-                {/* Crop */}
-                <td className="p-4  text-dark font-semibold flex items-center gap-2">
-                  <span>{crop.emoji}</span>
-                  {crop.name}
-                </td>
+                <tbody>
+                  {paginatedCrop.map((crop) => (
+                    <tr
+                      key={crop.id}
+                      className="border-t hover:bg-gray-50 transition"
+                    >
+                      {/* Crop */}
+                      <td
+                        title={crop.name}
+                        className="p-4 truncate max-w-full  text-dark font-semibold flex items-center gap-2"
+                      >
+                        {crop.name}
+                      </td>
 
-                {/* Field */}
-                <td className="p-4 text-zinc-700">{crop.field}</td>
+                      {/* Field */}
+                      <td
+                        title={crop.field}
+                        className="p-4 truncate max-w-full text-zinc-700"
+                      >
+                        {crop.field}
+                      </td>
+                      <td
+                        title={crop.irrigationType}
+                        className="p-4 truncate max-w-full text-zinc-700"
+                      >
+                        {crop.irrigationType}
+                      </td>
+                      <td
+                        title={`${crop.areaPlanted} ${crop.areaUnit}`}
+                        className="p-4 truncate max-w-full text-zinc-700"
+                      >
+                        {crop.areaPlanted} {crop.areaUnit}
+                      </td>
 
-                {/* Status */}
-                <td className="p-4">
-                  <span
-                    className={`px-3 py-1 text-xs rounded-full ${statusStyles[crop.status]}`}
-                  >
-                    {crop.status}
-                  </span>
-                </td>
+                      {/* Status */}
+                      <td
+                        title={crop.status}
+                        className="p-4 truncate max-w-full"
+                      >
+                        <span
+                          className={`px-3 py-1 text-xs rounded-full ${statusStyles[crop.status]}`}
+                        >
+                          {crop.status}
+                        </span>
+                      </td>
+                      <td
+                        title={crop.growthStage}
+                        className="p-4 truncate max-w-full"
+                      >
+                        <span
+                          className={`px-3 py-1 text-xs rounded-full ${statusStyles[crop.growthStage]}`}
+                        >
+                          {crop.growthStage}
+                        </span>
+                      </td>
 
-                {/* Dates */}
-                <td className="p-4 text-zinc-700">{crop.planted}</td>
-                <td className="p-4 text-zinc-700">{crop.harvest}</td>
+                      {/* Dates */}
+                      <td
+                        title={`${crop.seedQuantity} ${crop.seedUnit}`}
+                        className="p-4 truncate max-w-[80px] text-zinc-700"
+                      >
+                        {crop.seedQuantity} {crop.seedUnit}
+                      </td>
+                      <td
+                        title={`${crop.expectedYield} ${crop.yieldUnit}`}
+                        className="p-4 truncate max-w-[80px] text-zinc-700"
+                      >
+                        {crop.expectedYield} {crop.yieldUnit}
+                      </td>
+                      <td
+                        title={crop.plantedDate}
+                        className="p-4 truncate max-w-[90px] text-zinc-700"
+                      >
+                        {crop.plantedDate}
+                      </td>
+                      <td
+                        title={crop.expectedHarvestDate}
+                        className="p-4 truncate max-w-[90px] text-zinc-700"
+                      >
+                        {crop.expectedHarvestDate}
+                      </td>
 
-                {/* Progress */}
-                <td className="p-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-24 h-2 bg-gray-200 rounded-full">
-                      <div
-                        className="h-2 bg-green-600 rounded-full"
-                        style={{ width: `${crop.progress}%` }}
-                      />
+                      {/* Progress */}
+                      <td className="p-4 truncate max-w-full">
+                        <div className="flex items-center gap-2">
+                          <div className="w-24 h-2 bg-gray-200 rounded-full">
+                            <div
+                              className={`h-2 rounded-full transition-all duration-500 ${getProgressColor(crop.progress)}`}
+                              style={{ width: `${crop.progress}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-gray-600">
+                            {crop.progress}%
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="p-4 truncate max-w-full text-right">
+                        <div className="flex justify-end gap-3 text-gray-500">
+                          <FaEye className="cursor-pointer hover:text-black" />
+                          <FaEllipsisV className="cursor-pointer hover:text-black" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="md:hidden space-y-3 p-4">
+              {paginatedCrop.map((crop) => (
+                <div key={crop.id} className="border rounded-lg p-4 shadow-sm">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex gap-2 items-center font-medium">
+                      {crop.name}
                     </div>
-                    <span className="text-xs text-gray-600">
-                      {crop.progress}%
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${statusStyles[crop.status]}`}
+                    >
+                      {crop.status}
                     </span>
                   </div>
-                </td>
 
-                {/* Actions */}
-                <td className="p-4 text-right">
-                  <div className="flex justify-end gap-3 text-gray-500">
-                    <FaEye className="cursor-pointer hover:text-black" />
-                    <FaEllipsisV className="cursor-pointer hover:text-black" />
+                  <p className="text-xs text-gray-500">Field: {crop.field}</p>
+                  <p className="text-xs text-gray-500">
+                    Planted: {crop.plantedDate}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Harvest: {crop.expectedHarvestDate}
+                  </p>
+
+                  <div className="flex items-center justify-between mt-2 gap-2">
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${statusStyles[crop.growthStage]}`}
+                    >
+                      {crop.growthStage}
+                    </span>
+                    <div className=" flex items-center gap-2 w-full">
+                      <div className="w-full h-2 bg-gray-200 rounded-full">
+                        <div
+                          className={`h-2 rounded-full transition-all duration-500 ${getProgressColor(crop.progress)}`}
+                          style={{ width: `${crop.progress}%` }}
+                        />
+                      </div>
+                      <span className="text-xs">{crop.progress}%</span>
+                    </div>
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Mobile View */}
-      <div className="md:hidden space-y-3 p-4">
-        {crops.map((crop) => (
-          <div key={crop.id} className="border rounded-lg p-4 shadow-sm">
-            <div className="flex justify-between items-center mb-2">
-              <div className="flex gap-2 items-center font-medium">
-                <span>{crop.emoji}</span>
-                {crop.name}
-              </div>
-              <span
-                className={`text-xs px-2 py-1 rounded-full ${statusStyles[crop.status]}`}
-              >
-                {crop.status}
-              </span>
-            </div>
-
-            <p className="text-xs text-gray-500">Field: {crop.field}</p>
-            <p className="text-xs text-gray-500">Planted: {crop.planted}</p>
-            <p className="text-xs text-gray-500">Harvest: {crop.harvest}</p>
-
-            <div className="mt-2 flex items-center gap-2">
-              <div className="w-full h-2 bg-gray-200 rounded-full">
-                <div
-                  className="h-2 bg-green-600 rounded-full"
-                  style={{ width: `${crop.progress}%` }}
-                />
-              </div>
-              <span className="text-xs">{crop.progress}%</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+      <CropPagination
+        total={cropArr.length}
+        pageSize={PAGE_SIZE}
+        pageKey={`cropPage`}
+      />
+    </>
   );
 }

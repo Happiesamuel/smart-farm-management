@@ -102,6 +102,12 @@ export interface CropInfo {
   areaPlanted: number;
   areaUnit: string;
   status: string;
+  growthStage:
+    | "seedling"
+    | "vegetative"
+    | "flowering"
+    | "fruiting"
+    | "harvesting";
   description?: string;
   farms: string;
   fields: string;

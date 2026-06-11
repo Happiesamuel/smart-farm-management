@@ -9,40 +9,95 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import React, { useState } from "react";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { GoPlus } from "react-icons/go";
 import { IoSearch } from "react-icons/io5";
 
-export default function FarmCropsFilter() {
-  const [field, setField] = useState("all");
-  const [stat, setStat] = useState("all");
+export default function FarmCropsFilter({
+  fields,
+}: {
+  fields: { name: string; value: string }[];
+}) {
   const { workspaceId } = useParams();
-const {farmId} = useParams()
-  const fields = [
-    { id: 1, name: "All Fields", value: "all" },
-    { id: 2, name: "Field B", value: "fieldA" },
-    { id: 3, name: "Field C", value: "fieldB" },
-    { id: 4, name: "Field D", value: "fieldC" },
-    { id: 5, name: "Field B", value: "fieldD" },
-  ];
+  const { farmId } = useParams();
+
   const status = [
-    { id: 1, name: "All Statuses", value: "all" },
-    { id: 2, name: "Pending", value: "pending" },
-    { id: 3, name: "Inactive", value: "inactive" },
-    { id: 4, name: "Growing", value: "growing" },
+    {
+      name: "All Status",
+      value: "all",
+    },
+    {
+      name: "Growing",
+      value: "growing",
+    },
+    {
+      name: "Harvested",
+      value: "harvested",
+    },
+    {
+      name: "Failed",
+      value: "failed",
+    },
+    {
+      name: "Planted",
+      value: "planted",
+    },
+    {
+      name: "Drying",
+      value: "drying",
+    },
+    {
+      name: "Stored",
+      value: "stored",
+    },
   ];
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const field = searchParams.get("field") || "all";
+  const stat = searchParams.get("field") || "all";
+  function handleFieldChange(val: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (val && val !== "all") {
+      params.set("field", val);
+    } else {
+      params.delete("field");
+    }
+    router.push(`?${params.toString()}`);
+  }
+  function handleStatusChange(val: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (val && val !== "all") {
+      params.set("status", val);
+    } else {
+      params.delete("status");
+    }
+    router.push(`?${params.toString()}`);
+  }
+  function handleSearchChange(val: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (val) {
+      params.set("search", val);
+    } else {
+      params.delete("search");
+    }
+    router.push(`?${params.toString()}`);
+  }
+
   return (
     <div className="flex sm:flex-row gap-4 flex-col items-center justify-between pb-4">
       <div className="flex sm:flex-row flex-col items-center sm:w-fit w-full gap-2 sm:gap-4">
-        <Select onValueChange={(e) => setField(e)} defaultValue={field}>
+        <Select
+          onValueChange={(e) => handleFieldChange(e)}
+          defaultValue={field}
+        >
           <SelectTrigger className="text-dark/90 border w-full border-border bg-white rounded-lg">
             <SelectValue placeholder="All Fields" />
           </SelectTrigger>
-          <SelectContent className="bg-white border-border text-zinc-400">
+          <SelectContent className="bg-white mt-6 border-border text-zinc-400">
             {fields.map((x) => (
               <SelectItem
-                key={x.id}
+                key={x.value}
                 value={x.value}
                 className="hover:bg-zinc-900 text-dark/90 transition-all duration-500 cursor-pointer"
               >
@@ -51,14 +106,17 @@ const {farmId} = useParams()
             ))}
           </SelectContent>
         </Select>
-        <Select onValueChange={(e) => setStat(e)} defaultValue={stat}>
+        <Select
+          onValueChange={(e) => handleStatusChange(e)}
+          defaultValue={stat}
+        >
           <SelectTrigger className="text-dark/90 w-full border border-border bg-white rounded-lg">
             <SelectValue placeholder="All Statuses" />
           </SelectTrigger>
           <SelectContent className="bg-white border-border text-zinc-400">
             {status.map((x) => (
               <SelectItem
-                key={x.id}
+                key={x.name}
                 value={x.value}
                 className="hover:bg-zinc-900 text-dark/90 transition-all duration-500 cursor-pointer"
               >
@@ -70,8 +128,9 @@ const {farmId} = useParams()
         <div className="flex w-full  items-center border border-border gap-2 rounded-lg px-2">
           <IoSearch />
           <Input
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search Crops..."
-            className="border-none p-0 group focus-visible:none shadow-none"
+            className="border-none p-0 group focus-visible:none shadow-none w-full"
           />
         </div>
       </div>
