@@ -310,7 +310,7 @@ export default function CropTable() {
                       </td>
                       <td className="p-4  max-w-full truncate">
                         <span
-                          className={`px-3 py-1 text-xs rounded-full ${statusStyles[crop.status]}`}
+                          className={`px-3 py-1 text-xs rounded-full ${statusStyles[crop.growthStage]}`}
                         >
                           {crop.growthStage}
                         </span>

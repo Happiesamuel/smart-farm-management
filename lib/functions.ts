@@ -302,3 +302,107 @@ export const getProgressColor = (progress: number) => {
   if (progress <= 75) return "bg-yellow-500";
   return "bg-green-500";
 };
+
+export const getGrowthStageData = (
+  crops: { [key: string]: string | number }[],
+) => {
+  const map = new Map<string, { count: number; area: number }>();
+
+  crops.forEach((crop) => {
+    const stage = crop.growthStage || "unknown";
+    const area = Number(crop.areaPlanted || 0);
+
+    if (!map.has(stage as string)) {
+      map.set(stage as string, { count: 0, area: 0 });
+    }
+
+    const current = map.get(stage as string)!;
+    current.count += 1;
+    current.area += area;
+  });
+
+  const COLORS: Record<string, string> = {
+    seedling: "#22c55e",
+    vegetative: "#4ade80",
+    flowering: "#3b82f6",
+    fruiting: "#f59e0b",
+    harvesting: "#ef4444",
+    unknown: "#6b7280",
+  };
+
+  return Array.from(map.entries()).map(([stage, data]) => ({
+    food: stage,
+    value: data.count,
+    area: `${data.area}ac`,
+    fill: COLORS[stage] || COLORS.unknown,
+  }));
+};
+
+function generateColors(count: number): string[] {
+  const base = [
+    "#03732b",
+    "#4e8afd",
+    "#fcb304",
+    "#e45551",
+    "#bfbfc0",
+    "#ab75e0",
+    "#ff8c42",
+    "#00bcd4",
+    "#e91e8c",
+    "#8bc34a",
+  ];
+
+  if (count <= base.length) return base.slice(0, count);
+
+  // generate extra colors by rotating hue
+  const extras: string[] = [];
+  for (let i = base.length; i < count; i++) {
+    const hue = (i * 137.508) % 360; // golden angle — avoids similar adjacent colors
+    extras.push(`hsl(${hue}, 65%, 50%)`);
+  }
+
+  return [...base, ...extras];
+}
+
+export function buildCropPieData(crops: { [key: string]: string | number }[]) {
+  const map = new Map<string, number>();
+
+  crops.forEach((crop) => {
+    const name = crop.cropName || "Unknown";
+    const area = Number(crop.areaPlanted || 0);
+    map.set(name as string, (map.get(name as string) || 0) + area);
+  });
+
+  const total = Array.from(map.values()).reduce((a, b) => a + b, 0);
+  const colors = generateColors(map.size); // 👈 generates exactly as many as needed
+
+  const result = Array.from(map.entries())
+    .map(([name, area], i) => ({
+      food: name,
+      value: total > 0 ? Math.round((area / total) * 100) : 0,
+      fill: colors[i],
+      area: `${area}ac`,
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 6);
+
+  return { data: result, total };
+}
+
+export function toAcres(area: number, unit: string): number {
+  switch (unit?.toLowerCase()) {
+    case "hectares":
+    case "hectare":
+      return area * 2.47105;
+    case "acres":
+    case "acre":
+      return area;
+    case "square meters":
+    case "square_meters":
+    case "sqm":
+    case "m2":
+      return area * 0.000247105;
+    default:
+      return area;
+  }
+}
