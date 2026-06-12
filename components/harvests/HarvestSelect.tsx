@@ -1,5 +1,3 @@
-import React, { Dispatch, SetStateAction } from "react";
-
 import {
   Select,
   SelectContent,
@@ -14,14 +12,14 @@ export default function HarvestSelect({
 }: {
   array: { [key: string]: string }[];
   val: string;
-  setVal: Dispatch<SetStateAction<string>>;
+  setVal: (e: string) => void;
 }) {
   return (
     <Select onValueChange={(e) => setVal(e)} defaultValue={val}>
       <SelectTrigger className="text-dark/90 w-full md:w-full border border-border bg-white rounded-lg">
         <SelectValue placeholder="All Farms" />
       </SelectTrigger>
-      <SelectContent className="bg-white border-border text-zinc-400">
+      <SelectContent className="bg-white mt-6 border-border text-zinc-400">
         {array.map((x) => (
           <SelectItem
             key={x.value}

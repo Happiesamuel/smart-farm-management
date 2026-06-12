@@ -1,197 +1,332 @@
+"use client";
+
 import { FaEye, FaEllipsisV } from "react-icons/fa";
 import HarvestTableHeader from "./HarvestTableHeader";
 import BothPagination from "../salesExpense/BothPagination";
+import { useSearchParams } from "next/navigation";
+import { useCropFilter } from "@/hooks/useCropFilter";
+import { useApp } from "@/stores/useAppStore";
+import { useGetCrops } from "@/hooks/crops/useCrops";
+import { useGetFarm } from "@/hooks/farms/useFarm";
+import { useGetFields } from "@/hooks/fields/useFields";
+import { useGetHarvest } from "@/hooks/harvest/useHarvest";
+import { FormLoader, NoResult } from "../loader/GeneralLoader";
 
-const sales = [
-  {
-    id: "inv-128",
-    date: "May 25, 2025",
-    crop: "Maize",
-    farm: "Green Valley Farm",
-    field: "Field A",
-    quality: "Good",
-    buyer: "Green Foods Ltd",
-    revenue: "₦50,000",
-    quantity: "500",
-    unit: "kg",
-  },
-  {
-    id: "inv-127",
-    date: "May 20, 2025",
-    crop: "Rice",
-    farm: "Sunrise Farm",
-    quantity: "30",
-    unit: "bags",
-    revenue: "₦30,000",
-    field: "Field B",
-    quality: "Good",
-    buyer: "Rice Traders",
-  },
-  {
-    id: "inv-126",
-    date: "May 15, 2025",
-    crop: "Tomatoes",
-    farm: "Golden Arces Farm",
-    quantity: "20",
-    unit: "crates",
-    revenue: "₦20,000",
-    field: "Field C",
-    quality: "Excellent",
-    buyer: "Fresh Mort",
-  },
-  {
-    id: "inv-125",
-    date: "May 10, 2025",
-    crop: "Pepper",
-    farm: "Riverbend Farm",
-    quantity: "15",
-    unit: "crates",
-    revenue: "₦12,000",
-    field: "Field D",
-    quality: "Good",
-    buyer: "Spice World",
-  },
-  {
-    id: "inv-124",
-    date: "May 05, 2025",
-    crop: "Cabbage",
-    farm: "Golden Arces Farm",
-    quantity: "40",
-    unit: "heads",
-    revenue: "₦20,000",
-    field: "Field E",
-    quality: "Good",
-    buyer: "Veggie Store",
-  },
-  {
-    id: "inv-123",
-    date: "May 10, 2025",
-    crop: "Pepper",
-    farm: "Riverbend Farm",
-    quantity: "15",
-    unit: "crates",
-    revenue: "₦12,000",
-    field: "Field A",
-    quality: "Good",
-    buyer: "Healthy Store",
-  },
-];
-
-//10 result per page
-const paymentStyles: Record<string, string> = {
-  "Bank Transfer": "bg-green-100 text-green-700",
-  Cash: "bg-blue-100 text-blue-700",
+const qualityStyles: Record<string, string> = {
+  Excellent: "bg-emerald-100 text-emerald-700",
+  Good: "bg-green-100 text-green-700",
+  Average: "bg-yellow-100 text-yellow-700",
+  Poor: "bg-red-100 text-red-700",
 };
 
 const statusStyles: Record<string, string> = {
-  Good: "bg-green-100 text-green-700",
-  Excellent: "bg-green-100 text-green-700",
-  Pending: "bg-[#fff1dd] text-[#de852c]",
+  Sold: "bg-blue-100 text-blue-700",
+  Stored: "bg-purple-100 text-purple-700",
+  Wasted: "bg-red-100 text-red-700",
 };
-
 export default function HarvestTable() {
+  const searchParams = useSearchParams();
+  const { filterCrop } = useCropFilter();
+  const { workspace, user, ready } = useApp();
+  const { crops, status, error } = useGetCrops(
+    workspace?.id ?? null,
+    user?.id ?? null,
+  );
+  const {
+    farms,
+    status: farmStat,
+    error: farmErr,
+  } = useGetFarm(workspace?.id ?? null, user?.id ?? null);
+  const {
+    fields,
+    status: fieldStat,
+    error: fieldErr,
+  } = useGetFields(workspace?.id ?? null, user?.id ?? null);
+
+  const {
+    harvests,
+    status: harvestStat,
+    error: harvestErr,
+  } = useGetHarvest(workspace?.id ?? null, user?.id ?? null);
+
+  if (!ready)
+    return (
+      <div className="h-70">
+        <FormLoader>Loading app...</FormLoader>
+      </div>
+    );
+
+  if (!user || !workspace)
+    return (
+      <div className="h-70">
+        <NoResult>Unauthorised</NoResult>
+      </div>
+    );
+
+  const isLoading =
+    status === "pending" ||
+    fieldStat === "pending" ||
+    harvestStat === "pending" ||
+    farmStat === "pending";
+
+  if (isLoading)
+    return (
+      <div className="h-70">
+        <FormLoader>Loading harvest data...</FormLoader>
+      </div>
+    );
+
+  const errorMessage =
+    error?.message ||
+    fieldErr?.message ||
+    harvestErr?.message ||
+    farmErr?.message;
+
+  if (errorMessage)
+    return (
+      <div className="h-70">
+        <NoResult>{errorMessage}</NoResult>
+      </div>
+    );
+
+  if (!harvests?.length)
+    return (
+      <div className="h-70">
+        <NoResult>No harvest found!</NoResult>
+      </div>
+    );
+
+  const fieldMap = new Map(fields?.map((f) => [f.$id, f]));
+  const farmMap = new Map(farms?.map((f) => [f.$id, f]));
+  const cropMap = new Map(crops?.map((c) => [c.$id, c]));
+
+  const harvestArr =
+    harvests?.map((harvest) => {
+      const field = fieldMap.get(harvest.fields);
+      const crop = cropMap.get(harvest.crops);
+      const farm = farmMap.get(harvest.farms);
+
+      return {
+        id: harvest.$id,
+        date: new Date(harvest.harvestDate).toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }),
+        crop: crop?.cropName ?? "Unknown Crop",
+        farm: farm?.farmName ?? "Unknown Farm",
+        status:
+          harvest.status.slice(0, 1).toUpperCase() + harvest.status.slice(1),
+        quantity: harvest.quantity,
+        unit: harvest.unit,
+        unitPrice: `₦${harvest.pricePerUnit.toLocaleString()}`,
+        revenue: `₦${harvest.totalAmount.toLocaleString()}`,
+        field: field?.fieldName ?? "Unknown Field",
+        quality:
+          harvest.quality.slice(0, 1).toUpperCase() + harvest.quality.slice(1),
+      };
+    }) ?? [];
+
+  const PAGE_SIZE = 10;
+  const currentPage = Number(searchParams.get("harvestPage") || 1);
+  const filtered = filterCrop(harvestArr ?? []);
+  const paginatedHarvest = filtered.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+  const allFields = fields?.length
+    ? [
+        { name: "All Fields", value: "all" },
+        ...new Map(
+          fields.map((x) => [
+            x.fieldName,
+            { name: x.fieldName, value: x.fieldName.split(" ").join("+") },
+          ]),
+        ).values(),
+      ]
+    : [];
+
+  const allFarms = farms?.length
+    ? [
+        { name: "All Farms", value: "all" },
+        ...new Map(
+          farms.map((x) => [
+            x.farmName,
+            { name: x.farmName, value: x.farmName.split(" ").join("+") },
+          ]),
+        ).values(),
+      ]
+    : [];
   return (
     <div className="mt-2">
-      <HarvestTableHeader />
+      <HarvestTableHeader fields={allFields} farms={allFarms} />
       <div className="  overflow-hidden mt-4">
-        <div className="block overflow-x-auto">
-          <table className="w-full text-sm ">
-            <thead className=" bg-zinc-200/50 border rounded-t-2xl border-border text-gray-600">
-              <tr className="text-left ">
-                <th className="py-2 truncate max-w-[50px] px-2">Date</th>
-                <th className="py-2 truncate max-w-[50px] pl-1">Farm</th>
-                <th className="py-2 truncate max-w-[50px] px-4">Crop</th>
-                <th className="py-2 truncate max-w-[50px] pl-2">Field</th>
-                <th className="py-2 truncate max-w-[50px] pl-">Quantity</th>
-                <th className="py-2 truncate max-w-[50px] pl-">Unit</th>
-                <th className="py-2 truncate max-w-[50px] pl-2">Quality</th>
-                <th className="py-2 truncate max-w-[50px] pl-2">Revenue</th>
-                <th className="py-2 truncate max-w-[50px] pl-2">Buyer</th>
-                <th className="py-2 truncate max-w-[50px] px-2 text-right">
-                  Actions
-                </th>
-              </tr>
-            </thead>
+        {!filtered.length ? (
+          <div className="h-100">
+            <NoResult>No harvest found!</NoResult>
+          </div>
+        ) : (
+          <>
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-sm ">
+                <thead className=" bg-zinc-200/50 border rounded-t-2xl border-border text-gray-600">
+                  <tr className="text-left ">
+                    <th className="py-2 truncate max-w-[50px] px-2">Date</th>
+                    <th className="py-2 truncate max-w-[50px] pl-1">Farm</th>
+                    <th className="py-2 truncate max-w-[50px] px-4">Crop</th>
+                    <th className="py-2 truncate max-w-[50px] pl-2">Field</th>
+                    <th className="py-2 truncate max-w-[50px] pl-">Quantity</th>
+                    <th className="py-2 truncate max-w-[50px] pl-">
+                      Unit Price
+                    </th>
+                    <th className="py-2 truncate max-w-[50px] pl-2">Quality</th>
+                    <th className="py-2 truncate max-w-[50px] pl-2">Status</th>
+                    <th className="py-2 truncate max-w-[50px] pl-2">Revenue</th>
+                    <th className="py-2 truncate max-w-[50px] px-2 text-right">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
 
-            <tbody>
-              {sales.map((s) => (
-                <tr key={s.id} className="border-t hover:bg-gray-50">
-                  <td
-                    title={s.date}
-                    className="py-3 truncate font-medium max-w-[70px] px-2 text-[13px] text-zinc-600"
-                  >
-                    {s.date}
-                  </td>
+                <tbody>
+                  {paginatedHarvest.map((s) => (
+                    <tr key={s.id} className="border-t hover:bg-gray-50">
+                      <td
+                        title={s.date}
+                        className="py-3 truncate font-medium max-w-[70px] px-2 text-[13px] text-zinc-600"
+                      >
+                        {s.date}
+                      </td>
 
-                  <td
-                    title={s.farm}
-                    className="py-3 truncate font-medium max-w-[70px] pr-2 text-[13px] text-zinc-600"
-                  >
-                    {s.farm}
-                  </td>
+                      <td
+                        title={s.farm}
+                        className="py-3 truncate font-medium max-w-[70px] pr-2 text-[13px] text-zinc-600"
+                      >
+                        {s.farm}
+                      </td>
 
-                  <td
-                    title={`${s.crop}`}
-                    className="py-3 truncate font-medium max-w-[70px] px-4 text-[13px] text-zinc-600 flex items-center gap-2"
-                  >
-                    {s.crop}
-                  </td>
-                  <td
-                    title={`${s.field}`}
-                    className="py-3 truncate font-medium max-w-[70px] px-2 text-[13px] text-zinc-600 fle items-center gap-2"
-                  >
-                    {s.field}
-                  </td>
-                  <td
-                    title={s.quantity}
-                    className="py-3 truncate font-medium max-w-[70px] pl-2 text-[13px] text-zinc-600"
-                  >
-                    {s.quantity}
-                  </td>
-                  <td
-                    title={s.unit}
-                    className="py-3 truncate font-medium max-w-[70px] px-2 text-[13px] text-zinc-600"
-                  >
-                    {s.unit}
-                  </td>
-                  <td
-                    title={s.quality}
-                    className={`py-3 truncate  font-medium max-w-[70px] pl-2 pr- text-[13px] text-zinc-600`}
-                  >
-                    {" "}
-                    <span
-                      className={`px-2 py-0.5 text-[12px] rounded-full ${statusStyles[s.quality]} `}
-                    >
-                      {s.quality}
-                    </span>
-                  </td>
-                  <td
-                    title={s.revenue}
-                    className="py-3 truncate font-semibold max-w-[70px] px-2 text-[13px] text-zinc-700 "
-                  >
-                    {s.revenue}
-                  </td>
-                  <td
-                    title={s.buyer}
-                    className="py-3 truncate  font-medium max-w-[70px]  pr-4 text-[13px] text-zinc-600"
-                  >
-                    {s.buyer}
-                  </td>
+                      <td
+                        title={`${s.crop}`}
+                        className="py-3 truncate font-medium max-w-[70px] px-4 text-[13px] text-zinc-600 flex items-center gap-2"
+                      >
+                        {s.crop}
+                      </td>
+                      <td
+                        title={`${s.field}`}
+                        className="py-3 truncate font-medium max-w-[70px] px-2 text-[13px] text-zinc-600 fle items-center gap-2"
+                      >
+                        {s.field}
+                      </td>
+                      <td
+                        title={`${s.quantity} ${s.unit}`}
+                        className="py-3 truncate font-medium max-w-[70px] pl-2 text-[13px] text-zinc-600"
+                      >
+                        {s.quantity} {s.unit}
+                      </td>
+                      <td
+                        title={s.unitPrice}
+                        className="py-3 truncate font-medium max-w-[70px] px-2 text-[13px] text-zinc-600"
+                      >
+                        {s.unitPrice}
+                      </td>
+                      <td
+                        title={s.quality}
+                        className={`py-3 truncate  font-medium max-w-[70px] pl-2 pr- text-[13px] text-zinc-600`}
+                      >
+                        {" "}
+                        <span
+                          className={`px-2 py-0.5 text-[12px] rounded-full ${qualityStyles[s.quality]} `}
+                        >
+                          {s.quality}
+                        </span>
+                      </td>
+                      <td
+                        title={s.quality}
+                        className={`py-3 truncate  font-medium max-w-[70px] pl-2 pr- text-[13px] text-zinc-600`}
+                      >
+                        {" "}
+                        <span
+                          className={`px-2 py-0.5 text-[12px] rounded-full ${statusStyles[s.status]} `}
+                        >
+                          {s.status}
+                        </span>
+                      </td>
+                      <td
+                        title={s.revenue}
+                        className="py-3 truncate font-semibold max-w-[70px] px-2 text-[13px] text-zinc-700 "
+                      >
+                        {s.revenue}
+                      </td>
 
-                  <td className="py-3 px-2 truncate font-medium max-w-[70px] px- text-[13px] text-zinc-600 text-right">
-                    <div className="flex justify-end gap-3 text-gray-500">
-                      <FaEye className="cursor-pointer hover:text-black" />
-                      <FaEllipsisV className="cursor-pointer hover:text-black" />
+                      <td className="py-3 px-2 truncate font-medium max-w-[70px] px- text-[13px] text-zinc-600 text-right">
+                        <div className="flex justify-end gap-3 text-gray-500">
+                          <FaEye className="cursor-pointer hover:text-black" />
+                          <FaEllipsisV className="cursor-pointer hover:text-black" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="md:hidden space-y-3 p-4">
+              {paginatedHarvest.map((harvest) => (
+                <div
+                  key={harvest.id}
+                  className="border rounded-lg p-4 shadow-sm"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex gap-2 items-center font-medium">
+                      {harvest.crop}
                     </div>
-                  </td>
-                </tr>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${statusStyles[harvest.status]}`}
+                    >
+                      {harvest.status}
+                    </span>
+                  </div>
+
+                  <p className="text-sm my-1 text-dark/90">
+                    Field: {harvest.farm}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Field: {harvest.field}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Harvest Date: {harvest.date}
+                  </p>
+
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-xs text-gray-500">
+                      Unit Price: {harvest.unitPrice}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Revenue: {harvest.revenue}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-xs text-gray-500">
+                      Quantity: {harvest.quantity} {harvest.unit}
+                    </p>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${qualityStyles[harvest.quality]}`}
+                    >
+                      {harvest.quality}
+                    </span>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </>
+        )}
       </div>
       <div className="mt-4">
-        <BothPagination type="harvests" />
+        <BothPagination
+          total={filtered.length}
+          pageSize={PAGE_SIZE}
+          pageKey={`harvestPage`}
+          type="harvests"
+        />
       </div>
     </div>
   );

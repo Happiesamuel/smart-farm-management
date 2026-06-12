@@ -39,25 +39,6 @@ export default function CropTableHeader({
   fields: { name: string; value: string }[];
   farms: { name: string; value: string }[];
 }) {
-  const seasons = [
-    {
-      value: "all",
-      name: "All Seasons",
-    },
-    {
-      value: "summer",
-      name: "Summer",
-    },
-    {
-      value: "Wwnter",
-      name: "Winter",
-    },
-    {
-      value: "autum",
-      name: "Autum ",
-    },
-  ];
-
   const searchParams = useSearchParams();
   const router = useRouter();
   const field = searchParams.get("field") || "all";

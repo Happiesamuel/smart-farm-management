@@ -406,3 +406,91 @@ export function toAcres(area: number, unit: string): number {
       return area;
   }
 }
+
+function toKg(qty: number, unit: string): number {
+  switch (unit?.toLowerCase()) {
+    case "tons":
+    case "ton":
+      return qty * 1000;
+    case "bags":
+    case "bag":
+      return qty * 50;
+    case "kg":
+    default:
+      return qty;
+  }
+}
+
+export function buildHarvestPieData(
+  harvests: { [key: string]: string | number }[],
+  crops: { [key: string]: string | number }[],
+) {
+  const cropMap = new Map(crops.map((c) => [c.$id, c.cropName]));
+  const map = new Map<string, number>();
+
+  harvests.forEach((h) => {
+    const cropName = cropMap.get(h.crops) || "Unknown";
+    const qty = toKg(Number(h.quantity || 0), h.unit as string);
+
+    map.set(cropName as string, (map.get(cropName as string) || 0) + qty);
+  });
+
+  const total = Array.from(map.values()).reduce((a, b) => a + b, 0);
+  const colors = generateColors(map.size);
+
+  const data = Array.from(map.entries()).map(([name, qty], i) => {
+    const percent = total > 0 ? (qty / total) * 100 : 0;
+
+    return {
+      food: name,
+      value: Number(percent.toFixed(1)),
+      fill: colors[i],
+      area: `${qty.toLocaleString()}kg`,
+    };
+  });
+  return { data, total };
+}
+
+export function buildHarvestStats(
+  harvests: { [key: string]: string | number }[],
+  sales: { [key: string]: string | number }[],
+) {
+  if (!harvests?.length) {
+    return {
+      totalHarvests: 0,
+      totalQty: 0,
+      totalRevenue: 0,
+      thisMonth: 0,
+    };
+  }
+
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  let totalQty = 0;
+  let thisMonth = 0;
+
+  harvests.forEach((h) => {
+    const qty = toKg(Number(h.quantity || 0), h.unit as string);
+    totalQty += qty;
+
+    const d = new Date(h.date);
+    if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+      thisMonth++;
+    }
+  });
+
+  // 🔥 revenue comes from sales
+  const totalRevenue = sales?.reduce(
+    (acc, s) => acc + (+s.totalAmount || 0),
+    0,
+  );
+
+  return {
+    totalHarvests: harvests.length,
+    totalQty,
+    totalRevenue,
+    thisMonth,
+  };
+}

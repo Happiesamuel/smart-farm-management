@@ -8,16 +8,6 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 
-export const description = "A donut chart with text";
-
-const data = [
-  { food: "Maize", value: 33, fill: "#03732b", area: "2,500kg" },
-  { food: "Rice", value: 25, fill: "#4e8afd", area: "2,100kg" },
-  { food: "Tomatoes", value: 17, fill: "#fcb304", area: "1,500kg" },
-  { food: "Pepper", value: 15, fill: "#e45551", area: "1,200kg" },
-  { food: "Others", value: 10, fill: "#bfbfc0", area: "1,150kg" },
-];
-
 const chartConfig = {
   value: { label: "Value" },
   Maize: { label: "Maize" },
@@ -27,7 +17,13 @@ const chartConfig = {
   Others: { label: "Others" },
 } satisfies ChartConfig;
 
-export function HarvestPieChart() {
+export function HarvestPieChart({
+  data,
+  total,
+}: {
+  data: { food: string; value: number; fill: string; area: string }[];
+  total: number;
+}) {
   return (
     <div className="w-full p-4  gap-0 bg-transparent flex-1 relative rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[300px] shrink-0">
       <div className="pb-0 shrink-0">
@@ -77,7 +73,7 @@ export function HarvestPieChart() {
                               dy="-0.3em"
                               className="text-sm font-semibold"
                             >
-                              8,450
+                              {total?.toLocaleString()}
                             </tspan>
 
                             <tspan

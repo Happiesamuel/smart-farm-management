@@ -8,6 +8,7 @@ export function useCropFilter() {
   const field = searchParams.get("field");
   const status = searchParams.get("status");
   const search = searchParams.get("search");
+  const quality = searchParams.get("quality");
 
   function filterCrop<
     T extends {
@@ -16,6 +17,7 @@ export function useCropFilter() {
       field?: string;
       status?: string;
       name?: string;
+      quality?: string;
     },
   >(items: T[]): T[] {
     return items.filter((item) => {
@@ -25,8 +27,18 @@ export function useCropFilter() {
         return false;
       if (status && status !== "all" && item.status?.toLowerCase() !== status)
         return false;
-      if (search && !item.name?.toLowerCase().startsWith(search.toLowerCase()))
+      if (
+        quality &&
+        quality !== "all" &&
+        item.quality?.toLowerCase() !== quality
+      )
         return false;
+      if (search) {
+        const q = search.toLowerCase();
+        const matchesName = item.name?.toLowerCase().includes(q);
+        const matchesCrop = item.crop?.toLowerCase().includes(q);
+        if (!matchesName && !matchesCrop) return false;
+      }
 
       return true;
     });
