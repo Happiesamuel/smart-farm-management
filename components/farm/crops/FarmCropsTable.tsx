@@ -85,7 +85,7 @@ export default function FarmCropsTable() {
   if (isLoading)
     return (
       <div className="h-70">
-        <FormLoader>Loading crop data...</FormLoader>
+        <FormLoader>Loading crop records...</FormLoader>
       </div>
     );
 
@@ -102,7 +102,7 @@ export default function FarmCropsTable() {
   if (!crops?.length)
     return (
       <div className="h-70">
-        <NoResult>No crop found!</NoResult>
+        <NoResult>No crop record!</NoResult>
       </div>
     );
   const stageProgressMap: Record<string, number> = {

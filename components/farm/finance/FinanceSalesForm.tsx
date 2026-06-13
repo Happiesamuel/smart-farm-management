@@ -27,10 +27,16 @@ import { useGetCrops, useGetFarmCrops } from "@/hooks/crops/useCrops";
 import { useGetFarmHarvest, useGetHarvest } from "@/hooks/harvest/useHarvest";
 import { PiPlant } from "react-icons/pi";
 import { FormLoader } from "@/components/loader/GeneralLoader";
+import { format } from "date-fns";
+import { useUpdateDoc } from "@/hooks/useUpdate";
 export default function FinanceSalesFormFetch({
   onClose,
+  def,
+  type = "create",
 }: {
   onClose?(): void;
+  def?: { [key: string]: string | number };
+  type?: string;
 }) {
   const { workspace, user, ready } = useApp();
   const { farmId: x } = useParams();
@@ -103,6 +109,8 @@ export default function FinanceSalesFormFetch({
       harvestss={harvestss}
       farmId={farmId as string}
       onClose={onClose}
+      def={def}
+      type={type}
     />
   );
 }
@@ -117,6 +125,8 @@ function FinanceSalesForm({
   cropss,
   farmId,
   onClose,
+  type,
+  def,
 }: {
   workspaceId: string;
   userId: string;
@@ -125,21 +135,38 @@ function FinanceSalesForm({
   harvestss: { [key: string]: string | number }[] | undefined;
   cropss: { [key: string]: string | number }[] | undefined;
   crop: { [key: string]: string | number }[] | undefined;
+  def?: { [key: string]: string | number };
+  type?: string;
   farmId: string;
   onClose?(): void;
 }) {
+  const defaultValue = def?.id
+    ? {
+        farm: farmId ?? def.farmId ?? "",
+        harvest: def?.harvestId ?? "",
+        totalAmount: (def?.total as string).replace(/[₦,]/g, ""),
+        unitPrice: (def?.unitPrice as string).replace(/[₦,]/g, ""),
+        quantity: def?.quantity.toString(),
+        unit: def?.unit ?? "",
+        paymentMethod:
+          (def?.payment as string).toLowerCase().split(" ").join("-") ?? "",
+        status: (def?.status as string).toLowerCase() ?? "",
+        buyer: def?.buyer ?? "",
+        saleDate: def.date ? new Date(def.date) : new Date(),
+      }
+    : {
+        farm: farmId ? farmId : "",
+      };
   const form = useForm<z.infer<typeof financeSaleSchema>>({
     resolver: zodResolver(financeSaleSchema) as Resolver<
       z.infer<typeof financeSaleSchema>
     >,
-    defaultValues: {
-      farm: farmId ? farmId : "",
-    },
+    defaultValues: defaultValue as z.infer<typeof financeSaleSchema>,
   });
   const { farmId: id } = useParams();
   const { createSales, status } = useCreateSales();
   const watchedFarmId = form.watch("farm");
-
+  const { update, status: upStat } = useUpdateDoc();
   const filteredHarvests =
     harvestss?.filter((f) => f.farms === watchedFarmId) ?? [];
   const cropMap = farmId
@@ -170,20 +197,52 @@ function FinanceSalesForm({
         farms: farm,
       },
     };
-    createSales(obj, {
-      onSuccess: () => {
-        toast("Sales created successfully", {
-          description: "You can now proceed to managing your task",
-        });
-        onClose?.();
-      },
-      onError: (err) =>
-        toast("Error creating sales", {
-          description: err.message,
-          duration: 4000,
-          closeButton: true,
-        }),
-    });
+    if (def?.id) {
+      const o = obj.data;
+      const newO = {
+        ...o,
+        saleDate: format(o.saleDate, "PPP"),
+      };
+      update(
+        {
+          collection: "sales",
+          id: (def.id as string).slice(4) as string,
+          data: newO,
+          workspaceId: workspaceId,
+          userId: userId,
+        },
+        {
+          onSuccess: () => {
+            toast("Sale updated successfully", {
+              description: "You've updated your sale record",
+            });
+
+            onClose?.();
+          },
+          onError: (err) =>
+            toast("Error updating sale record", {
+              description: err.message,
+              duration: 4000,
+              closeButton: true,
+            }),
+        },
+      );
+    } else {
+      createSales(obj, {
+        onSuccess: () => {
+          toast("Sales created successfully", {
+            description: "You can now proceed to managing your task",
+          });
+          onClose?.();
+        },
+        onError: (err) =>
+          toast("Error creating sales", {
+            description: err.message,
+            duration: 4000,
+            closeButton: true,
+          }),
+      });
+    }
   }
 
   const arrQuantity = [
@@ -232,9 +291,10 @@ function FinanceSalesForm({
       value: "mobile-money",
     },
   ];
+
   return (
     <div className="w-full pt-3">
-      <p className="text-primary-green pb-1 text-sm w-full font-semibold border-border border-b">
+      <p className="text-primary-green text-start pb-1 text-sm w-full font-semibold border-border border-b">
         Sale Information
       </p>
 
@@ -251,7 +311,9 @@ function FinanceSalesForm({
               placeholder={
                 farmId
                   ? (farms.find((x) => x.value === farmId)?.name ?? "")
-                  : "Select farm"
+                  : def?.id
+                    ? (farms.find((x) => x.value === def.farmId)?.name ?? "")
+                    : "Select farm"
               }
               setValue={form.setValue}
               array={farmId || id ? [] : farms}
@@ -263,7 +325,12 @@ function FinanceSalesForm({
               control={form.control}
               label="Harvested Crop"
               key={watchedFarmId}
-              placeholder="Select crop"
+              placeholder={
+                def?.id
+                  ? ((harvestOptions.find((x) => x.value === def.harvestId)
+                      ?.name ?? "Select harvested crop") as string)
+                  : "Select harvested crop"
+              }
               array={harvestOptions as { [key: string]: string }[]}
               Icon={PiPlant}
             />
@@ -275,7 +342,12 @@ function FinanceSalesForm({
               control={form.control}
               label="Quantity"
               placeholder="e.g. 50"
-              placeholder2="kg"
+              placeholder2={
+                def?.id
+                  ? ((arrQuantity.find((x) => x.value === def.unit)?.name ??
+                      "kg") as string)
+                  : "kg"
+              }
               type="number"
               name1="quantity"
               name2="unit"
@@ -292,7 +364,13 @@ function FinanceSalesForm({
               name="status"
               control={form.control}
               label="Payment Status"
-              placeholder="Select status"
+              placeholder={
+                def?.id
+                  ? ((stat.find(
+                      (x) => x.value === (def.status as string).toLowerCase(),
+                    )?.name ?? "Select Status") as string)
+                  : "Select Status"
+              }
               array={stat}
               Icon={IoMdGrid}
             />
@@ -315,7 +393,18 @@ function FinanceSalesForm({
               name="paymentMethod"
               control={form.control}
               label="Payment Method"
-              placeholder="Select payment method"
+              placeholder={
+                def?.id
+                  ? ((arrPayment.find(
+                      (x) =>
+                        x.value ===
+                        (def.payment as string)
+                          .toLowerCase()
+                          .split(" ")
+                          .join("-"),
+                    )?.name ?? "Select payment method") as string)
+                  : "Select payment method"
+              }
               array={arrPayment}
               Icon={MdOutlinePayment}
             />
@@ -343,17 +432,17 @@ function FinanceSalesForm({
 
             <Button
               type="submit"
-              disabled={status === "pending"}
+              disabled={status === "pending" || upStat === "pending"}
               className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              {status === "pending" ? (
+              {status === "pending" || upStat === "pending" ? (
                 <>
                   <ButtonLoader />
-                  Creating...
+                  {def?.id ? "Updating..." : "Creating..."}
                 </>
               ) : (
                 <div className="flex items-center gap-2">
-                  <FaRegSave /> Save sale
+                  <FaRegSave /> {def?.id ? "Update Sale" : "Save Sale"}
                 </div>
               )}
             </Button>

@@ -1,5 +1,4 @@
 "use client";
-import { FaEye, FaEllipsisV } from "react-icons/fa";
 import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
 import { useGetCrops } from "@/hooks/crops/useCrops";
 import { useGetHarvest } from "@/hooks/harvest/useHarvest";
@@ -9,6 +8,13 @@ import { useApp } from "@/stores/useAppStore";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useGetFarm } from "@/hooks/farms/useFarm";
 import BothPagination from "./BothPagination";
+import TableActions from "../layout/TableAction";
+import { LuPencil, LuTrash2 } from "react-icons/lu";
+import { FinanceModal } from "../modals/FinanceModal";
+import FinanceSalesFormFetch from "../farm/finance/FinanceSalesForm";
+import { toast } from "sonner";
+import { useDeleteDoc } from "@/hooks/useDelete";
+import { FiShoppingCart } from "react-icons/fi";
 
 const paymentStyles: Record<string, string> = {
   Transfer: "bg-green-100 text-green-700",
@@ -27,6 +33,7 @@ export default function SalesTable({ type }: { type: string }) {
   const searchParams = useSearchParams();
   const { workspace, user, ready } = useApp();
   const { filterByDate } = useFinanceFilters();
+  const { remove, status: deleteStat } = useDeleteDoc();
   const { sales, status, error } = useGetSales(
     workspace?.id ?? null,
     user?.id ?? null,
@@ -105,7 +112,9 @@ export default function SalesTable({ type }: { type: string }) {
 
       return {
         id: sale.$id ? `INV-${sale.$id}` : `INV-${index + 1}`,
-
+        farmId: farm?.$id ?? "",
+        harvestId: harvest?.$id ?? "",
+        cropId: crop?.id ?? "",
         date: new Date(sale.saleDate).toLocaleDateString("en-US", {
           day: "numeric",
           month: "short",
@@ -264,8 +273,64 @@ export default function SalesTable({ type }: { type: string }) {
 
                       <td className="py-3 px-2 truncate font-medium max-w-[70px] px- text-[13px] text-zinc-600 text-right">
                         <div className="flex justify-end gap-3 text-gray-500">
-                          <FaEye className="cursor-pointer hover:text-black" />
-                          <FaEllipsisV className="cursor-pointer hover:text-black" />
+                          <TableActions
+                            actions={[
+                              {
+                                type: "modal",
+                                label: "Edit",
+                                icon: <LuPencil className="text-sm" />,
+                                modal: (onClose) => (
+                                  <FinanceModal
+                                    text={"Edit your sale record"}
+                                    forWhat="Edit"
+                                    type={"Sale"}
+                                    iconColor="bg-[#e8f5ec] text-[#2d8952]"
+                                    Icon={FiShoppingCart}
+                                    open={true}
+                                    onClose={onClose}
+                                  >
+                                    <FinanceSalesFormFetch
+                                      def={s}
+                                      type={"edit"}
+                                      onClose={onClose}
+                                    />
+                                  </FinanceModal>
+                                ),
+                              },
+                              {
+                                type: "callback",
+                                label:
+                                  deleteStat === "pending"
+                                    ? "Deleting..."
+                                    : "Delete",
+                                icon: <LuTrash2 className="text-sm" />,
+                                variant: "danger",
+                                onClick: () =>
+                                  remove(
+                                    {
+                                      collection: "sales",
+                                      id: s.id.slice(4),
+                                      workspaceId: workspace.id,
+                                      userId: user.id,
+                                    },
+                                    {
+                                      onSuccess: () => {
+                                        toast("Deleted successfully", {
+                                          description:
+                                            "You've deleted a record",
+                                        });
+                                      },
+                                      onError: (err) =>
+                                        toast("Error deleting sale", {
+                                          description: err.message,
+                                          duration: 4000,
+                                          closeButton: true,
+                                        }),
+                                    },
+                                  ),
+                              },
+                            ]}
+                          />
                         </div>
                       </td>
                     </tr>

@@ -132,7 +132,7 @@ export function FinanceInputSelect({
 }: InputSelect) {
   return (
     <div className="space-y-2 w-full">
-      <div className="text-sm  text-dark">{label}</div>
+      <div className="text-sm text-start text-dark">{label}</div>
       <div className="flex items-cente">
         <FormField
           control={control}
