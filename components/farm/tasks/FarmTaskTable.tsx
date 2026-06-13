@@ -218,7 +218,7 @@ export default function FarmTaskTable() {
         ))}
       </div> */}
       </div>
-      <CropPagination>
+      <CropPagination total={6}>
         <p className="text-xs w-full pt-4 text-gray-500">
           Showing 1 to 5 of 5 tasks
         </p>
