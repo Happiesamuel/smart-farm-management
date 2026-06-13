@@ -13,7 +13,7 @@ export async function createFarm(obj: FarmObj) {
     let lnk: string = "";
     if (incl) {
       const uploaded = await uploadImage(obj.farmImage as unknown as File);
-      lnk = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.bucketId}/files/${uploaded.$id}/view?project=${appwriteConfig.projectId}&mode=admin`;
+      lnk = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.bucketId}/files/${uploaded.$id}/view?project=${appwriteConfig.projectId}&mode=public`;
     } else {
       lnk = avatar.getInitials({
         name: obj.farmName,
@@ -230,21 +230,21 @@ export const getSingleFarmDocs = async ({
     collection,
     [Query.equal("workspaces", workspaceId), Query.equal("$id", farmId)],
   );
-  const d = res.documents.at(0)
-  if(!d?.$id)throw new Error('Farm not found!')
+  const d = res.documents.at(0);
+  if (!d?.$id) throw new Error("Farm not found!");
   return {
-      description: d.description,
-      farmName: d.farmName,
-      farmImage:d.farmImage,
-      address: d.address,
-      lat: d.lat,
-      lng: d.lng,
-      size: d.size,
-      unit: d.unit,
-      soilType: d.soilType,
-      status: d.status,
-      users: d.users,
-      workspaces: d.workspaces,
-      id:d.$id
+    description: d.description,
+    farmName: d.farmName,
+    farmImage: d.farmImage,
+    address: d.address,
+    lat: d.lat,
+    lng: d.lng,
+    size: d.size,
+    unit: d.unit,
+    soilType: d.soilType,
+    status: d.status,
+    users: d.users,
+    workspaces: d.workspaces,
+    id: d.$id,
   };
 };

@@ -7,6 +7,7 @@ import {
   CropInfo,
   ExpenseInfo,
   FarmInfo,
+  FarmObj,
   FieldInfo,
   HarvestInfo,
   SalesInfo,
@@ -76,6 +77,41 @@ export const createDoc = async ({
     id: a.$id,
   };
 };
+
+export async function updateFarm({
+  id,
+  data,
+  workspaceId,
+  userId,
+  collection,
+}: {
+  id: string;
+  data: Record<string, number | string | File>;
+  workspaceId: string;
+  userId: string;
+  collection: string;
+}) {
+  await validateWorkspaceAccess({ userId, workspaceId });
+
+  const { database } = await createAdminClient();
+
+  let lnk: string = "";
+
+  if (data.farmImage instanceof File) {
+    const uploaded = await uploadImage(data.farmImage);
+    lnk = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.bucketId}/files/${uploaded.$id}/view?project=${appwriteConfig.projectId}&mode=public`;
+  } else if (typeof data.farmImage === "string") {
+    lnk = data.farmImage;
+  }
+
+  const finalData = { ...data, farmImage: lnk };
+
+  await database.updateDocument(appwriteConfig.databaseId, collection, id, {
+    ...finalData,
+    workspaces: workspaceId,
+    users: userId,
+  });
+}
 export async function img(obj: Omit<FieldInfo, "id" | "workspaces" | "users">) {
   const incl = Object.keys(obj).includes("fieldImage");
 
@@ -83,7 +119,7 @@ export async function img(obj: Omit<FieldInfo, "id" | "workspaces" | "users">) {
   let lnk: string = "";
   if (incl) {
     const uploaded = await uploadImage(obj.fieldImage as unknown as File);
-    lnk = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.bucketId}/files/${uploaded.$id}/view?project=${appwriteConfig.projectId}&mode=admin`;
+    lnk = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.bucketId}/files/${uploaded.$id}/view?project=${appwriteConfig.projectId}&mode=public`;
   } else {
     lnk = avatar.getInitials({
       name: obj.fieldName,

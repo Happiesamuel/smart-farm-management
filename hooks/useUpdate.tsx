@@ -3,12 +3,13 @@ import {
   CropInfo,
   ExpenseInfo,
   FarmInfo,
+  FarmObj,
   FieldInfo,
   HarvestInfo,
   SalesInfo,
   TaskInfo,
 } from "@/lib/types";
-import { updateDoc } from "@/servers/crud-actions";
+import { updateDoc, updateFarm } from "@/servers/crud-actions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useUpdateDoc = () => {
@@ -31,6 +32,31 @@ export const useUpdateDoc = () => {
       workspaceId: string;
       userId: string;
     }) => updateDoc(data),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [variables.collection, variables.workspaceId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["farm-finance", variables.workspaceId],
+      });
+    },
+  });
+
+  return { update, status };
+};
+export const useUpdateDocWithImg = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate: update, status } = useMutation({
+    mutationFn: (data: {
+      collection: string;
+      id: string;
+      data: Record<string, number | string | File>;
+      workspaceId: string;
+      userId: string;
+    }) => updateFarm(data),
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({

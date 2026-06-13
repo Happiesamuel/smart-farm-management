@@ -263,10 +263,12 @@ export const createFarmSchema = z.object({
     .string({ message: "Please select a status" })
     .min(1, "Please select a status"),
   farmImage: z
-    .instanceof(File, { message: "Please upload farm image." })
-    .refine((file) => file.size < 3 * 1024 * 1024, {
-      message: "image must be smaller than 3MB.",
-    })
+    .union([
+      z.instanceof(File).refine((file) => file.size < 3 * 1024 * 1024, {
+        message: "Image must be smaller than 3MB.",
+      }),
+      z.string().url({ message: "Invalid image URL." }), // 👈 existing appwrite URL
+    ])
     .optional(),
 });
 

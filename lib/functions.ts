@@ -23,7 +23,7 @@ export async function uploadImage(file: File) {
       ID.unique(),
       file,
     );
-    return { ...uploaded };
+    return { $id: uploaded.$id };
   } catch (error) {
     console.log(error);
     throw error;
