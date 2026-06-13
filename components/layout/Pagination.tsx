@@ -14,10 +14,10 @@ export default function Paginate({ totalPages }: { totalPages: number }) {
   const router = useRouter();
   const currentPage = Number(searchParams.get("page") || 1);
 
-  function getPageUrl(page: number) {
+  function goToPage(page: number) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", String(page));
-    return `?${params.toString()}`;
+    router.push(`?${params.toString()}`, { scroll: false });
   }
 
   if (totalPages <= 1) return null;
@@ -27,8 +27,8 @@ export default function Paginate({ totalPages }: { totalPages: number }) {
       <PaginationContent className="gap-5">
         <PaginationItem>
           <PaginationPrevious
-            className="border text-zinc-700 border-zinc-300"
-            href={currentPage > 1 ? getPageUrl(currentPage - 1) : "#"}
+            className="border text-zinc-700 border-zinc-300 cursor-pointer"
+            onClick={() => currentPage > 1 && goToPage(currentPage - 1)}
             aria-disabled={currentPage === 1}
           />
         </PaginationItem>
@@ -36,9 +36,9 @@ export default function Paginate({ totalPages }: { totalPages: number }) {
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
           <PaginationItem key={page}>
             <PaginationLink
-              className="text-zinc-700"
-              href={getPageUrl(page)}
+              className={`cursor-pointer ${page === currentPage ? "" : "text-zinc-700"}`}
               isActive={page === currentPage}
+              onClick={() => goToPage(page)}
             >
               {page}
             </PaginationLink>
@@ -47,8 +47,10 @@ export default function Paginate({ totalPages }: { totalPages: number }) {
 
         <PaginationItem>
           <PaginationNext
-            className="border text-zinc-700 border-zinc-300"
-            href={currentPage < totalPages ? getPageUrl(currentPage + 1) : "#"}
+            className="border text-zinc-700 border-zinc-300 cursor-pointer"
+            onClick={() =>
+              currentPage < totalPages && goToPage(currentPage + 1)
+            }
             aria-disabled={currentPage === totalPages}
           />
         </PaginationItem>

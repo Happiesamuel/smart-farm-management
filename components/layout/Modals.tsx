@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { FaXmark } from "react-icons/fa6";
 import { Button } from "../ui/button";
+import ButtonLoader from "./ButtonLoader";
 
 export function AddUserFormModal({
   open,
@@ -63,9 +64,13 @@ export function AddUserFormModal({
 export function DeleteModal({
   open,
   onClose,
+  onClick,
+  load,
 }: {
   onClose(): void;
+  onClick?(): void;
   open: boolean;
+  load?: boolean;
 }) {
   useEffect(() => {
     if (open) {
@@ -109,8 +114,19 @@ export function DeleteModal({
             >
               Cancel
             </Button>
-            <Button className="cursor-pointer bg-red-600  text-white px-6">
-              Delete
+            <Button
+              onClick={onClick}
+              disabled={load}
+              className="cursor-pointer bg-red-600  text-white px-6"
+            >
+              {load ? (
+                <>
+                  <ButtonLoader />
+                  Deleting...
+                </>
+              ) : (
+                <>Delete</>
+              )}
             </Button>
           </div>
         </div>

@@ -15,8 +15,11 @@ import { useGetFarmCrops } from "@/hooks/crops/useCrops";
 
 export default function FarmFieldList({
   setOpenId,
+  handleModal,
 }: {
   setOpenId: Dispatch<SetStateAction<string | null>>;
+  openModal: boolean;
+  handleModal(e: { [key: string]: string | number }): void;
 }) {
   const { workspaceId, farmId } = useParams();
   const { workspace, user, ready } = useApp();
@@ -129,8 +132,10 @@ export default function FarmFieldList({
         name: field.fieldName,
         size: field.size,
         sizeUnit: field.sizeUnit,
-        soilType: field.soilType,
-
+        soilType:
+          field.soilType.slice(0, 1).toUpperCase() + field.soilType.slice(1),
+        irrigationType: field.irrigationType || "",
+        description: field.description,
         // 💡 derived status
         status: hasActiveCrop ? "Active" : "Inactive",
 
@@ -243,7 +248,14 @@ export default function FarmFieldList({
                         View Details
                       </Link>
                     </Button>
-                    <Button className="bg-transparent w-[48%] rounded-md  border border-dark/60 cursor-pointer text-dark">
+                    <Button
+                      onClick={() =>
+                        handleModal(
+                          farm as unknown as { [key: string]: string | number },
+                        )
+                      }
+                      className="bg-transparent w-[48%] rounded-md  border border-dark/60 cursor-pointer text-dark"
+                    >
                       Edit
                     </Button>
                   </div>

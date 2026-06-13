@@ -356,8 +356,10 @@ export function CreateFieldCombo({
 
 export function CreateFieldUpload({
   control,
+  img,
 }: {
   control: Control<z.infer<typeof createFieldSchema>>;
+  img?: string;
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -398,13 +400,12 @@ export function CreateFieldUpload({
                 }}
               />
 
-              {/* Upload UI */}
-              {!preview && (
+              {!img && !preview && (
                 <div className="flex flex-col items-center justify-center gap-2">
                   <Upload className="w-6 h-6 text-gray-500" />
 
                   <p className="text-sm font-medium text-gray-700">
-                    Upload Field Image
+                    Upload Farm Image
                   </p>
 
                   <p className="text-xs text-gray-500">JPG, PNG (Max 5MB)</p>
@@ -412,18 +413,32 @@ export function CreateFieldUpload({
               )}
 
               {/* IMAGE PREVIEW */}
-              {preview && (
+              {preview ? (
                 <img
                   src={preview}
                   alt="image preview"
                   className="mt-2 w-full h-40 object-cover object-center rounded-md"
                 />
+              ) : img ? (
+                <img
+                  src={img}
+                  alt="image preview"
+                  className="mt-2 w-full h-40 object-cover object-center rounded-md"
+                />
+              ) : img && preview ? (
+                <img
+                  src={preview}
+                  alt="image preview"
+                  className="mt-2 w-full h-40 object-cover object-center rounded-md"
+                />
+              ) : (
+                ""
               )}
 
               {/* File name fallback */}
               {field.value && !preview && (
                 <p className="mt-3 text-xs text-green-600">
-                  {field.value.name}
+                  {(field.value as File).name}
                 </p>
               )}
             </div>

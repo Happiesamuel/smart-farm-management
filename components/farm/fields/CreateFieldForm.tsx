@@ -25,9 +25,17 @@ import { useApp } from "@/stores/useAppStore";
 import { useGetFarm } from "@/hooks/farms/useFarm";
 import { FormLoader } from "@/components/loader/GeneralLoader";
 import { useParams, useRouter } from "next/navigation";
+import { useUpdateDocWithImg } from "@/hooks/useUpdate";
 
-export default function CreateFieldFormFetch() {
+export default function CreateFieldFormFetch({
+  onClose,
+  def,
+}: {
+  onClose?(): void;
+  def?: { [key: string]: string | number };
+}) {
   const { workspace, user, ready } = useApp();
+
   const { farms, status, error } = useGetFarm(
     workspace?.id ?? null,
     user?.id ?? null,
@@ -60,6 +68,8 @@ export default function CreateFieldFormFetch() {
       farmId={farmId as string}
       workspaceId={workspace!.id}
       userId={user!.id}
+      def={def}
+      onClose={onClose}
       farms={farmOptions}
     />
   );
@@ -70,22 +80,40 @@ function CreateFieldForm({
   userId,
   farmId,
   farms,
+  def,
+  onClose,
 }: {
   workspaceId: string;
   userId: string;
   farmId: string;
   farms: { name: string; value: string }[];
+  onClose?(): void;
+  def?: { [key: string]: string | number };
 }) {
+  const defaultValue = def?.id
+    ? {
+        fieldName: def?.name ?? "",
+        farm: farmId ?? def.farmId ?? "",
+        fieldImage: def?.image ?? "",
+        size: def?.size.toString(),
+        sizeUnit: def?.sizeUnit,
+        soilType: (def?.soilType as string).toLowerCase() ?? "",
+        irrigationType: (def?.irrigationType as string).toLowerCase() ?? "",
+        status: (def?.status as string).toLowerCase() ?? "",
+        description: def?.description ?? "",
+      }
+    : {
+        farm: farmId ? farmId : "",
+      };
+  const { update, status: upStat } = useUpdateDocWithImg();
   const { createField, status } = useCreateField();
-  const {workspace}=useApp()
-const router = useRouter()
+  const { workspace } = useApp();
+  const router = useRouter();
   const form = useForm<z.infer<typeof createFieldSchema>>({
     resolver: zodResolver(createFieldSchema) as Resolver<
       z.infer<typeof createFieldSchema>
     >,
-    defaultValues: {
-      farm: farmId ? farmId : "",
-    },
+    defaultValues: defaultValue as unknown as z.infer<typeof createFieldSchema>,
   });
   async function onSubmit(values: z.infer<typeof createFieldSchema>) {
     const { farm, ...val } = values;
@@ -98,20 +126,48 @@ const router = useRouter()
         farms: farm,
       },
     };
-    createField(obj, {
-      onSuccess: () => {
-        toast("Field created successfully", {
-          description: "You can now proceed to managing your field",
-        });
-router.push(`/user/${workspace?.workspaceId}/farms/${farmId}`)
-      },
-      onError: (err) =>
-        toast("Error creating field", {
-          description: err.message,
-          duration: 4000,
-          closeButton: true,
-        }),
-    });
+    if (def?.id) {
+      const o = obj.data;
+
+      update(
+        {
+          id: def.id as string,
+          data: o,
+          workspaceId: workspaceId,
+          userId: userId,
+          collection: "fields",
+        },
+        {
+          onSuccess: () => {
+            toast("Field updated successfully", {
+              description: "You've updated your field",
+            });
+            onClose?.();
+          },
+          onError: (err) =>
+            toast("Error updating field", {
+              description: err.message,
+              duration: 4000,
+              closeButton: true,
+            }),
+        },
+      );
+    } else {
+      createField(obj, {
+        onSuccess: () => {
+          toast("Field created successfully", {
+            description: "You can now proceed to managing your field",
+          });
+          router.push(`/user/${workspace?.workspaceId}/farms/${farmId}`);
+        },
+        onError: (err) =>
+          toast("Error creating field", {
+            description: err.message,
+            duration: 4000,
+            closeButton: true,
+          }),
+      });
+    }
   }
 
   const soil = [
@@ -232,7 +288,13 @@ router.push(`/user/${workspace?.workspaceId}/farms/${farmId}`)
               control={form.control}
               label="Field Size"
               placeholder="e.g. 100"
-              placeholder2="arces"
+              placeholder2={
+                def?.id
+                  ? ((arrSize.find(
+                      (x) => x.value === (def.sizeUnit as string).toLowerCase(),
+                    )?.name ?? "arces") as string)
+                  : "arces"
+              }
               type={"number"}
               name1="size"
               name2="sizeUnit"
@@ -241,7 +303,13 @@ router.push(`/user/${workspace?.workspaceId}/farms/${farmId}`)
               name="soilType"
               control={form.control}
               label="Soil Type"
-              placeholder="Select soil type"
+              placeholder={
+                def?.id
+                  ? ((soil.find(
+                      (x) => x.value === (def.soilType as string).toLowerCase(),
+                    )?.name ?? "Select soil type") as string)
+                  : "Select soil type"
+              }
               array={soil}
               Icon={TbRipple}
             />
@@ -251,18 +319,35 @@ router.push(`/user/${workspace?.workspaceId}/farms/${farmId}`)
               name="irrigationType"
               control={form.control}
               label="Irrigation Type (Optional)"
-              placeholder="Select irrigation type"
+              placeholder={
+                def?.id
+                  ? ((irrigation.find(
+                      (x) =>
+                        x.value ===
+                        (def.irrigationType as string).toLowerCase(),
+                    )?.name ?? "Select irrigation type") as string)
+                  : "Select irrigation type"
+              }
               array={irrigation}
               Icon={ImDroplet}
             />
-            <CreateFieldUpload control={form.control} />
+            <CreateFieldUpload
+              img={def?.image as string}
+              control={form.control}
+            />
           </div>
           <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
             <CreateFieldSelect
               name="status"
               control={form.control}
               label="Status"
-              placeholder="Select status"
+              placeholder={
+                def?.id
+                  ? ((stat.find(
+                      (x) => x.value === (def.status as string).toLowerCase(),
+                    )?.name ?? "Select Farm Status") as string)
+                  : "Select Farm Status"
+              }
               array={stat}
               Icon={TbRipple}
             />
@@ -277,23 +362,24 @@ router.push(`/user/${workspace?.workspaceId}/farms/${farmId}`)
           <div className="flex items-center gap-4 relative justify-end">
             <Button
               type="reset"
+              onClick={() => (def?.id ? onClose?.() : router.back())}
               className="text-dark bg-transparent rounded-md w-fit px-6 h-9 cursor-pointer border-border border"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={status === "pending"}
+              disabled={status === "pending" || upStat === "pending"}
               className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              {status === "pending" ? (
+              {status === "pending" || upStat === "pending" ? (
                 <>
                   <ButtonLoader />
-                  Creating...
+                  {def?.id ? "Updating..." : "Creating..."}
                 </>
               ) : (
                 <div className="flex items-center gap-2">
-                  <FaRegSave /> Add Field
+                  <FaRegSave /> {def?.id ? "Update Field" : "Save Field"}
                 </div>
               )}
             </Button>

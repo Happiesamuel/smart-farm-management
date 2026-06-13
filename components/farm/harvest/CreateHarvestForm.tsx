@@ -454,6 +454,7 @@ function CreateHarvestForm({
           <div className="flex items-center gap-4 relative justify-end">
             <Button
               type="reset"
+              onClick={() => (def?.id ? onClose?.() : router.back())}
               className="text-dark bg-transparent rounded-md w-fit px-6 h-9 cursor-pointer border-border border"
             >
               Cancel

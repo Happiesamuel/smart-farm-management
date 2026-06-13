@@ -277,10 +277,12 @@ export const createFieldSchema = z.object({
     .string({ message: "Field name is required" })
     .min(4, { message: "Field name must be at least 4 characters." }),
   fieldImage: z
-    .instanceof(File, { message: "Please upload field image." })
-    .refine((file) => file.size < 3 * 1024 * 1024, {
-      message: "image must be smaller than 3MB.",
-    })
+    .union([
+      z.instanceof(File).refine((file) => file.size < 3 * 1024 * 1024, {
+        message: "Image must be smaller than 3MB.",
+      }),
+      z.string().url({ message: "Invalid image URL." }), // 👈 existing appwrite URL
+    ])
     .optional(),
   farm: z
     .string({ message: "Please select farm" })

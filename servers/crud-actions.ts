@@ -96,15 +96,24 @@ export async function updateFarm({
   const { database } = await createAdminClient();
 
   let lnk: string = "";
+  let imageKey = "";
 
-  if (data.farmImage instanceof File) {
-    const uploaded = await uploadImage(data.farmImage);
-    lnk = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.bucketId}/files/${uploaded.$id}/view?project=${appwriteConfig.projectId}&mode=public`;
-  } else if (typeof data.farmImage === "string") {
-    lnk = data.farmImage;
+  if (collection === "farms") {
+    imageKey = "farmImage";
+  } else if (collection === "fields") {
+    imageKey = "fieldImage";
   }
 
-  const finalData = { ...data, farmImage: lnk };
+  if (imageKey) {
+    if (data[imageKey] instanceof File) {
+      const uploaded = await uploadImage(data[imageKey] as File);
+      lnk = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.bucketId}/files/${uploaded.$id}/view?project=${appwriteConfig.projectId}&mode=public`;
+    } else if (typeof data[imageKey] === "string") {
+      lnk = data[imageKey] as string;
+    }
+  }
+
+  const finalData = imageKey ? { ...data, [imageKey]: lnk } : { ...data };
 
   await database.updateDocument(appwriteConfig.databaseId, collection, id, {
     ...finalData,
