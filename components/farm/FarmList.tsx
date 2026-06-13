@@ -8,7 +8,7 @@ import Paginate from "../layout/Pagination";
 import Link from "next/link";
 import { useGetFarmsWithStats } from "@/hooks/farms/useFarm";
 import { useApp } from "@/stores/useAppStore";
-import { FormLoader } from "../loader/GeneralLoader";
+import { FormLoader, NoResult } from "../loader/GeneralLoader";
 import FarmFilter from "./FarmFilter";
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -62,7 +62,12 @@ export default function FarmList() {
       </div>
     );
 
-  if (!farms?.length) return <p>no farm</p>;
+  if (!farms?.length)
+    return (
+      <div className="h-85">
+        <NoResult>No Farm</NoResult>
+      </div>
+    );
 
   function handleSearchFarm(v: string) {
     setVal(v);
