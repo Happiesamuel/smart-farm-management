@@ -417,10 +417,7 @@ export const createHarvestSchema = z.object({
     message: "Total amount must be greater than 0.",
   }),
 
-  buyer: z
-    .string()
-    .min(3, "Buyer name must be at least 3 characters")
-    .optional(),
+  buyer: z.string().optional(),
 
   quality: z.enum(["excellent", "good", "average", "poor"], {
     message: "Please select quality",
@@ -428,10 +425,7 @@ export const createHarvestSchema = z.object({
 
   status: z.enum(["sold", "stored", "wasted"]).default("sold"),
 
-  description: z
-    .string()
-    .min(10, { message: "Description must be at least 10 characters." })
-    .optional(),
+  description: z.string().optional(),
 });
 // export const createHarvestSchema = z.object({
 //   cropName: comboSchema("Crop is required"),
@@ -489,10 +483,10 @@ export const createCropSchema = z.object({
       path: ["to"],
     }),
 
-  irrigationType: z
-    .enum(["drip", "sprinkler", "rain-fed", "manual", "flood", "pivot"])
-    .optional(),
-
+  irrigationType: z.enum(
+    ["drip", "sprinkler", "rain-fed", "manual", "flood", "pivot"],
+    { message: "Please select irrigation type" },
+  ),
   expectedYield: z.string({ message: "Expected yield is required" }).min(1, {
     message: "Expected yield must be greater than 0.",
   }),
@@ -521,7 +515,9 @@ export const createCropSchema = z.object({
     .enum(["growing", "harvested", "failed", "planted", "drying", "stored"])
     .default("growing"),
   growthStage: z
-    .enum(["seedling", "vegetative", "flowering", "fruiting", "harvesting"])
+    .enum(["seedling", "vegetative", "flowering", "fruiting", "harvesting"], {
+      message: "Please select growth stage",
+    })
     .default("seedling"),
 
   description: z.string().optional(),

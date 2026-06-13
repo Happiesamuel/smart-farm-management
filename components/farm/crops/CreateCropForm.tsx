@@ -27,8 +27,16 @@ import { toast } from "sonner";
 import { FormLoader } from "@/components/loader/GeneralLoader";
 import { useGetFarm } from "@/hooks/farms/useFarm";
 import { useGetFarmFields, useGetFields } from "@/hooks/fields/useFields";
+import { useUpdateDoc } from "@/hooks/useUpdate";
+import { format } from "date-fns";
 
-export default function CreateCropFormFetch({ onClose }: { onClose?(): void }) {
+export default function CreateCropFormFetch({
+  onClose,
+  def,
+}: {
+  onClose?(): void;
+  def?: { [key: string]: string | number };
+}) {
   const { workspace, user, ready } = useApp();
   const { farmId: x } = useParams();
   const { farms, status, error } = useGetFarm(
@@ -79,6 +87,7 @@ export default function CreateCropFormFetch({ onClose }: { onClose?(): void }) {
       fieldss={fieldss}
       farmId={farmId as string}
       onClose={onClose}
+      def={def}
     />
   );
 }
@@ -91,6 +100,7 @@ function CreateCropForm({
   fieldss,
   farmId,
   onClose,
+  def,
 }: {
   workspaceId: string;
   userId: string;
@@ -99,16 +109,45 @@ function CreateCropForm({
   field: { [key: string]: string | number }[] | undefined;
   fieldss: { [key: string]: string | number }[] | undefined;
   onClose?(): void;
+  def?: { [key: string]: string | number };
 }) {
+  const defaultValue = def?.id
+    ? {
+        cropName: def?.name ?? "",
+        farm: farmId ?? def.farmId ?? "",
+        irrigationType: (def?.irrigationType as string).toLowerCase() ?? "",
+        field: def?.fieldId ?? "",
+        status: (def?.status as string).toLowerCase() ?? "",
+        growthStage: (def?.growthStage as string).toLowerCase() ?? "",
+        expectedYield: def?.expectedYield.toString() ?? "",
+        yieldUnit: def?.yieldUnit ?? "",
+        seedQuantity: def?.seedQuantity.toString(),
+        seedUnit: def?.seedUnit ?? "",
+        areaPlanted: def?.areaPlanted.toString(),
+        areaUnit: def?.areaUnit,
+        description: def?.description ?? "",
+        plantingToHarvest:
+          def.plantedDate && def.expectedHarvestDate
+            ? {
+                from: new Date(def.plantedDate),
+                to: new Date(def.expectedHarvestDate),
+              }
+            : {
+                from: new Date(),
+                to: new Date(),
+              },
+      }
+    : {
+        farm: farmId ? farmId : "",
+      };
   const form = useForm<z.infer<typeof createCropSchema>>({
     resolver: zodResolver(createCropSchema) as Resolver<
       z.infer<typeof createCropSchema>
     >,
-    defaultValues: {
-      farm: farmId ? farmId : "",
-    },
+    defaultValues: defaultValue as z.infer<typeof createCropSchema>,
   });
   const { farmId: id } = useParams();
+  const { update, status: upStat } = useUpdateDoc();
   const { workspace } = useApp();
   const router = useRouter();
   const { createCrop, status } = useCreateCrop();
@@ -128,24 +167,58 @@ function CreateCropForm({
         expectedYield: +values.expectedYield,
       },
     };
-    createCrop(obj, {
-      onSuccess: () => {
-        toast("Crop created successfully", {
-          description: "You can now proceed to managing your crop",
-        });
-        return farmId
-          ? router.push(
-              `/user/${workspace?.workspaceId}/farms/${farmId}?tab=crops`,
-            )
-          : onClose?.();
-      },
-      onError: (err) =>
-        toast("Error creating crop", {
-          description: err.message,
-          duration: 4000,
-          closeButton: true,
-        }),
-    });
+
+    if (def?.id) {
+      const o = obj.data;
+      const newO = {
+        ...o,
+        plantedDate: format(o.plantedDate, "PPP"),
+        expectedHarvestDate: format(o.expectedHarvestDate, "PPP"),
+      };
+      update(
+        {
+          collection: "crops",
+          id: def.id as string,
+          data: newO,
+          workspaceId: workspaceId,
+          userId: userId,
+        },
+        {
+          onSuccess: () => {
+            toast("Crop updated successfully", {
+              description: "You've updated your crop",
+            });
+
+            onClose?.();
+          },
+          onError: (err) =>
+            toast("Error updating crop", {
+              description: err.message,
+              duration: 4000,
+              closeButton: true,
+            }),
+        },
+      );
+    } else {
+      createCrop(obj, {
+        onSuccess: () => {
+          toast("Crop created successfully", {
+            description: "You can now proceed to managing your crop",
+          });
+          return farmId
+            ? router.push(
+                `/user/${workspace?.workspaceId}/farms/${farmId}?tab=crops`,
+              )
+            : onClose?.();
+        },
+        onError: (err) =>
+          toast("Error creating crop", {
+            description: err.message,
+            duration: 4000,
+            closeButton: true,
+          }),
+      });
+    }
   }
 
   const watchedFarmId = form.watch("farm");
@@ -301,7 +374,7 @@ function CreateCropForm({
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-4 md:space-y-6 pt-6 w-full "
         >
-          <p className="text-primary-green  pb-1 text-sm w-full font-semibold border-border border-b">
+          <p className="text-primary-green text-start pb-1 text-sm w-full font-semibold border-border border-b">
             Crop Information
           </p>
           <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
@@ -322,7 +395,9 @@ function CreateCropForm({
               placeholder={
                 farmId
                   ? (farms.find((x) => x.value === farmId)?.name ?? "")
-                  : "Select farm"
+                  : def?.id
+                    ? (farms.find((x) => x.value === def.farmId)?.name ?? "")
+                    : "Select farm"
               }
               array={farmId || id ? [] : farms}
               Icon={PiFarm}
@@ -333,8 +408,16 @@ function CreateCropForm({
             <CreateCropSelect
               name="irrigationType"
               control={form.control}
-              label="Irrigation Type (Optional)"
-              placeholder="Select irrigation type"
+              label="Irrigation Type "
+              placeholder={
+                def?.id
+                  ? ((irrigation.find(
+                      (x) =>
+                        x.value ===
+                        (def.irrigationType as string).toLowerCase(),
+                    )?.name ?? "Select irrigation type") as string)
+                  : "Select irrigation type"
+              }
               array={irrigation}
               Icon={ImDroplet}
             />
@@ -343,7 +426,12 @@ function CreateCropForm({
               key={watchedFarmId}
               control={form.control}
               label="Select Field"
-              placeholder="Select field"
+              placeholder={
+                def?.id
+                  ? ((fields.find((x) => x.value === def.fieldId)?.name ??
+                      "Select Field") as string)
+                  : "Select field"
+              }
               array={fields as { [key: string]: string }[]}
               Icon={IoGrid}
             />
@@ -353,7 +441,13 @@ function CreateCropForm({
               name="status"
               control={form.control}
               label="Status"
-              placeholder="Select status"
+              placeholder={
+                def?.id
+                  ? ((stat.find(
+                      (x) => x.value === (def.status as string).toLowerCase(),
+                    )?.name ?? "Select Status") as string)
+                  : "Select Status"
+              }
               array={stat}
               Icon={MdSignalWifiStatusbar1Bar}
             />
@@ -361,7 +455,14 @@ function CreateCropForm({
               name="growthStage"
               control={form.control}
               label="Growth Stage"
-              placeholder="Select growth stage"
+              placeholder={
+                def?.id
+                  ? ((growth.find(
+                      (x) =>
+                        x.value === (def.growthStage as string).toLowerCase(),
+                    )?.name ?? "Select growth stage") as string)
+                  : "Select growth stage"
+              }
               array={growth}
               Icon={MdSignalWifiStatusbar1Bar}
             />
@@ -373,7 +474,14 @@ function CreateCropForm({
               control={form.control}
               label="Expected Yield"
               placeholder="e.g. 100"
-              placeholder2="kg"
+              placeholder2={
+                def?.id
+                  ? ((expectedYield.find(
+                      (x) =>
+                        x.value === (def.yieldUnit as string).toLowerCase(),
+                    )?.name ?? "kg") as string)
+                  : "kg"
+              }
               name1="expectedYield"
               name2="yieldUnit"
             />
@@ -382,9 +490,15 @@ function CreateCropForm({
               control={form.control}
               label="Seed Quantity"
               placeholder="e.g. 100"
-              placeholder2="bags"
               name1="seedQuantity"
               name2="seedUnit"
+              placeholder2={
+                def?.id
+                  ? ((seedQuantity.find(
+                      (x) => x.value === (def.seedUnit as string).toLowerCase(),
+                    )?.name ?? "bags") as string)
+                  : "bags"
+              }
             />
           </div>
 
@@ -394,7 +508,13 @@ function CreateCropForm({
               control={form.control}
               label="Area Planted"
               placeholder="e.g. 100"
-              placeholder2="arces"
+              placeholder2={
+                def?.id
+                  ? ((area.find(
+                      (x) => x.value === (def.areaUnit as string).toLowerCase(),
+                    )?.name ?? "arces") as string)
+                  : "arces"
+              }
               name1="areaPlanted"
               name2="areaUnit"
             />
@@ -423,17 +543,18 @@ function CreateCropForm({
             </Button>
             <Button
               type="submit"
-              disabled={status === "pending"}
+              disabled={status === "pending" || upStat === "pending"}
               className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              {status === "pending" ? (
+              {status === "pending" || upStat === "pending" ? (
                 <>
                   <ButtonLoader />
-                  Creating...
+                  {def?.id ? "Updating..." : "Creating..."}
                 </>
               ) : (
                 <div className="flex items-center gap-2">
-                  <FaRegSave /> Add Crop
+                  <FaRegSave />
+                  {def?.id ? "Update Crop" : "Add Crop"}
                 </div>
               )}
             </Button>

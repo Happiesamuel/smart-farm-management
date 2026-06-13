@@ -1,5 +1,3 @@
-import { FaEllipsisV } from "react-icons/fa";
-
 import BothPagination from "../../salesExpense/BothPagination";
 import FarmHarvestTableHeader from "./FarmHarvestTableHeader";
 import { useParams, useSearchParams } from "next/navigation";
@@ -9,6 +7,13 @@ import { useGetFarmCrops } from "@/hooks/crops/useCrops";
 import { useGetFarmFields } from "@/hooks/fields/useFields";
 import { useGetFarmHarvest } from "@/hooks/harvest/useHarvest";
 import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
+import TableActions from "@/components/layout/TableAction";
+import { LuPencil, LuTrash2 } from "react-icons/lu";
+import { FinanceModal } from "@/components/modals/FinanceModal";
+import CreateHarvestFormFetch from "./CreateHarvestForm";
+import { GiDigDug } from "react-icons/gi";
+import { useDeleteDoc } from "@/hooks/useDelete";
+import { toast } from "sonner";
 
 const qualityStyles: Record<string, string> = {
   Excellent: "bg-emerald-100 text-emerald-700",
@@ -27,6 +32,7 @@ export default function FarmHarvestTable() {
   const { farmId } = useParams();
   const searchParams = useSearchParams();
   const { filterCrop } = useCropFilter();
+  const { remove, status: deleteStat } = useDeleteDoc();
   const { workspace, user, ready } = useApp();
   const { crops, status, error } = useGetFarmCrops(
     workspace?.id ?? null,
@@ -75,7 +81,7 @@ export default function FarmHarvestTable() {
   if (isLoading)
     return (
       <div className="h-70">
-        <FormLoader>Loading crop data...</FormLoader>
+        <FormLoader>Loading harvest record...</FormLoader>
       </div>
     );
 
@@ -92,7 +98,7 @@ export default function FarmHarvestTable() {
   if (!harvests?.length)
     return (
       <div className="h-70">
-        <NoResult>No harvest found!</NoResult>
+        <NoResult>No harvest record!</NoResult>
       </div>
     );
 
@@ -110,6 +116,10 @@ export default function FarmHarvestTable() {
           month: "short",
           year: "numeric",
         }),
+        fieldId: field?.$id ?? "",
+        cropId: crop?.$id ?? "",
+        buyer: harvest.buyer || "",
+        description: harvest.description || "",
         crop: crop?.cropName ?? "Unknown Crop",
         status:
           harvest.status.slice(0, 1).toUpperCase() + harvest.status.slice(1),
@@ -237,7 +247,63 @@ export default function FarmHarvestTable() {
 
                       <td className="py-3 px-2 truncate font-medium max-w-[70px] px- text-[13px] text-zinc-600 text-right">
                         <div className="flex justify-end gap-3 text-gray-500">
-                          <FaEllipsisV className="cursor-pointer hover:text-black" />
+                          <TableActions
+                            actions={[
+                              {
+                                type: "modal",
+                                label: "Edit",
+                                icon: <LuPencil className="text-sm" />,
+                                modal: (onClose) => (
+                                  <FinanceModal
+                                    text={"Edit your harvest"}
+                                    forWhat="Edit"
+                                    type={"Harvest"}
+                                    iconColor="bg-[#e8f5ec] text-[#2d8952]"
+                                    Icon={GiDigDug}
+                                    open={true}
+                                    onClose={onClose}
+                                  >
+                                    <CreateHarvestFormFetch
+                                      def={s}
+                                      onClose={onClose}
+                                    />
+                                  </FinanceModal>
+                                ),
+                              },
+                              {
+                                type: "callback",
+                                label:
+                                  deleteStat === "pending"
+                                    ? "Deleting..."
+                                    : "Delete",
+                                icon: <LuTrash2 className="text-sm" />,
+                                variant: "danger",
+                                onClick: () =>
+                                  remove(
+                                    {
+                                      collection: "harvests",
+                                      id: s.id,
+                                      workspaceId: workspace.id,
+                                      userId: user.id,
+                                    },
+                                    {
+                                      onSuccess: () => {
+                                        toast("Deleted successfully", {
+                                          description:
+                                            "You've deleted a record",
+                                        });
+                                      },
+                                      onError: (err) =>
+                                        toast("Error deleting harvest", {
+                                          description: err.message,
+                                          duration: 4000,
+                                          closeButton: true,
+                                        }),
+                                    },
+                                  ),
+                              },
+                            ]}
+                          />
                         </div>
                       </td>
                     </tr>

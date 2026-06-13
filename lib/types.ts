@@ -19,6 +19,7 @@ export interface WorkspaceObj {
 }
 export interface UserObjId extends UserObj {
   id: string;
+  avatar?: string;
 }
 export interface WorkspaceObjId extends WorkspaceObj {
   id: string;

@@ -1,5 +1,5 @@
 "use client";
-
+import { format } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Resolver } from "react-hook-form";
 import { z } from "zod";
@@ -29,11 +29,14 @@ import { useGetFarmFields, useGetFields } from "@/hooks/fields/useFields";
 import { useGetFarm } from "@/hooks/farms/useFarm";
 import { useGetCrops, useGetFarmCrops } from "@/hooks/crops/useCrops";
 import { TbPlant2 } from "react-icons/tb";
+import { useUpdateDoc } from "@/hooks/useUpdate";
 
 export default function CreateHarvestFormFetch({
   onClose,
+  def,
 }: {
   onClose?(): void;
+  def?: { [key: string]: string };
 }) {
   const { workspace, user, ready } = useApp();
   const { farmId: x } = useParams();
@@ -97,6 +100,7 @@ export default function CreateHarvestFormFetch({
 
   return (
     <CreateHarvestForm
+      def={def}
       workspaceId={workspace!.id}
       userId={user!.id}
       farms={farmOptions}
@@ -120,6 +124,7 @@ function CreateHarvestForm({
   field,
   farmId,
   onClose,
+  def,
 }: {
   workspaceId: string;
   userId: string;
@@ -130,17 +135,34 @@ function CreateHarvestForm({
   crop: { [key: string]: string | number }[] | undefined;
   farmId: string;
   onClose?(): void;
+  def?: { [key: string]: string };
 }) {
+  const defaultValue = def?.id
+    ? {
+        farm: farmId ?? def.farmId ?? "",
+        field: def?.fieldId ?? "",
+        crop: def.cropId ?? "",
+        quantity: def?.quantity.toString() ?? "",
+        unit: def?.unit ?? "",
+        quality: def?.quality.toLowerCase() ?? "",
+        status: (def?.status as string).toLowerCase() ?? "",
+        totalAmount: (def?.revenue as string).replace(/[₦,]/g, ""),
+        pricePerUnit: (def?.unitPrice as string).replace(/[₦,]/g, ""),
+        harvestDate: def.date ? new Date(def.date) : new Date(),
+        buyer: def?.buyer ?? "",
+        description: def.description ?? "",
+      }
+    : {
+        farm: farmId ? farmId : "",
+      };
   const form = useForm<z.infer<typeof createHarvestSchema>>({
     resolver: zodResolver(createHarvestSchema) as Resolver<
       z.infer<typeof createHarvestSchema>
     >,
-    defaultValues: {
-      farm: farmId ? farmId : "",
-    },
+    defaultValues: defaultValue as z.infer<typeof createHarvestSchema>,
   });
-
   const { createHarvest, status } = useCreateHavest();
+  const { update, status: upStat } = useUpdateDoc();
   const { farmId: id } = useParams();
   const { workspace } = useApp();
   const router = useRouter();
@@ -190,24 +212,53 @@ function CreateHarvestForm({
       },
     };
 
-    createHarvest(obj, {
-      onSuccess: () => {
-        toast("Harvest created successfully", {
-          description: "You can now proceed to managing your crop",
-        });
-        return farmId
-          ? router.push(
-              `/user/${workspace?.workspaceId}/farms/${farmId}?tab=harvests`,
-            )
-          : onClose?.();
-      },
-      onError: (err) =>
-        toast("Error creating harvest", {
-          description: err.message,
-          duration: 4000,
-          closeButton: true,
-        }),
-    });
+    if (def?.id) {
+      const o = obj.data;
+      const newO = { ...o, harvestDate: format(o.harvestDate, "PPP") };
+      update(
+        {
+          collection: "harvests",
+          id: def.id,
+          data: newO,
+          workspaceId: workspaceId,
+          userId: userId,
+        },
+        {
+          onSuccess: () => {
+            toast("Harvest updated successfully", {
+              description: "You've updated your harvest",
+            });
+
+            onClose?.();
+          },
+          onError: (err) =>
+            toast("Error updating harvest", {
+              description: err.message,
+              duration: 4000,
+              closeButton: true,
+            }),
+        },
+      );
+    } else {
+      createHarvest(obj, {
+        onSuccess: () => {
+          toast("Harvest created successfully", {
+            description: "You can now proceed to managing your crop",
+          });
+          return farmId
+            ? router.push(
+                `/user/${workspace?.workspaceId}/farms/${farmId}?tab=harvests`,
+              )
+            : onClose?.();
+        },
+        onError: (err) =>
+          toast("Error creating harvest", {
+            description: err.message,
+            duration: 4000,
+            closeButton: true,
+          }),
+      });
+    }
   }
 
   const quantity = [
@@ -264,7 +315,7 @@ function CreateHarvestForm({
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-4 md:space-y-6 pt-6 w-full "
         >
-          <p className="text-primary-green  pb-1 text-sm w-full font-semibold border-border border-b">
+          <p className="text-primary-green  pb-1 text-sm w-full font-semibold text-start border-border border-b">
             Harvest Information
           </p>
           <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
@@ -275,7 +326,9 @@ function CreateHarvestForm({
               placeholder={
                 farmId
                   ? (farms.find((x) => x.value === farmId)?.name ?? "")
-                  : "Select farm"
+                  : def?.id
+                    ? (farms.find((x) => x.value === def.farmId)?.name ?? "")
+                    : "Select farm"
               }
               setValue={form.setValue}
               array={farmId || id ? [] : farms}
@@ -287,7 +340,12 @@ function CreateHarvestForm({
               control={form.control}
               key={watchedFarmId}
               label="Select Field"
-              placeholder="Select field"
+              placeholder={
+                def?.id
+                  ? ((fields.find((x) => x.value === def.fieldId)?.name ??
+                      "Select Field") as string)
+                  : "Select field"
+              }
               setValue={form.setValue}
               array={fields as { [key: string]: string }[]}
               Icon={IoGrid}
@@ -299,7 +357,12 @@ function CreateHarvestForm({
               name="crop"
               control={form.control}
               label="Select Harvested Crop"
-              placeholder="Select harvested crop"
+              placeholder={
+                def?.id
+                  ? ((crops.find((x) => x.value === def.cropId)?.name ??
+                      "Select harvested crop") as string)
+                  : "Select harvested crop"
+              }
               key={watchedFieldId}
               array={crops as { [key: string]: string }[]}
               Icon={TbPlant2}
@@ -309,7 +372,12 @@ function CreateHarvestForm({
               name="status"
               control={form.control}
               label="Status"
-              placeholder="Select status"
+              placeholder={
+                def?.id
+                  ? ((stat.find((x) => x.value === def.status.toLowerCase())
+                      ?.name ?? "Select Status") as string)
+                  : "Select Status"
+              }
               array={stat}
               Icon={MdSignalWifiStatusbar1Bar}
             />
@@ -321,7 +389,12 @@ function CreateHarvestForm({
               control={form.control}
               label="Quantity"
               placeholder="e.g. 100"
-              placeholder2="bags"
+              placeholder2={
+                def?.id
+                  ? ((quantity.find((x) => x.value === def.unit.toLowerCase())
+                      ?.name ?? "bags") as string)
+                  : "bags"
+              }
               name1="quantity"
               name2="unit"
             />
@@ -329,7 +402,12 @@ function CreateHarvestForm({
               name="quality"
               control={form.control}
               label="Quality"
-              placeholder="Select quality"
+              placeholder={
+                def?.id
+                  ? ((quality.find((x) => x.value === def.quality.toLowerCase())
+                      ?.name ?? "Select Quality") as string)
+                  : "Select Quality"
+              }
               array={quality}
             />
           </div>
@@ -356,6 +434,9 @@ function CreateHarvestForm({
               placeholder="Enter buyer's name"
             />
             <CreateHavestDate
+              placeholder={
+                def?.date ? format(def.date as string, "PPP") : "Pick a date"
+              }
               label="Harvest Date"
               name="harvestDate"
               control={form.control}
@@ -379,17 +460,17 @@ function CreateHarvestForm({
             </Button>
             <Button
               type="submit"
-              disabled={status === "pending"}
+              disabled={status === "pending" || upStat === "pending"}
               className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              {status === "pending" ? (
+              {status === "pending" || upStat === "pending" ? (
                 <>
                   <ButtonLoader />
-                  Creating...
+                  {def?.id ? "Updating..." : "Creating..."}
                 </>
               ) : (
                 <div className="flex items-center gap-2">
-                  <FaRegSave /> Add Harvest
+                  <FaRegSave /> {def?.id ? "Update Harvest" : "Add Harvest"}
                 </div>
               )}
             </Button>

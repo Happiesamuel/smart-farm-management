@@ -6,9 +6,15 @@ import { useGetFarmHarvest } from "@/hooks/harvest/useHarvest";
 import { getProgressColor } from "@/lib/functions";
 import { useApp } from "@/stores/useAppStore";
 import { useParams, useSearchParams } from "next/navigation";
-import { FaEye, FaEllipsisV } from "react-icons/fa";
 import FarmCropsFilter from "./FarmCropsFilter";
 import { useCropFilter } from "@/hooks/useCropFilter";
+import TableActions from "@/components/layout/TableAction";
+import { LuPencil, LuTrash2 } from "react-icons/lu";
+import { FinanceModal } from "@/components/modals/FinanceModal";
+import CreateCropFormFetch from "./CreateCropForm";
+import { toast } from "sonner";
+import { useDeleteDoc } from "@/hooks/useDelete";
+import { TbPlant2 } from "react-icons/tb";
 
 const statusStyles: Record<string, string> = {
   Growing: "bg-green-100 text-green-700",
@@ -31,6 +37,7 @@ export default function FarmCropsTable() {
   const searchParams = useSearchParams();
   const { filterCrop } = useCropFilter();
   const { workspace, user, ready } = useApp();
+  const { remove, status: deleteStat } = useDeleteDoc();
   const { crops, status, error } = useGetFarmCrops(
     workspace?.id ?? null,
     user?.id ?? null,
@@ -150,6 +157,7 @@ export default function FarmCropsTable() {
       return {
         id: crop.$id,
         name: crop.cropName,
+        fieldId: field?.$id ?? "",
         field: field?.fieldName ?? "Unknown Field",
 
         areaPlanted: crop.areaPlanted,
@@ -381,8 +389,63 @@ export default function FarmCropsTable() {
                       {/* Actions */}
                       <td className="p-4 truncate max-w-full text-right">
                         <div className="flex justify-end gap-3 text-gray-500">
-                          <FaEye className="cursor-pointer hover:text-black" />
-                          <FaEllipsisV className="cursor-pointer hover:text-black" />
+                          <TableActions
+                            actions={[
+                              {
+                                type: "modal",
+                                label: "Edit",
+                                icon: <LuPencil className="text-sm" />,
+                                modal: (onClose) => (
+                                  <FinanceModal
+                                    text={"Edit your crop"}
+                                    forWhat="Edit"
+                                    type={"Crop"}
+                                    iconColor="bg-[#e8f5ec] text-[#2d8952]"
+                                    Icon={TbPlant2}
+                                    open={true}
+                                    onClose={onClose}
+                                  >
+                                    <CreateCropFormFetch
+                                      def={crop}
+                                      onClose={onClose}
+                                    />
+                                  </FinanceModal>
+                                ),
+                              },
+                              {
+                                type: "callback",
+                                label:
+                                  deleteStat === "pending"
+                                    ? "Deleting..."
+                                    : "Delete",
+                                icon: <LuTrash2 className="text-sm" />,
+                                variant: "danger",
+                                onClick: () =>
+                                  remove(
+                                    {
+                                      collection: "crops",
+                                      id: crop.id,
+                                      workspaceId: workspace.id,
+                                      userId: user.id,
+                                    },
+                                    {
+                                      onSuccess: () => {
+                                        toast("Deleted successfully", {
+                                          description:
+                                            "You've deleted a record",
+                                        });
+                                      },
+                                      onError: (err) =>
+                                        toast("Error deleting crop", {
+                                          description: err.message,
+                                          duration: 4000,
+                                          closeButton: true,
+                                        }),
+                                    },
+                                  ),
+                              },
+                            ]}
+                          />
                         </div>
                       </td>
                     </tr>

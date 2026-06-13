@@ -1,6 +1,6 @@
 "use client";
-
-import { FaEye, FaEllipsisV } from "react-icons/fa";
+import { LuPencil, LuTrash2 } from "react-icons/lu";
+import { GiDigDug } from "react-icons/gi";
 import HarvestTableHeader from "./HarvestTableHeader";
 import BothPagination from "../salesExpense/BothPagination";
 import { useSearchParams } from "next/navigation";
@@ -11,6 +11,11 @@ import { useGetFarm } from "@/hooks/farms/useFarm";
 import { useGetFields } from "@/hooks/fields/useFields";
 import { useGetHarvest } from "@/hooks/harvest/useHarvest";
 import { FormLoader, NoResult } from "../loader/GeneralLoader";
+import TableActions from "../layout/TableAction";
+import { FinanceModal } from "../modals/FinanceModal";
+import CreateHarvestFormFetch from "../farm/harvest/CreateHarvestForm";
+import { useDeleteDoc } from "@/hooks/useDelete";
+import { toast } from "sonner";
 
 const qualityStyles: Record<string, string> = {
   Excellent: "bg-emerald-100 text-emerald-700",
@@ -28,6 +33,7 @@ export default function HarvestTable() {
   const searchParams = useSearchParams();
   const { filterCrop } = useCropFilter();
   const { workspace, user, ready } = useApp();
+  const { remove, status: deleteStat } = useDeleteDoc();
   const { crops, status, error } = useGetCrops(
     workspace?.id ?? null,
     user?.id ?? null,
@@ -108,6 +114,11 @@ export default function HarvestTable() {
 
       return {
         id: harvest.$id,
+        farmId: farm?.$id ?? "",
+        fieldId: field?.$id ?? "",
+        cropId: crop?.$id ?? "",
+        buyer: harvest.buyer || "",
+        description: harvest.description || "",
         date: new Date(harvest.harvestDate).toLocaleDateString("en-US", {
           day: "numeric",
           month: "short",
@@ -260,8 +271,63 @@ export default function HarvestTable() {
 
                       <td className="py-3 px-2 truncate font-medium max-w-[70px] px- text-[13px] text-zinc-600 text-right">
                         <div className="flex justify-end gap-3 text-gray-500">
-                          <FaEye className="cursor-pointer hover:text-black" />
-                          <FaEllipsisV className="cursor-pointer hover:text-black" />
+                          <TableActions
+                            actions={[
+                              {
+                                type: "modal",
+                                label: "Edit",
+                                icon: <LuPencil className="text-sm" />,
+                                modal: (onClose) => (
+                                  <FinanceModal
+                                    text={"Edit your harvest"}
+                                    forWhat="Edit"
+                                    type={"Harvest"}
+                                    iconColor="bg-[#e8f5ec] text-[#2d8952]"
+                                    Icon={GiDigDug}
+                                    open={true}
+                                    onClose={onClose}
+                                  >
+                                    <CreateHarvestFormFetch
+                                      def={s}
+                                      onClose={onClose}
+                                    />
+                                  </FinanceModal>
+                                ),
+                              },
+                              {
+                                type: "callback",
+                                label:
+                                  deleteStat === "pending"
+                                    ? "Deleting..."
+                                    : "Delete",
+                                icon: <LuTrash2 className="text-sm" />,
+                                variant: "danger",
+                                onClick: () =>
+                                  remove(
+                                    {
+                                      collection: "harvests",
+                                      id: s.id,
+                                      workspaceId: workspace.id,
+                                      userId: user.id,
+                                    },
+                                    {
+                                      onSuccess: () => {
+                                        toast("Deleted successfully", {
+                                          description:
+                                            "You've deleted a record",
+                                        });
+                                      },
+                                      onError: (err) =>
+                                        toast("Error deleting harvest", {
+                                          description: err.message,
+                                          duration: 4000,
+                                          closeButton: true,
+                                        }),
+                                    },
+                                  ),
+                              },
+                            ]}
+                          />
                         </div>
                       </td>
                     </tr>

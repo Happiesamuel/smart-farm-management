@@ -96,7 +96,7 @@ export function CreateCropSelect({
       name={name}
       render={({ field }) => (
         <FormItem className=" w-full min-w-[2px]">
-          <FormLabel className="text-sm text-sidebar-content gap-1 font-normal">
+          <FormLabel className="text-sm text-dark text-sidebar-content gap-1 font-normal">
             {label}
           </FormLabel>
           <div className="w-full flex justify-center items-center min-w-[2px]">
@@ -151,7 +151,7 @@ export function CreateCropInputSelect({
 }: InputSelect) {
   return (
     <div className="space-y-2 w-full">
-      <div className="text-sm  text-dark">{label}</div>
+      <div className="text-sm text-start text-dark">{label}</div>
       <div className="flex items-cente">
         <FormField
           control={control}
@@ -218,7 +218,9 @@ export default function CreateCropInput({
       name={name}
       render={({ field }) => (
         <FormItem className="w-full">
-          <FormLabel className="text-sm  text-dark">{label}</FormLabel>
+          <FormLabel className="text-sm text-dark  text-dark">
+            {label}
+          </FormLabel>
           <FormControl>
             <div className="h-9! border border-border  px-2 rounded-md flex items-center gap-2">
               {Icon && <Icon className="text-primary-green" />}
@@ -244,7 +246,9 @@ export function CreateCropText({ name, label, placeholder, control }: Inputs) {
       name={name}
       render={({ field }) => (
         <FormItem className="w-full">
-          <FormLabel className="text-sm   text-dark">{label}</FormLabel>
+          <FormLabel className="text-sm text-dark   text-dark">
+            {label}
+          </FormLabel>
           <FormControl>
             <Textarea
               placeholder={placeholder}
@@ -285,7 +289,9 @@ export function CreateCropDate({
             : undefined;
         return (
           <FormItem className="w-full">
-            <FormLabel className="text-sm text-dark">{label}</FormLabel>
+            <FormLabel className="text-sm text-dark text-dark">
+              {label}
+            </FormLabel>
 
             <Popover>
               <PopoverTrigger asChild>

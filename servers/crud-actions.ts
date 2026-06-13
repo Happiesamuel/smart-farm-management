@@ -175,12 +175,13 @@ export const updateDoc = async ({
 }) => {
   await validateWorkspaceAccess({ userId, workspaceId });
   const { database } = await createAdminClient();
-  return await database.updateDocument(
+  await database.updateDocument(
     appwriteConfig.databaseId,
     collection,
     id,
     data,
   );
+  return true;
 };
 export const updateField = async ({
   collection,
@@ -221,9 +222,6 @@ export const deleteDoc = async ({
 }) => {
   await validateWorkspaceAccess({ userId, workspaceId });
   const { database } = await createAdminClient();
-  return await database.deleteDocument(
-    appwriteConfig.databaseId,
-    collection,
-    id,
-  );
+  await database.deleteDocument(appwriteConfig.databaseId, collection, id);
+  return true;
 };

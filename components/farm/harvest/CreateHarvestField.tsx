@@ -87,6 +87,7 @@ interface Dates {
   control: Control<z.infer<typeof createHarvestSchema>>;
   name: FieldPath<z.infer<typeof createHarvestSchema>>;
   label: string;
+  placeholder: string;
 }
 
 export function CreateHarvestSelect({
@@ -105,7 +106,7 @@ export function CreateHarvestSelect({
       name={name}
       render={({ field }) => (
         <FormItem className=" w-full min-w-[2px]">
-          <FormLabel className="text-sm text-sidebar-content gap-1 font-normal">
+          <FormLabel className="text-dark text-sm text-sidebar-content gap-1 font-normal">
             {label}
           </FormLabel>
           <div className="w-full flex justify-center items-center min-w-[2px]">
@@ -163,7 +164,7 @@ export function CreateHarvestInputSelect({
 }: InputSelect) {
   return (
     <div className="space-y-2 w-full">
-      <div className="text-sm  text-dark">{label}</div>
+      <div className="text-sm  text-dark text-start">{label}</div>
       <div className="flex items-cente">
         <FormField
           control={control}
@@ -229,7 +230,9 @@ export default function CreateHarvestInput({
       name={name}
       render={({ field }) => (
         <FormItem className="w-full">
-          <FormLabel className="text-sm  text-dark">{label}</FormLabel>
+          <FormLabel className="text-dark text-sm  text-dark">
+            {label}
+          </FormLabel>
           <FormControl>
             <div className="h-9! border border-border  px-2 rounded-md flex items-center gap-2">
               <Input
@@ -259,7 +262,9 @@ export function CreateHarvestText({
       name={name}
       render={({ field }) => (
         <FormItem className="w-full">
-          <FormLabel className="text-sm   text-dark">{label}</FormLabel>
+          <FormLabel className="text-dark text-sm   text-dark">
+            {label}
+          </FormLabel>
           <FormControl>
             <Textarea
               placeholder={placeholder}
@@ -278,7 +283,7 @@ export function CreateHarvestText({
   );
 }
 
-export function CreateHavestDate({ control, name, label }: Dates) {
+export function CreateHavestDate({ control, name, label, placeholder }: Dates) {
   return (
     <FormField
       control={control}
@@ -286,7 +291,9 @@ export function CreateHavestDate({ control, name, label }: Dates) {
       render={({ field }) => {
         return (
           <FormItem className="w-full">
-            <FormLabel className="text-sm text-dark">{label}</FormLabel>
+            <FormLabel className="text-dark text-sm text-dark">
+              {label}
+            </FormLabel>
 
             <Popover>
               <PopoverTrigger asChild>
@@ -302,7 +309,7 @@ export function CreateHavestDate({ control, name, label }: Dates) {
                     {field.value ? (
                       format(field.value as string, "PPP")
                     ) : (
-                      <span>Pick a date</span>
+                      <span>{placeholder}</span>
                     )}
                   </Button>
                 </FormControl>
@@ -314,7 +321,9 @@ export function CreateHavestDate({ control, name, label }: Dates) {
                   selected={
                     field.value ? new Date(field.value as string) : undefined
                   }
-                  onSelect={(date) => field.onChange(date)}
+                  onSelect={(date) => {
+                    field.onChange(date);
+                  }}
                   disabled={(date) => date > new Date()}
                 />
               </PopoverContent>
@@ -437,7 +446,9 @@ export function CreateHarvestAmount({
       name={name}
       render={({ field }) => (
         <FormItem className="w-full">
-          <FormLabel className="text-sm  text-dark">{label}</FormLabel>
+          <FormLabel className="text-dark text-sm  text-dark">
+            {label}
+          </FormLabel>
           <FormControl>
             <div className="flex border border-border rounded-md h-9 px-3 items-center gap-2">
               <p className="text-dark/80 border-r pr-2 border-border">₦</p>

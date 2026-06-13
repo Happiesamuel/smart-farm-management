@@ -16,6 +16,7 @@ import { GoTasklist } from "react-icons/go";
 import { FiActivity } from "react-icons/fi";
 import { DashboardSheet, WorkerDashboardSheet } from "./DashboardSheet";
 import { useLogout } from "@/hooks/auth/useLogout";
+import { useApp } from "@/stores/useAppStore";
 
 export default function Header() {
   const links = [
@@ -94,6 +95,9 @@ export default function Header() {
     },
   ];
   const route = usePathname();
+  const { collaspe } = useCollaspe();
+  const { logoutUser } = useLogout();
+  const { ready, user } = useApp();
   const segments = route.split("/");
 
   const base = segments[1];
@@ -103,8 +107,7 @@ export default function Header() {
   const newRou = `/${base}/${workspaceId}/${slug}`;
 
   const active = links.find((x) => x.base === base && x.slug === slug);
-  const { collaspe } = useCollaspe();
-  const { logoutUser } = useLogout();
+
   return (
     <div
       className={`flex border-b border-border fixed max-w-424 py-3 bg-white px-2 md:px-4  min-w-0 z-100 w-full  ${collaspe ? "lg:w-[calc(100%-4.8rem)]" : "lg:w-[calc(100%-14rem)]"} items-center justify-between`}
@@ -132,25 +135,37 @@ export default function Header() {
           <IoMdNotificationsOutline className="text-2xl text-dark" />
           <div className="size-1.5 bg-light-green rounded-full absolute bottom-[70%] left-[50%]" />
         </Link>
-        <div className="flex items-center gap-3 lg:gap-2">
-          <Image
-            src={User}
-            width={35}
-            height={35}
-            alt="user"
-            className="rounded-full object-center object-cover border-2 border-light-green"
-          />
-          <div className="lg:hidden">
-            <DashboardSheet />
-            {/* <WorkerDashboardSheet /> */}
+        {!ready ? (
+          <div className="flex items-center gap-2">
+            <div className="size-9 bg-zinc-200 rounded-full animate-pulse" />
+            <div className="flex flex-col gap-1">
+              <div className="h-3 w-24 bg-zinc-200 rounded-full animate-pulse" />
+              <div className="h-2 w-32 bg-zinc-200 rounded-full animate-pulse" />
+            </div>
           </div>
-          <div className="hidden lg:block">
-            <p className="text-dark text-xs font-semibold">John Doe</p>
-            <p className="text-zinc-500 text-[10px] font-semibold">
-              johndoe@gmail.com
-            </p>
+        ) : (
+          <div className="flex items-center gap-3 lg:gap-2">
+            <Image
+              src={user?.avatar || User}
+              width={35}
+              height={35}
+              alt="user"
+              className="rounded-full object-center object-cover border-2 border-light-green"
+            />
+            <div className="lg:hidden">
+              <DashboardSheet />
+              {/* <WorkerDashboardSheet /> */}
+            </div>
+            <div className="hidden lg:block">
+              <p className="text-dark text-xs font-semibold">
+                {user?.fullName}
+              </p>
+              <p className="text-zinc-500 text-[10px] font-semibold">
+                {user?.email}
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
