@@ -7,7 +7,6 @@ export const metadata = {
   title: "Expenses",
 };
 export default function page() {
-
   const categories = [
     "All Categories",
     "Fertilizer",
@@ -20,15 +19,13 @@ export default function page() {
     "Transport",
   ];
 
-
-
   return (
     <div className="pt-18 px-2 sm:px-4 pb-8">
       <BothHeader type="expenses" />
-      <BothBoxes type="expenses"  />
-      <div className="grid h-fit lg:h-[600px] mt-2 grid-cols-1 xl:grid-cols-[1fr_15rem] border border-border rounded-md">
+      <BothBoxes type="expenses" />
+      <div className="grid h-fit xl:h-[650px] mt-2 grid-cols-1 xl:grid-cols-[1fr_15rem] border border-border rounded-md">
         <BothTable type="expense" arrayOne={categories} />
-        <BothOverView type="expense"  />
+        <BothOverView type="expense" />
       </div>
     </div>
   );

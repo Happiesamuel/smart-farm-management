@@ -25,11 +25,15 @@ import { useGetCrops, useGetFarmCrops } from "@/hooks/crops/useCrops";
 import { useGetFarm } from "@/hooks/farms/useFarm";
 import { useGetFarmFields, useGetFields } from "@/hooks/fields/useFields";
 import { FormLoader } from "@/components/loader/GeneralLoader";
+import { useUpdateDoc } from "@/hooks/useUpdate";
+import { format } from "date-fns";
 
 export default function FinanceExpenseFormFetch({
   onClose,
+  def,
 }: {
   onClose?(): void;
+  def?: { [key: string]: string | number };
 }) {
   const { workspace, user, ready } = useApp();
   const { farmId: x } = useParams();
@@ -99,6 +103,7 @@ export default function FinanceExpenseFormFetch({
       crop={crops}
       fieldss={fieldss}
       cropss={cropss}
+      def={def}
       onClose={onClose}
     />
   );
@@ -112,6 +117,7 @@ function FinanceExpenseFom({
   cropss,
   field,
   crop,
+  def,
   farmId,
   onClose,
 }: {
@@ -124,16 +130,33 @@ function FinanceExpenseFom({
   cropss: { [key: string]: string | number }[] | undefined;
   crop: { [key: string]: string | number }[] | undefined;
   onClose?(): void;
+  def?: { [key: string]: string | number };
 }) {
+  const defaultValue = def?.id
+    ? {
+        farm: farmId ?? def.farmId ?? "",
+        field: def?.fieldId ?? "",
+        crop: def.cropId ?? "",
+        category: (def?.category as string).toLowerCase() ?? "",
+        paymentMethod:
+          (def?.payment as string).toLowerCase().split(" ").join("-") ?? "",
+        status: (def?.status as string).toLowerCase() ?? "",
+        vendor: def?.vendor ?? "",
+        amount: (def?.total as string).replace(/[₦,]/g, ""),
+        description: def?.description ?? "",
+        expenseDate: def.date ? new Date(def.date) : new Date(),
+      }
+    : {
+        farm: farmId ? farmId : "",
+      };
   const form = useForm<z.infer<typeof financeExpenseSchema>>({
     resolver: zodResolver(financeExpenseSchema) as Resolver<
       z.infer<typeof financeExpenseSchema>
     >,
-    defaultValues: {
-      farm: farmId ? farmId : "",
-    },
+    defaultValues: defaultValue as z.infer<typeof financeExpenseSchema>,
   });
   const { farmId: id } = useParams();
+  const { update, status: upStat } = useUpdateDoc();
   const { createExpense, status } = useCreateExpenses();
   const watchedFarmId = form.watch("farm");
   const watchedFieldId = form.watch("field");
@@ -168,20 +191,52 @@ function FinanceExpenseFom({
         fields: field,
       },
     };
-    createExpense(obj, {
-      onSuccess: () => {
-        toast("Expenses created successfully", {
-          description: "You can now proceed to managing your task",
-        });
-        onClose?.();
-      },
-      onError: (err) =>
-        toast("Error creating expenses", {
-          description: err.message,
-          duration: 4000,
-          closeButton: true,
-        }),
-    });
+    if (def?.id) {
+      const o = obj.data;
+      const newO = {
+        ...o,
+        expenseDate: format(o.expenseDate, "PPP"),
+      };
+      update(
+        {
+          collection: "expenses",
+          id: (def.id as string).slice(4) as string,
+          data: newO,
+          workspaceId: workspaceId,
+          userId: userId,
+        },
+        {
+          onSuccess: () => {
+            toast("Expense updated successfully", {
+              description: "You've updated your expense record",
+            });
+
+            onClose?.();
+          },
+          onError: (err) =>
+            toast("Error updating expense record", {
+              description: err.message,
+              duration: 4000,
+              closeButton: true,
+            }),
+        },
+      );
+    } else {
+      createExpense(obj, {
+        onSuccess: () => {
+          toast("Expenses created successfully", {
+            description: "You can now proceed to managing your task",
+          });
+          onClose?.();
+        },
+        onError: (err) =>
+          toast("Error creating expenses", {
+            description: err.message,
+            duration: 4000,
+            closeButton: true,
+          }),
+      });
+    }
   }
 
   const category = [
@@ -249,7 +304,7 @@ function FinanceExpenseFom({
   ];
   return (
     <div className="w-full pt-3">
-      <p className="text-primary-green pb-1 text-sm w-full font-semibold border-border border-b">
+      <p className="text-primary-green text-start pb-1 text-sm w-full font-semibold border-border border-b">
         Expense Information
       </p>
 
@@ -263,7 +318,13 @@ function FinanceExpenseFom({
               name="category"
               control={form.control}
               label="Category"
-              placeholder="Select category"
+              placeholder={
+                def?.id
+                  ? ((category.find(
+                      (x) => x.value === (def.category as string).toLowerCase(),
+                    )?.name ?? "Select category") as string)
+                  : "Select category"
+              }
               array={category}
               Icon={AiOutlineTag}
             />
@@ -274,7 +335,9 @@ function FinanceExpenseFom({
               placeholder={
                 farmId
                   ? (farms.find((x) => x.value === farmId)?.name ?? "")
-                  : "Select farm"
+                  : def?.id
+                    ? (farms.find((x) => x.value === def.farmId)?.name ?? "")
+                    : "Select farm"
               }
               setValue={form.setValue}
               array={farmId || id ? [] : farms}
@@ -288,7 +351,12 @@ function FinanceExpenseFom({
               name="field"
               control={form.control}
               label="Field (optional)"
-              placeholder="Select field"
+              placeholder={
+                def?.id
+                  ? ((fields.find((x) => x.value === def.fieldId)?.name ??
+                      "Select Field") as string)
+                  : "Select field"
+              }
               key={watchedFarmId}
               setValue={form.setValue}
               array={fields as { [key: string]: string }[]}
@@ -298,7 +366,12 @@ function FinanceExpenseFom({
               name="crop"
               control={form.control}
               label="Crop (optional)"
-              placeholder="Select crop"
+              placeholder={
+                def?.id
+                  ? ((crops.find((x) => x.value === def.cropId)?.name ??
+                      "Select crop") as string)
+                  : "Select crop"
+              }
               key={watchedFieldId}
               array={crops as { [key: string]: string }[]}
               Icon={AiOutlineTag}
@@ -309,7 +382,18 @@ function FinanceExpenseFom({
               name="paymentMethod"
               control={form.control}
               label="Payment Method"
-              placeholder="Select payment method"
+              placeholder={
+                def?.id
+                  ? ((arrPayment.find(
+                      (x) =>
+                        x.value ===
+                        (def.payment as string)
+                          .toLowerCase()
+                          .split(" ")
+                          .join("-"),
+                    )?.name ?? "Select payment method") as string)
+                  : "Select payment method"
+              }
               array={arrPayment}
               Icon={MdOutlinePayment}
             />
@@ -317,7 +401,13 @@ function FinanceExpenseFom({
               name="status"
               control={form.control}
               label="Payment status"
-              placeholder="Select payment status"
+              placeholder={
+                def?.id
+                  ? ((stat.find(
+                      (x) => x.value === (def.status as string).toLowerCase(),
+                    )?.name ?? "Select Status") as string)
+                  : "Select Status"
+              }
               array={stat}
               Icon={MdOutlinePayment}
             />
@@ -359,17 +449,17 @@ function FinanceExpenseFom({
             </Button>
             <Button
               type="submit"
-              disabled={status === "pending"}
+              disabled={status === "pending" || upStat === "pending"}
               className="text-white bg-red-600 rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              {status === "pending" ? (
+              {status === "pending" || upStat === "pending" ? (
                 <>
                   <ButtonLoader />
-                  Creating...
+                  {def?.id ? "Updating..." : "Creating..."}
                 </>
               ) : (
                 <div className="flex items-center gap-2">
-                  <FaRegSave /> Save expense
+                  <FaRegSave /> {def?.id ? "Update Expense" : "Save Expense"}
                 </div>
               )}
             </Button>

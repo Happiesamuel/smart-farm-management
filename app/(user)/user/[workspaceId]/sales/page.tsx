@@ -7,8 +7,6 @@ export const metadata = {
   title: "Sales",
 };
 export default function page() {
-
-
   const crops = [
     "All Crops",
     "Maize",
@@ -23,13 +21,12 @@ export default function page() {
     "Soyabean",
   ];
 
-
   return (
     <div className="pt-18 px-2 sm:px-4 pb-8">
       <BothHeader type="sales" />
       <BothBoxes type="sales" />
 
-      <div className="grid xl:h-[600px] mt-4 grid-cols-1 xl:grid-cols-[1fr_15rem] border border-border rounded-md">
+      <div className="grid xl:h-[650px] mt-4 grid-cols-1 xl:grid-cols-[1fr_15rem] border border-border rounded-md">
         <BothTable type="sale" arrayOne={crops} />
         <BothOverView type="sale" />
       </div>

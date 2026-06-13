@@ -338,7 +338,7 @@ export const getGrowthStageData = (
   }));
 };
 
-function generateColors(count: number): string[] {
+export function generateColors(count: number): string[] {
   const base = [
     "#03732b",
     "#4e8afd",

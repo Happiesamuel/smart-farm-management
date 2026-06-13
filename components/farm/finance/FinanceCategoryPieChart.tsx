@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
 import { useApp } from "@/stores/useAppStore";
 import { useParams } from "next/navigation";
@@ -13,74 +13,92 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { useGetFarmExpenses } from "@/hooks/expense/useExpense";
-
+import { generateColors } from "@/lib/functions";
 
 export function FinanceCategoryPieChart() {
+  const { farmId } = useParams();
+  const { workspace, user, ready } = useApp();
+  const { expenses, status, error } = useGetFarmExpenses(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
+  if (!ready)
+    return (
+      <div className="h-35">
+        <FormLoader>Loading app...</FormLoader>
+      </div>
+    );
 
+  if (!user || !workspace)
+    return (
+      <div className="h-35">
+        <NoResult>Unauthorised</NoResult>
+      </div>
+    );
 
-const {farmId}=useParams()
-const {workspace,user,ready}=useApp()
-const {expenses,status,error} = useGetFarmExpenses(workspace?.id??null,user?.id??null,farmId as string)
-if (!ready) return <div className="h-35"><FormLoader>Loading app...</FormLoader></div>;
+  const isLoading = status === "pending";
 
-if (!user || !workspace) return <div className="h-35"><NoResult>Unauthorised</NoResult></div>
+  if (isLoading)
+    return (
+      <div className="h-35">
+        <FormLoader>Loading Expense chart...</FormLoader>
+      </div>
+    );
 
-const isLoading =
-  status === "pending" 
+  const errorMessage = error?.message;
 
-if (isLoading) return <div className="h-35"><FormLoader>Loading Expense chart...</FormLoader></div>;
+  if (errorMessage)
+    return (
+      <div className="h-35">
+        <NoResult>{errorMessage}</NoResult>
+      </div>
+    );
 
-const errorMessage =
- error?.message  
+  if (!expenses?.length)
+    return (
+      <div className="h-35">
+        <NoResult>No sales found!</NoResult>
+      </div>
+    );
 
-if (errorMessage) return <div className="h-35"><NoResult>{errorMessage}</NoResult></div>;
+  const categoryTotals =
+    expenses?.reduce(
+      (acc, exp) => {
+        const key = exp.category || "Others";
 
-if (!expenses?.length) return <div className="h-35"><NoResult>No sales found!</NoResult></div>;
+        if (!acc[key]) acc[key] = 0;
 
+        acc[key] += Number(exp.amount || 0);
 
-const categoryTotals =
-  expenses?.reduce((acc, exp) => {
-    const key = exp.category || "Others";
-
-    if (!acc[key]) acc[key] = 0;
-
-    acc[key] += Number(exp.amount || 0);
-
-    return acc;
-  }, {} as Record<string, number>) ?? {};
+        return acc;
+      },
+      {} as Record<string, number>,
+    ) ?? {};
 
   const total = Object.values(categoryTotals).reduce(
-  (sum, val) => sum + val,
-  0
-);
+    (sum, val) => sum + val,
+    0,
+  );
 
-const COLORS = [
-  "#ab75e0",
-  "#ffab07",
-  "#63c634",
-  "#5c8de2",
-  "#808692",
-];
+  const COLORS = generateColors(total);
 
-const chartData = Object.entries(categoryTotals).map(
-  ([key, value], index) => ({
-    food:    
-        key.charAt(0).toUpperCase() +
-        key.slice(1),
-    value: total > 0 ? Number(((value / total) * 100).toFixed(1)) : 0,
-    fill: COLORS[index % COLORS.length],
-  })
-);
-const chartConfig = {
-  value: { label: "Value" },
-  ...Object.fromEntries(
-    Object.keys(categoryTotals).map((key) => [
-      key,
-      { label:  key.charAt(0).toUpperCase() +
-        key.slice(1) },
-    ])
-  ),
-} satisfies ChartConfig;
+  const chartData = Object.entries(categoryTotals).map(
+    ([key, value], index) => ({
+      food: key.charAt(0).toUpperCase() + key.slice(1),
+      value: total > 0 ? Number(((value / total) * 100).toFixed(1)) : 0,
+      fill: COLORS[index % COLORS.length],
+    }),
+  );
+  const chartConfig = {
+    value: { label: "Value" },
+    ...Object.fromEntries(
+      Object.keys(categoryTotals).map((key) => [
+        key,
+        { label: key.charAt(0).toUpperCase() + key.slice(1) },
+      ]),
+    ),
+  } satisfies ChartConfig;
 
   return (
     <Card className="w-full gap-0  h-[300px] xl:h-[220px] shrink-0">
@@ -96,7 +114,10 @@ const chartConfig = {
         <div className="flex sm:flex-row lg:flex-row  flex-col items-center h-full">
           {/* LEFT → PIE CHART */}
           <div className="w-full sm:w-[65%] lg:w-full xl:w-[55%] h-full">
-            <ChartContainer config={chartConfig}  className="w-full h-[220px] lg:h-[220px] xl:h-full md:h-full">
+            <ChartContainer
+              config={chartConfig}
+              className="w-full h-[220px] lg:h-[220px] xl:h-full md:h-full"
+            >
               <PieChart>
                 <ChartTooltip
                   cursor={false}
@@ -125,7 +146,11 @@ const chartConfig = {
     </Card>
   );
 }
-const CustomLegend = ({chartData}:{chartData:{food:string,value:number,fill:string}[]}) => {
+const CustomLegend = ({
+  chartData,
+}: {
+  chartData: { food: string; value: number; fill: string }[];
+}) => {
   return (
     <div className="flex overflow-scroll no-scroll lg:gap-2 sm:justify-start justify-center flex-row lg:flex-col sm:flex-col gap-2 text-xs">
       {chartData.map((item, index) => (

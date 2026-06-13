@@ -154,7 +154,7 @@ export default function FinanceSalesTable() {
   );
 
   return (
-    <div className=" px-4 md:h-[340px] overflow-hidden">
+    <div className=" px-4  overflow-hidden">
       {/* Title */}
       <div className="py-2.5  font-semibold text-base text-dark">
         Sales Records
@@ -168,7 +168,7 @@ export default function FinanceSalesTable() {
         </div>
       ) : (
         <>
-          <div className="hidden md:block overflow-x-auto">
+          <div className="hidden md:block md:h-[300px] overflow-x-auto">
             <table className="w-full text-sm ">
               <thead className=" bg-zinc-200/50 border rounded-t-2xl border-border text-gray-600">
                 <tr className="text-left ">

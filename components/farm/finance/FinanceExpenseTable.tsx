@@ -1,11 +1,19 @@
 "use client";
 import FinancePagination from "@/components/layout/FinancePagination";
+import TableActions from "@/components/layout/TableAction";
 import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
+import { FinanceModal } from "@/components/modals/FinanceModal";
 import { useGetFarmExpenses } from "@/hooks/expense/useExpense";
 import { useFinanceFilters } from "@/hooks/useFinanceFilters";
 import { useApp } from "@/stores/useAppStore";
 import { useParams, useSearchParams } from "next/navigation";
-import { FaEye, FaEllipsisV } from "react-icons/fa";
+import { LuPencil, LuTrash2 } from "react-icons/lu";
+import FinanceExpenseFormFetch from "./FinanceExpenseFom";
+import { GrMoney } from "react-icons/gr";
+import { toast } from "sonner";
+import { useDeleteDoc } from "@/hooks/useDelete";
+import { useGetFarmCrops } from "@/hooks/crops/useCrops";
+import { useGetFarmFields } from "@/hooks/fields/useFields";
 
 const paymentStyles: Record<string, string> = {
   Transfer: "bg-green-100 text-green-700",
@@ -23,12 +31,30 @@ export default function FinanceExpenseTable() {
   const searchParams = useSearchParams();
   const { workspace, user, ready } = useApp();
   const { filterByDate } = useFinanceFilters();
+  const { remove, status: deleteStat } = useDeleteDoc();
   const { expenses, status, error } = useGetFarmExpenses(
     workspace?.id ?? null,
     user?.id ?? null,
     farmId as string,
   );
-
+  const {
+    crops,
+    status: cropStat,
+    error: cropErr,
+  } = useGetFarmCrops(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
+  const {
+    fields,
+    status: fieldStat,
+    error: fieldErr,
+  } = useGetFarmFields(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
   if (!ready)
     return (
       <div className="h-70">
@@ -43,7 +69,8 @@ export default function FinanceExpenseTable() {
       </div>
     );
 
-  const isLoading = status === "pending";
+  const isLoading =
+    status === "pending" || fieldStat === "pending" || cropStat === "pending";
 
   if (isLoading)
     return (
@@ -52,7 +79,7 @@ export default function FinanceExpenseTable() {
       </div>
     );
 
-  const errorMessage = error?.message;
+  const errorMessage = error?.message || fieldErr?.message || cropErr?.message;
 
   if (errorMessage)
     return (
@@ -68,8 +95,12 @@ export default function FinanceExpenseTable() {
       </div>
     );
 
+  const fieldMap = new Map(fields?.map((f) => [f.$id, f]));
+  const cropMap = new Map(crops?.map((c) => [c.$id, c]));
   const expensesArr =
     expenses?.map((expense, index) => {
+      const field = fieldMap.get(expense?.fields);
+      const crop = cropMap.get(expense?.crops);
       return {
         id: expense.$id ? `EXP-${expense.$id}` : `EXP-${index + 1}`,
 
@@ -80,7 +111,8 @@ export default function FinanceExpenseTable() {
         }),
 
         farm: expense.farmName ?? "-", // optional if you join farms
-
+        cropId: crop?.$id ?? "",
+        fieldId: field?.$id ?? "",
         category:
           expense.category.charAt(0).toUpperCase() + expense.category.slice(1),
 
@@ -116,7 +148,7 @@ export default function FinanceExpenseTable() {
     currentPage * PAGE_SIZE,
   );
   return (
-    <div className=" px-4 md:h-[340px] overflow-hidden">
+    <div className=" px-4  overflow-hidden">
       {/* Title */}
       <div className="py-2.5 border-t border-border font-semibold text-base text-dark">
         Expense Records
@@ -130,7 +162,7 @@ export default function FinanceExpenseTable() {
       ) : (
         <>
           {" "}
-          <div className="hidden md:block overflow-x-auto">
+          <div className="hidden md:h-[300px] md:block overflow-x-auto">
             <table className="w-full text-sm ">
               <thead className=" bg-zinc-200/50 border rounded-t-2xl border-border text-gray-600">
                 <tr className="text-left ">
@@ -213,8 +245,62 @@ export default function FinanceExpenseTable() {
 
                     <td className="py-3 px-2 truncate font-medium max-w-[70px] px- text-xs text-zinc-700 text-right">
                       <div className="flex justify-end gap-3 text-gray-500">
-                        <FaEye className="cursor-pointer hover:text-black" />
-                        <FaEllipsisV className="cursor-pointer hover:text-black" />
+                        <TableActions
+                          actions={[
+                            {
+                              type: "modal",
+                              label: "Edit",
+                              icon: <LuPencil className="text-sm" />,
+                              modal: (onClose) => (
+                                <FinanceModal
+                                  text={"Edit your crop"}
+                                  forWhat="Edit"
+                                  type={"Expense"}
+                                  iconColor="bg-[#e8f5ec] text-[#2d8952]"
+                                  Icon={GrMoney}
+                                  open={true}
+                                  onClose={onClose}
+                                >
+                                  <FinanceExpenseFormFetch
+                                    def={s}
+                                    onClose={onClose}
+                                  />
+                                </FinanceModal>
+                              ),
+                            },
+                            {
+                              type: "callback",
+                              label:
+                                deleteStat === "pending"
+                                  ? "Deleting..."
+                                  : "Delete",
+                              icon: <LuTrash2 className="text-sm" />,
+                              variant: "danger",
+                              onClick: () =>
+                                remove(
+                                  {
+                                    collection: "expenses",
+                                    id: s.id.slice(4),
+                                    workspaceId: workspace.id,
+                                    userId: user.id,
+                                  },
+                                  {
+                                    onSuccess: () => {
+                                      toast("Deleted successfully", {
+                                        description: "You've deleted a record",
+                                      });
+                                    },
+                                    onError: (err) =>
+                                      toast("Error deleting expenses", {
+                                        description: err.message,
+                                        duration: 4000,
+                                        closeButton: true,
+                                      }),
+                                  },
+                                ),
+                            },
+                          ]}
+                        />
                       </div>
                     </td>
                   </tr>
@@ -256,7 +342,7 @@ export default function FinanceExpenseTable() {
       )}
 
       <FinancePagination
-        type="expensess"
+        type="expenses"
         total={filtered.length}
         pageKey="expensePage"
       />

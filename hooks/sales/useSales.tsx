@@ -21,14 +21,17 @@ export const useCreateSales = () => {
       queryClient.invalidateQueries({
         queryKey: ["sales", variables.workspaceId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["farm-finance", variables.workspaceId],
+      });
     },
   });
   return { createSales, status };
 };
 
 export const useGetFarmSales = (
-  workspaceId: string|null,
-  userId: string|null,
+  workspaceId: string | null,
+  userId: string | null,
   farmId: string,
 ) => {
   const {
@@ -40,8 +43,8 @@ export const useGetFarmSales = (
     queryFn: () =>
       getFarmDocs({
         collection: "sales",
-        workspaceId:workspaceId as string,
-        userId:userId as string,
+        workspaceId: workspaceId as string,
+        userId: userId as string,
         farmId,
       }),
     enabled: !!workspaceId && !!userId && !!farmId,
@@ -49,7 +52,10 @@ export const useGetFarmSales = (
   return { sales, error, status };
 };
 
-export const useGetSales = (workspaceId: string|null, userId: string|null) => {
+export const useGetSales = (
+  workspaceId: string | null,
+  userId: string | null,
+) => {
   const {
     data: sales,
     status,
@@ -59,8 +65,8 @@ export const useGetSales = (workspaceId: string|null, userId: string|null) => {
     queryFn: () =>
       getDocs({
         collection: "sales",
-        workspaceId:workspaceId as string,
-        userId:userId as string,
+        workspaceId: workspaceId as string,
+        userId: userId as string,
       }),
   });
   return { sales, error, status };

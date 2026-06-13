@@ -677,12 +677,7 @@ export const financeExpenseSchema = z.object({
 
   vendor: z.string().optional(), // who you paid
 
-  description: z
-    .string()
-    .min(10, {
-      message: "Description must be at least 10 characters.",
-    })
-    .optional(),
+  description: z.string().optional(),
 });
 // export const financeExpenseSchema = z.object({
 //   category: z
