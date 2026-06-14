@@ -6,7 +6,6 @@ import {
   getWorkspace,
   getWorkspaceByWorkspaceId,
   getWorkspaceMembers,
-  getWorkspaceMembersWithWorkspaceId,
 } from "@/servers/workspace-action";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -51,7 +50,9 @@ export function useGetWorkspaceByWorkspaceId(workspaceId: string | undefined) {
 
   return { workspace, status, error, refetch };
 }
-export function useGetWorkspaceMembersWithWorkspaceId(workspaceId: string) {
+export function useGetWorkspaceMembersWithWorkspaceId(
+  workspaceId: string | null,
+) {
   const {
     data: workspaceMember,
     status,
@@ -59,7 +60,7 @@ export function useGetWorkspaceMembersWithWorkspaceId(workspaceId: string) {
     refetch,
   } = useQuery({
     queryKey: ["workspaceMembers", workspaceId],
-    queryFn: async () => await getWorkspaceMembers(workspaceId),
+    queryFn: async () => await getWorkspaceMembers(workspaceId as string),
     enabled: !!workspaceId,
   });
 

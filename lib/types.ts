@@ -135,13 +135,13 @@ export interface HarvestInfo {
 }
 export interface TaskInfo {
   taskTitle: string;
-  farm: string;
-  field: string;
-  priority: string;
+  farms: string;
+  fields: string;
+  priority: "low" | "high" | "medium";
   assignTo: string;
   description: string;
-  dueDate: string;
-  farmId: string;
+  status: "pending" | "in_progress" | "cancelled" | "delayed" | "completed";
+  dueDate: string | Date;
   id: string;
   workspaces: string;
   users: string;

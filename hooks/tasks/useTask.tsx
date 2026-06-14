@@ -14,12 +14,12 @@ export const useCreateTask = () => {
     }) =>
       createDoc({
         ...data,
-        collection: "task",
+        collection: "tasks",
       }),
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["task", variables.workspaceId],
+        queryKey: ["tasks", variables.workspaceId],
       });
     },
   });
@@ -27,8 +27,8 @@ export const useCreateTask = () => {
 };
 
 export const useGetFarmTasks = (
-  workspaceId: string,
-  userId: string,
+  workspaceId: string | null,
+  userId: string | null,
   farmId: string,
 ) => {
   const {
@@ -40,8 +40,8 @@ export const useGetFarmTasks = (
     queryFn: () =>
       getFarmDocs({
         collection: "tasks",
-        workspaceId,
-        userId,
+        workspaceId: workspaceId as string,
+        userId: userId as string,
         farmId,
       }),
     enabled: !!workspaceId && !!userId && !!farmId,

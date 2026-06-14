@@ -1,4 +1,4 @@
-import CreateTaskForm from "@/components/farm/tasks/CreateTaskForm";
+import CreateCropTaskFetch from "@/components/farm/tasks/CreateTaskForm";
 import TaskPriorityGuide from "@/components/farm/tasks/TaskPriorityGuide";
 import { FaRegCalendarCheck } from "react-icons/fa";
 
@@ -20,7 +20,7 @@ export default function page() {
       </div>
 
       <div className="grid gap-6 md:gap-3 lg:gap-0 grid-cols-1 lg:grid-cols-[1fr_0.5fr] xl:grid-cols-[1fr_0.4fr]">
-        <CreateTaskForm />
+        <CreateCropTaskFetch />
         <TaskPriorityGuide />
       </div>
     </div>

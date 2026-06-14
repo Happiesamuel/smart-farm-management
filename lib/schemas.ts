@@ -594,20 +594,26 @@ export const createTaskSchema = z.object({
     .string({ message: "Please select farm field" })
     .min(1, "Please select farm field"),
   //optional
-  priority: z
-    .string({ message: "Please select priority" })
-    .min(1, "Please select priority"),
+  priority: z.enum(["low", "high", "medium"], {
+    message: "Please select a priority",
+  }),
+  status: z.enum(
+    ["pending", "in_progress", "cancelled", "delayed", "completed"],
+    {
+      message: "Please select a status",
+    },
+  ),
   assignTo: z
     .string({ message: "Please select assignee" })
     .min(1, "Please select assignee"), //assign
 
   description: z
-    .string({ message: "descripton is required" })
-    .min(10, { message: "description must be at least 10 characters." }),
+    .string({ message: "Descripton is required" })
+    .min(10, { message: "Description must be at least 10 characters." }),
 
-  dueDate: z
-    .string({ message: " Date is required" })
-    .min(1, "Date is required"),
+  dueDate: z.date({
+    error: "Due date is required",
+  }),
 });
 export const activitySchema = z.object({
   taskName: z.string({ message: "Task name is required" }).min(4, {

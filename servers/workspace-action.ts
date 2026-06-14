@@ -163,3 +163,73 @@ export const getUserWorkspacesWithRole = async ({
     };
   });
 };
+
+export const getWorkspaceAssignOptions = async (workspaceId: string) => {
+  const { database } = await createAdminClient();
+
+  const membersRes = await database.listDocuments(
+    appwriteConfig.databaseId,
+    "workspaceMembers",
+    [Query.equal("workspaces", workspaceId)],
+  );
+
+  const members = membersRes.documents;
+
+  const userIds = members.map((m) => m.users);
+
+  if (!userIds.length) return [];
+
+  const usersRes = await database.listDocuments(
+    appwriteConfig.databaseId,
+    "users",
+    [Query.equal("$id", userIds)],
+  );
+
+  const users = usersRes.documents;
+
+  // 🔥 RETURN PLAIN DATA ONLY
+  return members.map((m) => {
+    const user = users.find((u) => u.$id === m.users);
+
+    return {
+      name: user?.fullName ?? "Unknown User",
+      value: user?.$id ?? "",
+      role: m.role,
+    };
+  });
+};
+export const getWorkspaceUser = async (workspaceId: string) => {
+  const { database } = await createAdminClient();
+
+  const membersRes = await database.listDocuments(
+    appwriteConfig.databaseId,
+    "workspaceMembers",
+    [Query.equal("workspaces", workspaceId)],
+  );
+
+  const members = membersRes.documents;
+
+  const userIds = members.map((m) => m.users);
+
+  if (!userIds.length) return [];
+
+  const usersRes = await database.listDocuments(
+    appwriteConfig.databaseId,
+    "users",
+    [Query.equal("$id", userIds)],
+  );
+
+  const users = usersRes.documents;
+
+  // 🔥 RETURN PLAIN DATA ONLY
+  return members.map((m) => {
+    const user = users.find((u) => u.$id === m.users);
+
+    return {
+      name: user?.fullName ?? "Unknown User",
+      id: user?.$id ?? "",
+      avatar: user?.avatar ?? "",
+      email: user?.email ?? "",
+    };
+  });
+};
