@@ -1,7 +1,9 @@
 import CreateCropFormFetch from "@/components/farm/crops/CreateCropForm";
 
 import { PiPlantDuotone } from "react-icons/pi";
-
+export const metadata = {
+  title: "Add Crop",
+};
 export default function page() {
   return (
     <div className="pt-18 px-2 sm:px-4 ">

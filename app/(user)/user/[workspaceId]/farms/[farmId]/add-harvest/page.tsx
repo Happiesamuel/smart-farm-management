@@ -1,6 +1,8 @@
 import CreateHarvestFormFetch from "@/components/farm/harvest/CreateHarvestForm";
 import { GiDigDug } from "react-icons/gi";
-
+export const metadata = {
+  title: "Add Harvest",
+};
 export default function page() {
   return (
     <div className="pt-18 px-2 sm:px-4 ">

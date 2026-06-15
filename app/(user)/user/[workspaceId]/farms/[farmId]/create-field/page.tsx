@@ -1,6 +1,8 @@
 import CreateFieldFormFetch from "@/components/farm/fields/CreateFieldForm";
 import { IoGrid } from "react-icons/io5";
-
+export const metadata = {
+  title: "Create Field",
+};
 export default function page() {
   return (
     <div className="pt-18 px-2 sm:px-4 ">

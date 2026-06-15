@@ -32,8 +32,8 @@ export default function TaskFilter({
   assigns,
   fields,
 }: {
-  assigns: { name: string; value: string }[];
-  fields: { name: string; value: string }[];
+  assigns?: { name: string; value: string }[];
+  fields?: { name: string; value: string }[];
 }) {
   const searchParams = useSearchParams();
   const { farmId, workspaceId } = useParams();

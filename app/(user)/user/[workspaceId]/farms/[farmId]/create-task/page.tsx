@@ -1,7 +1,9 @@
 import CreateCropTaskFetch from "@/components/farm/tasks/CreateTaskForm";
 import TaskPriorityGuide from "@/components/farm/tasks/TaskPriorityGuide";
 import { FaRegCalendarCheck } from "react-icons/fa";
-
+export const metadata = {
+  title: "Create Task",
+};
 export default function page() {
   return (
     <div className="pt-18 px-2 sm:px-4 ">

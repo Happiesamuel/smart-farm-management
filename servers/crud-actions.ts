@@ -21,7 +21,6 @@ export const validateWorkspaceAccess = async ({
   userId: string;
   workspaceId: string;
 }) => {
-  console.log(userId, workspaceId);
   const { database } = await createAdminClient();
   const res = await database.listDocuments(
     appwriteConfig.databaseId,

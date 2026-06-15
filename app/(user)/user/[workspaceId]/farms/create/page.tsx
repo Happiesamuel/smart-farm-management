@@ -1,7 +1,9 @@
 import CreateFarmForm from "@/components/farm/create/CreateFarmForm";
 import React from "react";
 import { PiFarm } from "react-icons/pi";
-
+export const metadata = {
+  title: "Add Farm",
+};
 export default function page() {
   return (
     <div className="pt-18 px-2 sm:px-4 ">
