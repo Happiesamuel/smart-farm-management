@@ -1,7 +1,5 @@
 "use client";
-import { FaEllipsisV } from "react-icons/fa";
-import { MdOutlineEdit } from "react-icons/md";
-import CropPagination from "../../layout/CropPagination";
+
 import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
 import { useParams, useSearchParams } from "next/navigation";
 import { useCropFilter } from "@/hooks/useCropFilter";
@@ -16,20 +14,9 @@ import { FinanceModal } from "@/components/modals/FinanceModal";
 import { FaRegCalendarCheck } from "react-icons/fa6";
 import CreateCropTaskFetch from "./CreateTaskForm";
 import { toast } from "sonner";
-import BothPagination from "@/components/salesExpense/BothPagination";
-import Paginate from "@/components/layout/Pagination";
+
 import FinancePagination from "@/components/layout/FinancePagination";
 import TaskFilter from "./TaskFilter";
-interface Tasks {
-  id: number;
-  task: string;
-  assignee: string;
-  initials: string;
-  due: string;
-  priority: string;
-  status: string;
-  progress: number;
-}
 
 const priorityStyles: Record<string, string> = {
   Low: "bg-green-100 text-green-700",

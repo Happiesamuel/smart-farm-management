@@ -214,7 +214,7 @@ export function ManagerSidebar() {
                 width={35}
                 height={35}
                 alt="user"
-                className="rounded-full object-cover border-2 border-light-green"
+                className="rounded-full object-cover "
               />
 
               <div>
@@ -297,6 +297,7 @@ export function ManagerSidebar() {
 }
 export function WorkerSidebar() {
   const { workspaceId } = useParams();
+  const { ready, user, role } = useApp();
   const pathname = usePathname();
   const { handleToogleCollapse, collaspe } = useCollaspe();
   const segments = pathname.split("/");
@@ -464,38 +465,60 @@ export function WorkerSidebar() {
           ))}
         </div>
 
-        <div className="absolute bottom-6 px-3 w-full">
-          <div className="flex items-center gap-2 border-t border-zinc-300 w-full pt-5">
-            <Image
-              src={User}
-              width={35}
-              height={35}
-              alt="user"
-              className="rounded-full object-cover border-2 border-light-green"
-            />
-
-            <div>
-              <p
-                className={`transition-opacity text-dark text-xs font-semibold duration-200 ${
-                  collaspe
-                    ? "opacity-0 w-0 overflow-hidden"
-                    : "opacity-100 w-auto delay-300"
-                }`}
-              >
-                John Doe
-              </p>
-
-              <p
-                className={`transition-opacity text-zinc-500 text-[10px] font-semibold duration-200 ${
-                  collaspe
-                    ? "opacity-0 w-0 overflow-hidden"
-                    : "opacity-100 w-auto delay-300"
-                }`}
-              >
-                Farm Manager
-              </p>
+        <div className="absolute z-50 bg-[#f3f3f3]   bottom-6 px-3 w-full">
+          {!ready ? (
+            <div className="flex items-center gap-2">
+              <div className="size-9 bg-zinc-200 rounded-full animate-pulse" />
+              <div className="flex flex-col gap-1">
+                <div
+                  className={`  ${
+                    collaspe
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100 w-auto delay-300"
+                  } transition-opacity duration-200   h-3 w-24  bg-zinc-200 rounded-full animate-pulse`}
+                />
+                <div
+                  className={` ${
+                    collaspe
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100 w-auto delay-300"
+                  } transition-opacity duration-200 h-2 w-32 bg-zinc-200 rounded-full animate-pulse`}
+                />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex items-center gap-2 border-t border-zinc-300 w-full pt-5">
+              <Image
+                src={user?.avatar || User}
+                width={35}
+                height={35}
+                alt="user"
+                className="rounded-full object-cover "
+              />
+
+              <div>
+                <p
+                  className={`transition-opacity text-dark text-xs font-semibold duration-200 ${
+                    collaspe
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100 w-auto delay-300"
+                  }`}
+                >
+                  {user?.fullName}
+                </p>
+
+                <p
+                  className={`transition-opacity text-zinc-500 text-[10px] font-semibold duration-200 ${
+                    collaspe
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100 w-auto delay-300"
+                  }`}
+                >
+                  {`${role === "owner" ? "Farm" : ""} ${role!.slice(0, 1).toUpperCase() + role!.slice(1)}`}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className="lg:hidden block fixed bottom-1.5 left-1/2 -translate-x-1/2 z-50">

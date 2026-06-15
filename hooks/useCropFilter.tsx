@@ -3,7 +3,7 @@ import { useSearchParams } from "next/navigation";
 
 export function useCropFilter() {
   const searchParams = useSearchParams();
-
+  const sort = searchParams.get("sort");
   const farm = searchParams.get("farm");
   const field = searchParams.get("field");
   const status = searchParams.get("status");
@@ -11,6 +11,7 @@ export function useCropFilter() {
   const quality = searchParams.get("quality");
   const priority = searchParams.get("priority");
   const assign = searchParams.get("assign");
+  const worTask = searchParams.get("worTask");
 
   function filterCrop<
     T extends {
@@ -23,9 +24,10 @@ export function useCropFilter() {
       priority?: string;
       assignTo?: string;
       taskTitle?: string;
+      createdAt?: string;
     },
   >(items: T[]): T[] {
-    return items.filter((item) => {
+    const filtered = items.filter((item) => {
       if (farm && farm !== "all" && item.farm !== farm.split("+").join(" "))
         return false;
       if (field && field !== "all" && item.field !== field.split("+").join(" "))
@@ -50,6 +52,13 @@ export function useCropFilter() {
         item.quality?.toLowerCase() !== quality
       )
         return false;
+      if (
+        worTask &&
+        worTask !== "all" &&
+        item.status?.toLowerCase() !== worTask
+      )
+        return false;
+
       if (search) {
         const q = search.toLowerCase();
         const matchesName = item.name?.toLowerCase().includes(q);
@@ -60,6 +69,19 @@ export function useCropFilter() {
 
       return true;
     });
+    if (sort === "recent") {
+      return filtered.sort(
+        (a, b) =>
+          new Date(b.createdAt ?? 0).getTime() -
+          new Date(a.createdAt ?? 0).getTime(),
+      );
+    }
+
+    return filtered.sort(
+      (a, b) =>
+        new Date(a.createdAt ?? 0).getTime() -
+        new Date(b.createdAt ?? 0).getTime(),
+    );
   }
 
   return { farm, filterCrop };

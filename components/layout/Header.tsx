@@ -150,7 +150,7 @@ export default function Header() {
               width={35}
               height={35}
               alt="user"
-              className="rounded-full object-center object-cover border-2 border-light-green"
+              className="rounded-full object-center object-cover "
             />
             <div className="lg:hidden">
               <DashboardSheet />

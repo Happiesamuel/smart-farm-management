@@ -1,29 +1,33 @@
 "use client";
 
 import { useCollaspe } from "@/context/SidebarCollasibleContext";
-import { useApp } from "@/stores/useAppStore";
 import { FaRegCalendarCheck } from "react-icons/fa6";
 import { GrMoney } from "react-icons/gr";
 import { PiFarm, PiPlant, PiPackage, PiChartLine } from "react-icons/pi";
-import { TfiLayoutGrid4 } from "react-icons/tfi";
-export default function DashboardFarms() {
+import { TbPigMoney } from "react-icons/tb";
+interface Stat {
+  totalFarms: number;
+  totalFields: number;
+  totalCrops: number;
+  activeTasks: number;
+  completedTasks: number;
+
+  totalRevenue: number;
+  totalExpenses: number;
+  netProfit: number;
+  profitMargin: number;
+}
+export default function DashboardFarms({ stat }: { stat: Stat }) {
   const stats = [
     {
-      num: 2,
+      num: stat.totalFarms,
       name: "Total Farms",
       icon: <PiFarm />,
       iconColor: "bg-[#e8f5ec] text-[#2d8952] ",
       bg: "bg-[#f8fdf9]",
       border: "border-green-100",
     },
-    {
-      num: 12,
-      name: "Total Fields",
-      icon: <TfiLayoutGrid4 />,
-      iconColor: "bg-[#e1eefd] text-[#1058d6] ",
-      bg: "bg-[#f7fafe]",
-      border: "border-blue-100",
-    },
+
     {
       num: 18,
       name: "Total Crops",
@@ -41,7 +45,7 @@ export default function DashboardFarms() {
       border: "border-orange-100",
     },
     {
-      num: "₦1,250,000",
+      num: `₦${stat.totalRevenue.toLocaleString()}`,
       name: "Total Revenue",
       icon: <PiPackage />,
       iconColor: "bg-[#e7f5eb] text-[#056b36] ",
@@ -49,7 +53,7 @@ export default function DashboardFarms() {
       border: "border-green-100",
     },
     {
-      num: "₦620,000",
+      num: `₦${stat.totalExpenses.toLocaleString()}`,
       name: "Total Expenses",
       icon: <GrMoney />,
       iconColor: "bg-[#fee7e7] text-[#e82a2d] ",
@@ -57,16 +61,23 @@ export default function DashboardFarms() {
       border: "border-red-100",
     },
     {
-      num: "₦630,000",
+      num: `₦${stat.netProfit.toLocaleString()}`,
       name: "Net Profit",
       icon: <PiChartLine />,
       iconColor: "bg-[#e7f5eb] text-[#056b36] ",
       bg: "bg-[#f5faf6]",
       border: "border-green-100",
     },
+    {
+      num: `${stat.profitMargin}%`,
+      name: "Profit Margin",
+      icon: <TbPigMoney />,
+      iconColor: "bg-[#e1eefd] text-[#1058d6] ",
+      bg: "bg-[#f7fafe]",
+      border: "border-blue-100",
+    },
   ];
   const { collaspe } = useCollaspe();
-  const { user, workspace, role } = useApp();
   return (
     <div className="pb-4">
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7 gap-2">

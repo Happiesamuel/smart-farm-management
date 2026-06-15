@@ -49,7 +49,10 @@ export const useGetFarmTasks = (
   return { tasks, error, status };
 };
 
-export const useGetTasks = (workspaceId: string, userId: string) => {
+export const useGetTasks = (
+  workspaceId: string | null,
+  userId: string | null,
+) => {
   const {
     data: tasks,
     status,
@@ -59,9 +62,10 @@ export const useGetTasks = (workspaceId: string, userId: string) => {
     queryFn: () =>
       getDocs({
         collection: "tasks",
-        workspaceId,
-        userId,
+        workspaceId: workspaceId as string,
+        userId: userId as string,
       }),
+    enabled: !!workspaceId && !!userId,
   });
   return { tasks, error, status };
 };
