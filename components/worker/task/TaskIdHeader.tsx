@@ -9,8 +9,9 @@ import {
 } from "../../ui/select";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { RxUpdate } from "react-icons/rx";
+import { TaskInfo } from "@/lib/types";
 
-export default function TaskIdHeader() {
+export default function TaskIdHeader({ task }: { task: TaskInfo }) {
   const [val, setVal] = useState("pending");
   const array = [
     {
@@ -31,12 +32,12 @@ export default function TaskIdHeader() {
       <div className="flex items-center text-sm text-zinc-500">
         <p>My Tasks </p>
         <MdOutlineKeyboardArrowRight />
-        <p>taskID</p>
+        <p>ID-{task.id}</p>
       </div>
       <div className="flex flex-col sm:flex-row items-start md:items-center justify-between">
         <div>
           <div className="pb-3 flex flex-col md:flex-row md:items-center items-start gap-3">
-            <p className="text-xl text-dark font-semibold ">Task Title</p>
+            <p className="text-xl text-dark font-semibold ">{task.taskTitle}</p>
             <div className="flex items-center gap-2">
               <p className="text-[#1058d6] w-fit text-sm px-3 py-1 rounded-md bg-[#1058d6]/15">
                 In Progress

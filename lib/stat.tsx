@@ -1,3 +1,5 @@
+import { generateColors } from "./functions";
+
 export function buildExpensePieData(
   expenses: { [key: string]: string | number }[],
 ) {
@@ -12,14 +14,7 @@ export function buildExpensePieData(
 
   const total = Array.from(map.values()).reduce((a, b) => a + b, 0);
 
-  const colors = [
-    "#3f86ee",
-    "#53bf62",
-    "#fdb214",
-    "#e9575a",
-    "#b893ed",
-    "#c8c7ee",
-  ];
+  const colors = generateColors(total);
 
   const data = Array.from(map.entries()).map(([name, amt], i) => ({
     food: name,
@@ -226,4 +221,140 @@ export function buildDashboardStats({
     hasSales: totalRevenue > 0,
     hasExpenses: totalExpenses > 0,
   };
+}
+
+export function buildFarmPerformance(
+  farms: { [key: string]: string | number }[],
+  sales: { [key: string]: string | number }[],
+  expenses: { [key: string]: string | number }[],
+  range: "year" | "month",
+) {
+  const now = new Date();
+
+  const isSameMonth = (date: string | Date) => {
+    const d = new Date(date);
+    return (
+      d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    );
+  };
+
+  const isSameYear = (date: string | Date) => {
+    return new Date(date).getFullYear() === now.getFullYear();
+  };
+
+  const filterFn = range === "month" ? isSameMonth : isSameYear;
+
+  return farms
+    .map((farm) => {
+      // ✅ SALES → linked directly to farm
+      const farmSales = sales.filter(
+        (s) => s.farms === farm.$id && filterFn(s.saleDate as string),
+      );
+
+      // ✅ EXPENSES → linked directly to farm
+      const farmExpenses = expenses.filter(
+        (e) => e.farms === farm.$id && filterFn(e.expenseDate as string),
+      );
+
+      // 💰 Revenue
+      const revenue = farmSales.reduce(
+        (acc, s) => acc + (Number(s.totalAmount) || 0),
+        0,
+      );
+
+      // 💸 Expenses
+      const expense = farmExpenses.reduce(
+        (acc, e) => acc + (Number(e.amount) || 0),
+        0,
+      );
+
+      // 📈 Profit
+      const profit = revenue - expense;
+
+      // 📊 Margin
+      const margin = revenue > 0 ? Math.round((profit / revenue) * 100) : 0;
+
+      return {
+        id: farm.$id,
+        name: farm.farmName,
+        revenue,
+        expenses: expense,
+        profit,
+        margin,
+      };
+    })
+    .sort((a, b) => b.profit - a.profit) // 🔥 top performing
+    .slice(0, 5) as {
+    id: string;
+    name: string;
+    revenue: number;
+    expenses: number;
+    profit: number;
+    margin: number;
+  }[];
+}
+
+export function buildRecentTasks(
+  tasks: { [key: string]: string | number }[],
+  fields: { [key: string]: string | number }[],
+  farms: { [key: string]: string | number }[],
+) {
+  const fieldMap = new Map(fields.map((f) => [f.$id, f]));
+  const farmMap = new Map(farms.map((f) => [f.$id, f]));
+
+  const now = new Date();
+
+  return tasks
+    .map((task) => {
+      const field = fieldMap.get(task.fields);
+      const farm = farmMap.get(field?.farms as string);
+
+      const due = task.dueDate ? new Date(task.dueDate) : null;
+
+      const isOverdue = due && due < now && task.status !== "completed";
+      const isToday = due && due.toDateString() === now.toDateString();
+
+      return {
+        id: task.$id,
+        title: task.taskTitle,
+        farm: farm?.farmName ?? "Unknown Farm",
+        field: field?.fieldName ?? "Unknown Field",
+
+        date: due
+          ? due.toLocaleDateString("en-US", {
+              day: "numeric",
+              month: "short",
+            })
+          : "No date",
+
+        priority:
+          (task.priority as string)?.charAt(0).toUpperCase() +
+          (task.priority as string)?.slice(1),
+
+        status: task.status,
+
+        isDone: task.status === "completed",
+        isOverdue,
+        isToday,
+      };
+    })
+    .sort((a, b) => {
+      // 🔥 sort by urgency
+      if (a.isOverdue) return -1;
+      if (b.isOverdue) return 1;
+      if (a.isToday) return -1;
+      if (b.isToday) return 1;
+      return 0;
+    })
+    .slice(0, 6) as {
+    title: string;
+    farm: string;
+    field: string;
+    date: string;
+    priority: string;
+    id: string;
+    status: string;
+    isOverdue: boolean;
+    isToday: boolean;
+  }[];
 }

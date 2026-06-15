@@ -3,6 +3,7 @@ import { BiTask } from "react-icons/bi";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import TaskPagination from "./TaskPagination";
 import { NoResult } from "@/components/loader/GeneralLoader";
+import { useParams } from "next/navigation";
 const priorityStyles: Record<string, string> = {
   Low: "bg-green-100 text-green-700",
   Medium: "bg-yellow-100 text-yellow-700",
@@ -31,6 +32,7 @@ export default function TaskList({
     time: string;
   }[];
 }) {
+  const { workspaceId } = useParams();
   return (
     <div className="mt-4">
       {!tasks.length ? (
@@ -42,7 +44,7 @@ export default function TaskList({
           <div className="space-y-2">
             {tasks.map((l) => (
               <Link
-                href={`/worker/tasks/${l.id}`}
+                href={`/worker/${workspaceId}/tasks/${l.id}`}
                 key={l.id}
                 className="grid grid-cols-1 gap-2 md:grid-cols-[1fr_20rem] lg:grid-cols-[1fr_30rem] px-2.5 py-3 rounded-xl border border-border/80 shadow-xs hover:shadow-sm transition bg-white"
               >

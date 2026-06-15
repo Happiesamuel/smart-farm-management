@@ -120,7 +120,7 @@ const CustomLegend = ({
               className="w-2 h-2 rounded-full text-dark/80"
               style={{ backgroundColor: item.fill as unknown as string }}
             />
-            {item.food}
+            {item.food.slice(0, 1).toUpperCase() + item.food.slice(1)}
           </div>
 
           {/* Right */}

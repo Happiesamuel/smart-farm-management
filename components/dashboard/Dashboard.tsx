@@ -21,13 +21,17 @@ import {
   buildAreaChartData,
   buildDashboardStats,
   buildExpensePieData,
+  buildFarmPerformance,
   buildOverviewStats,
+  buildRecentTasks,
 } from "@/lib/stat";
 import { useState } from "react";
 const NOW = Date.now();
+
 export default function Dashboard() {
   const { workspace, user, ready } = useApp();
   const [val, setVal] = useState<"year" | "month">("year");
+  const [farmVal, setFarmVal] = useState<"year" | "month">("year");
   const { crops, status, error } = useGetCrops(
     workspace?.id ?? null,
     user?.id ?? null,
@@ -123,6 +127,12 @@ export default function Dashboard() {
     expenses,
     filter: val,
   });
+  const farmData = buildFarmPerformance(
+    farms as { [key: string]: string | number }[],
+    sales as { [key: string]: string | number }[],
+    expenses as { [key: string]: string | number }[],
+    farmVal as "year" | "month",
+  );
   const { data, total } = buildExpensePieData(
     expenses as { [key: string]: string | number }[],
   );
@@ -131,7 +141,11 @@ export default function Dashboard() {
     expenses as { [key: string]: string | number }[],
     val as "year" | "month",
   );
-
+  const recentTasks = buildRecentTasks(
+    tasks as { [key: string]: string | number }[],
+    fields as { [key: string]: string | number }[],
+    farms as { [key: string]: string | number }[],
+  );
   const farmMap = new Map(farms?.map((f) => [f.$id, f]));
   const stageProgressMap: Record<string, number> = {
     seedling: 10,
@@ -220,10 +234,14 @@ export default function Dashboard() {
       <div className=" grid grid-cols-1 pt-4  md:grid-cols-2 xl:grid-cols-3 items-stretch  justify-between gap-4">
         <DashboardSmartAlertts />
         <DashboardCropsStatus crops={cropArr} />
-        <DashboardRecentTasks />
+        <DashboardRecentTasks tasks={recentTasks} />
       </div>
       <div className="w-full   xl:h-[220px grid grid-cols-1 lg:grid-cols-[1fr_0.8fr] gap-4 pt-4">
-        <DashboardTopPerforming />
+        <DashboardTopPerforming
+          val={farmVal}
+          setVal={setFarmVal}
+          farmData={farmData}
+        />
         <DashboardQucikActions />
       </div>
     </div>

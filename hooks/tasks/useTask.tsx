@@ -1,6 +1,7 @@
 "use client";
 import { TaskInfo } from "@/lib/types";
 import { createDoc, getDocs, getFarmDocs } from "@/servers/crud-actions";
+import { getSingleTaskDocs } from "@/servers/task-actions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateTask = () => {
@@ -68,4 +69,27 @@ export const useGetTasks = (
     enabled: !!workspaceId && !!userId,
   });
   return { tasks, error, status };
+};
+
+export const useGetSingleTask = (
+  workspaceId: string | null,
+  userId: string | null,
+  taskId: string,
+) => {
+  const {
+    data: task,
+    status,
+    error,
+  } = useQuery({
+    queryKey: ["tasks", workspaceId, taskId],
+    queryFn: () =>
+      getSingleTaskDocs({
+        collection: "tasks",
+        workspaceId: workspaceId as string,
+        userId: userId as string,
+        taskId,
+      }),
+    enabled: !!workspaceId && !!userId && !!taskId,
+  });
+  return { task, error, status };
 };

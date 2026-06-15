@@ -1,3 +1,4 @@
+import { FormLoader } from "@/components/loader/GeneralLoader";
 import WorkersTasks from "@/components/worker/task/WorkersTasks";
 import { Suspense } from "react";
 export const metadata = {
@@ -5,7 +6,13 @@ export const metadata = {
 };
 export default function Page() {
   return (
-    <Suspense fallback={<p>Loading...</p>}>
+    <Suspense
+      fallback={
+        <div className="h-125">
+          <FormLoader>Loading...</FormLoader>
+        </div>
+      }
+    >
       <WorkersTasks />
     </Suspense>
   );

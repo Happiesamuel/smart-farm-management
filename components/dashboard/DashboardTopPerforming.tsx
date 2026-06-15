@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import {
   Select,
   SelectContent,
@@ -7,46 +7,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-const farms = [
-  {
-    id: 1,
-    name: "Green Valley Farm",
-    revenue: 750000,
-    expenses: 320000,
-    profit: 430000,
-    margin: 57,
-  },
-  {
-    id: 2,
-    name: "Sunrise Farm",
-    revenue: 350000,
-    expenses: 180000,
-    profit: 170000,
-    margin: 49,
-  },
-  {
-    id: 3,
-    name: "Golden Acres Farm",
-    revenue: 100000,
-    expenses: 70000,
-    profit: 30000,
-    margin: 30,
-  },
-  {
-    id: 4,
-    name: "Hope Farm",
-    revenue: 50000,
-    expenses: 50000,
-    profit: 0,
-    margin: 0,
-  },
-];
 
 const formatNaira = (amount: number) => `₦${amount.toLocaleString("en-NG")}`;
 
-export default function DashboardTopPerforming() {
-  const [val, setVal] = useState("year");
-
+export default function DashboardTopPerforming({
+  farmData,
+  val,
+  setVal,
+}: {
+  farmData: {
+    id: string;
+    name: string;
+    revenue: number;
+    expenses: number;
+    profit: number;
+    margin: number;
+  }[];
+  val: "year" | "month";
+  setVal: Dispatch<SetStateAction<"year" | "month">>;
+}) {
   const year = [
     { id: 1, value: "year", name: "This Year" },
     { id: 2, value: "month", name: "This Month" },
@@ -60,11 +39,14 @@ export default function DashboardTopPerforming() {
           Top Performing Farms
         </h3>
 
-        <Select onValueChange={(e) => setVal(e)} defaultValue={val}>
+        <Select
+          onValueChange={(e: "year" | "month") => setVal(e)}
+          defaultValue={val}
+        >
           <SelectTrigger className="text-dark border border-border bg-white rounded-lg">
             <SelectValue placeholder="2024" />
           </SelectTrigger>
-          <SelectContent className="bg-white border-border text-zinc-400">
+          <SelectContent className="bg-white mt-6 border-border text-zinc-400">
             {year.map((x) => (
               <SelectItem
                 key={x.id}
@@ -92,7 +74,7 @@ export default function DashboardTopPerforming() {
           </thead>
 
           <tbody>
-            {farms.map((f) => (
+            {farmData.map((f) => (
               <tr key={f.id} className="border-t">
                 <td
                   title={f.name}
@@ -159,7 +141,7 @@ export default function DashboardTopPerforming() {
 
       {/* Mobile Cards */}
       <div className="sm:hidden overflow-scroll no-scroll space-y-3">
-        {farms.map((f) => (
+        {farmData.map((f) => (
           <div key={f.id} className="border rounded-lg p-3">
             <div className="flex justify-between">
               <h4 className="font-medium text-base text-dark/80">{f.name}</h4>

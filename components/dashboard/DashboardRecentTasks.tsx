@@ -1,54 +1,21 @@
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 
-export default function DashboardRecentTasks() {
-  const tasks = [
-    {
-      title: "Apply fertilizer to Maize",
-      farm: "Green Valley Farm",
-      field: "Field A",
-      date: "May 29",
-      priority: "High",
-      id: 1,
-      status: "done",
-    },
-    {
-      title: "Irrigate Field B",
-      farm: "Green Valley Farm",
-      field: "Field B",
-      date: "May 30",
-      priority: "Medium",
-      id: 2,
-      status: "none",
-    },
-    {
-      title: "Weed control in Field C",
-      farm: "Sunrise Farm",
-      field: "Field C",
-      date: "May 30",
-      priority: "Medium",
-      id: 3,
-      status: "done",
-    },
-    {
-      title: "Pest control inspection",
-      farm: "Green Valley Farm",
-      field: "Field D",
-      date: "Jun 2 ",
-      priority: "Low",
-      id: 4,
-      status: "none",
-    },
-    {
-      title: "Prepare for harvest (Rice)",
-      farm: "Sunrise Farm",
-      field: "Field A ",
-      date: "Jun 5 ",
-      priority: "Medium",
-      id: 5,
-      status: "none",
-    },
-  ];
+export default function DashboardRecentTasks({
+  tasks,
+}: {
+  tasks: {
+    title: string;
+    farm: string;
+    field: string;
+    date: string;
+    priority: string;
+    id: string;
+    status: string;
+    isOverdue: boolean;
+    isToday: boolean;
+  }[];
+}) {
   const priorityColor: Record<string, string> = {
     High: "bg-red-100 text-red-500",
     Medium: "bg-orange-100 text-orange-500",
@@ -74,7 +41,10 @@ export default function DashboardRecentTasks() {
                 checked={task.status === "done"}
               />
               <div className="space-y-1">
-                <Label htmlFor="terms-checkbox-2" className="text-dark text-sm">
+                <Label
+                  htmlFor="terms-checkbox-2"
+                  className="text-dark max-w-[150px] truncate text-sm"
+                >
                   {task.title}
                 </Label>
                 <div className="flex items-center gap-2 text-zinc-500 text-xs">
@@ -90,7 +60,17 @@ export default function DashboardRecentTasks() {
               >
                 {task.priority}
               </p>
-              <p className="text-zinc-500 text-xs">{task.date}</p>
+              <p
+                className={`text-xs ${
+                  task.isOverdue
+                    ? "text-red-500 font-medium"
+                    : task.isToday
+                      ? "text-orange-500"
+                      : "text-zinc-500"
+                }`}
+              >
+                {task.date}
+              </p>
             </div>
           </div>
         ))}
