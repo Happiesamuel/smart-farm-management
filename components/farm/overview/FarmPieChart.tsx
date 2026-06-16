@@ -10,16 +10,10 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
+import { buildFarmOverviewPieData } from "@/lib/stat";
+import { NoResult } from "@/components/loader/GeneralLoader";
 
 export const description = "A donut chart with text";
-
-const chartData = [
-  { food: "Maize", value: 33, fill: "#03732b" },
-  { food: "Rice", value: 25, fill: "#4e8afd" },
-  { food: "Tomatoes", value: 17, fill: "#fcb304" },
-  { food: "Pepper", value: 15, fill: "#60c03e" },
-  { food: "Others", value: 10, fill: "#bfbfc0" },
-];
 
 const chartConfig = {
   value: { label: "Value" },
@@ -30,11 +24,21 @@ const chartConfig = {
   Others: { label: "Others" },
 } satisfies ChartConfig;
 
-export function FarmPieChart() {
-  const totalvalue = React.useMemo(
-    () => chartData.reduce((acc, curr) => acc + curr.value, 0),
-    [],
-  );
+export function FarmPieChart({
+  harvests,
+  crops,
+}: {
+  harvests: { [key: string]: string | number }[];
+  crops: { [key: string]: string | number }[];
+}) {
+  const { data: chartData, total } = React.useMemo(() => {
+    if (!harvests?.length) return { data: [], total: 0 };
+
+    return buildFarmOverviewPieData(
+      harvests as { [key: string]: string | number }[],
+      crops as { [key: string]: string | number }[],
+    );
+  }, [harvests, crops]);
 
   return (
     <Card className="w-full gap-0 bg-white flex-1 relative rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[300px] shrink-0">
@@ -46,72 +50,82 @@ export function FarmPieChart() {
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1    min-h-0 relative overflow-hidden">
-        <div className="flex sm:flex-row xl:flex-row lg:flex-col flex-col items-center h-full">
-          {/* LEFT → PIE CHART */}
-          <div className="w-full sm:w-[65%] lg:w-full xl:w-[60%] h-full">
-            <ChartContainer config={chartConfig} className="w-full h-full">
-              <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel={false} />}
-                />
-
-                <Pie
-                  data={chartData}
-                  dataKey="value"
-                  nameKey="food"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius="60%"
-                  outerRadius="90%"
-                  strokeWidth={4}
-                >
-                  <Label
-                    content={({ viewBox }) => {
-                      if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                        return (
-                          <text
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                          >
-                            <tspan
-                              x={viewBox.cx}
-                              dy="-0.3em"
-                              className="text-base sm:text-lg font-semibold"
-                            >
-                              {totalvalue}
-                            </tspan>
-
-                            <tspan
-                              x={viewBox.cx}
-                              dy="1.4em"
-                              className="text-[11px] sm:text-sm font-normal"
-                              fill="#71717a"
-                            >
-                              Total Production
-                            </tspan>
-                          </text>
-                        );
-                      }
-                    }}
-                  />
-                </Pie>
-              </PieChart>
-            </ChartContainer>
-          </div>
-
-          <div className="w-full sm:w-[25%] lg:w-full xl:w-[30%] ">
-            <CustomLegend />
-          </div>
+      {!chartData.length ? (
+        <div className="h-full">
+          <NoResult>No crop distrubution</NoResult>
         </div>
-      </CardContent>
+      ) : (
+        <CardContent className="flex-1    min-h-0 relative overflow-hidden">
+          <div className="flex sm:flex-row xl:flex-row lg:flex-col flex-col items-center h-full">
+            {/* LEFT → PIE CHART */}
+            <div className="w-full sm:w-[65%] lg:w-full xl:w-[60%] h-full">
+              <ChartContainer config={chartConfig} className="w-full h-full">
+                <PieChart>
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel={false} />}
+                  />
+
+                  <Pie
+                    data={chartData}
+                    dataKey="value"
+                    nameKey="food"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius="60%"
+                    outerRadius="90%"
+                    strokeWidth={4}
+                  >
+                    <Label
+                      content={({ viewBox }) => {
+                        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                          return (
+                            <text
+                              x={viewBox.cx}
+                              y={viewBox.cy}
+                              textAnchor="middle"
+                              dominantBaseline="middle"
+                            >
+                              <tspan
+                                x={viewBox.cx}
+                                dy="-0.3em"
+                                className="text-base sm:text-lg font-semibold"
+                              >
+                                {total.toLocaleString()} kg
+                              </tspan>
+
+                              <tspan
+                                x={viewBox.cx}
+                                dy="1.4em"
+                                className="text-[11px] sm:text-sm font-normal"
+                                fill="#71717a"
+                              >
+                                Total Production
+                              </tspan>
+                            </text>
+                          );
+                        }
+                      }}
+                    />
+                  </Pie>
+                </PieChart>
+              </ChartContainer>
+            </div>
+
+            <div className="w-full sm:w-[25%] lg:w-full xl:w-[30%] ">
+              <CustomLegend chartData={chartData} />
+            </div>
+          </div>
+        </CardContent>
+      )}
     </Card>
   );
 }
-const CustomLegend = () => {
+const CustomLegend = ({
+  chartData,
+}: {
+  chartData: { food: string; value: number; fill: string; qty: number }[];
+}) => {
   return (
     <div className="flex overflow-scroll no-scroll lg:gap-4 xl:gap-2 sm:justify-start justify-center flex-row lg:flex-row xl:flex-col sm:flex-col gap-2 text-sm">
       {chartData.map((item, index) => (
@@ -131,6 +145,7 @@ const CustomLegend = () => {
           {/* Right */}
           <div className="text-zinc-500 hidden sm:flex items-center lg:gap-3 xl:gap-7 gap-7">
             <span>{item.value}%</span>
+            <span>{item.qty.toLocaleString()}kg</span>
           </div>
         </div>
       ))}

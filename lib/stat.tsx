@@ -358,3 +358,102 @@ export function buildRecentTasks(
     isToday: boolean;
   }[];
 }
+
+function toKg(qty: number, unit: string) {
+  switch (unit?.toLowerCase()) {
+    case "tons":
+      return qty * 1000;
+    case "bags":
+      return qty * 50;
+    case "crates":
+      return qty * 25; // 🔥 you were missing this earlier
+    default:
+      return qty;
+  }
+}
+
+export function buildFarmOverviewPieData(
+  harvests: { [key: string]: string | number }[],
+  crops: { [key: string]: string | number }[],
+) {
+  const cropMap = new Map(crops.map((c) => [c.$id, c.cropName]));
+  const map = new Map<string, number>();
+
+  harvests.forEach((h) => {
+    const cropName = cropMap.get(h.crops) || "Unknown";
+    const qty = toKg(Number(h.quantity || 0), h.unit as string);
+
+    map.set(cropName as string, (map.get(cropName as string) || 0) + qty);
+  });
+
+  const total = Array.from(map.values()).reduce((a, b) => a + b, 0);
+  console.log(total, "sal");
+
+  const colors = generateColors(map.size);
+
+  const data = Array.from(map.entries()).map(([name, qty], i) => ({
+    food: name,
+    value: total > 0 ? Math.round((qty / total) * 100) : 0,
+    fill: colors[i],
+    qty, // 🔥 keep raw value
+  }));
+
+  return { data, total };
+}
+export function buildFarmOverview({
+  farmId,
+  fields = [],
+  crops = [],
+  tasks = [],
+  sales = [],
+  expenses = [],
+}: {
+  farmId: string;
+  fields?: { [key: string]: string | number }[];
+  crops?: { [key: string]: string | number }[];
+  tasks?: { [key: string]: string | number }[];
+  sales?: { [key: string]: string | number }[];
+  expenses?: { [key: string]: string | number }[];
+}) {
+  const now = new Date();
+
+  const isThisMonth = (date: string) => {
+    const d = new Date(date);
+    return (
+      d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    );
+  };
+
+  // 🔹 Fields in farm
+  const fieldIds = fields.map((f) => f.$id);
+
+  // 🔹 Active crops (not harvested)
+  const activeCrops = crops.filter(
+    (c) => fieldIds.includes(c.fields) && c.growthStage !== "harvesting",
+  );
+
+  // 🔹 Active tasks
+  const activeTasks = tasks.filter(
+    (t) => fieldIds.includes(t.fields) && t.status !== "completed",
+  );
+
+  // 🔹 Revenue (this month)
+  const revenue = sales
+    .filter((s) => s.farms === farmId && isThisMonth(s.saleDate as string))
+    .reduce((acc, s) => acc + Number(s.totalAmount || 0), 0);
+
+  // 🔹 Expenses (this month)
+  const expense = expenses
+    .filter((e) => e.farms === farmId && isThisMonth(e.expenseDate as string))
+    .reduce((acc, e) => acc + Number(e.amount || 0), 0);
+
+  const profit = revenue - expense;
+
+  return {
+    totalFields: fields.length,
+    totalCrops: activeCrops.length,
+    activeTasks: activeTasks.length,
+    revenue,
+    profit,
+  };
+}
