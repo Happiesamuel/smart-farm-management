@@ -487,7 +487,7 @@ export function buildTaskActivities(
   acts.push({
     id: `created-${task.$id}`,
     title: `Task created by ${createdBy?.name ?? "Unknown user"}`,
-    date: task.$createdAt,
+    date: task.createdAt,
     icon: FaRegUser,
     iconColor: "bg-[#e8f5ec] text-[#2d8952]",
   });

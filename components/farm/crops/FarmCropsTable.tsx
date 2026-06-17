@@ -15,6 +15,9 @@ import CreateCropFormFetch from "./CreateCropForm";
 import { toast } from "sonner";
 import { useDeleteDoc } from "@/hooks/useDelete";
 import { TbPlant2 } from "react-icons/tb";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { GoPlus } from "react-icons/go";
 
 const statusStyles: Record<string, string> = {
   Growing: "bg-green-100 text-green-700",
@@ -33,7 +36,7 @@ const statusStyles: Record<string, string> = {
 const NOW = Date.now();
 
 export default function FarmCropsTable() {
-  const { farmId } = useParams();
+  const { farmId,workspaceId } = useParams();
   const searchParams = useSearchParams();
   const { filterCrop } = useCropFilter();
   const { workspace, user, ready } = useApp();
@@ -101,8 +104,19 @@ export default function FarmCropsTable() {
 
   if (!crops?.length)
     return (
-      <div className="h-70">
-        <NoResult>No crop record!</NoResult>
+      <div className="h-70 flex items-center justify-center">
+    <div className="flex items-center flex-col gap-1 ">
+          <NoResult>No crop record!</NoResult>
+          <Button className="bg-primary-green mt-1 w-full sm:w-fit cursor-pointer text-white">
+                <Link
+                  href={`/user/${workspaceId}/farms/${farmId}/add-crop`}
+                  className="flex items-center gap-1"
+                >
+                  <GoPlus />
+                  <p>Add Crop</p>
+                </Link>
+              </Button>
+    </div>
       </div>
     );
   const stageProgressMap: Record<string, number> = {

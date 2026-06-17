@@ -17,6 +17,9 @@ import { toast } from "sonner";
 
 import FinancePagination from "@/components/layout/FinancePagination";
 import TaskFilter from "./TaskFilter";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { GoPlus } from "react-icons/go";
 
 const priorityStyles: Record<string, string> = {
   Low: "bg-green-100 text-green-700",
@@ -32,7 +35,7 @@ const statusStyles: Record<string, string> = {
   Delayed: "bg-orange-100 text-orange-700",
 };
 export default function FarmTaskTable() {
-  const { farmId } = useParams();
+  const { farmId,workspaceId } = useParams();
   const searchParams = useSearchParams();
   const { filterCrop } = useCropFilter();
   const { remove, status: deleteStat } = useDeleteDoc();
@@ -92,8 +95,19 @@ export default function FarmTaskTable() {
 
   if (!tasks?.length)
     return (
-      <div className="h-70">
-        <NoResult>No task record!</NoResult>
+        <div className="h-70 flex items-center justify-center">
+    <div className="flex items-center flex-col gap-1 ">
+          <NoResult>No task record!</NoResult>
+          <Button className="bg-primary-green mt-1 w-full sm:w-fit cursor-pointer text-white">
+                <Link
+                  href={`/user/${workspaceId}/farms/${farmId}/create-task`}
+                  className="flex items-center gap-1"
+                >
+                  <GoPlus />
+                  <p>Add task</p>
+                </Link>
+              </Button>
+    </div>
       </div>
     );
 

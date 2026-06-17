@@ -9,6 +9,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
+import { NoResult } from "../loader/GeneralLoader";
 
 export const description = "A donut chart with text";
 
@@ -37,7 +38,7 @@ export function DashboardPieChart({
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1    min-h-0 relative overflow-hidden">
+  {!chartData.length ? <div className="h-full"><NoResult>No expense record found!</NoResult></div> :    <CardContent className="flex-1    min-h-0 relative overflow-hidden">
         <div className="flex sm:flex-row xl:flex-row lg:flex-col flex-col items-center h-full">
           {/* LEFT → PIE CHART */}
           <div className="w-full sm:w-[65%] lg:w-full xl:w-[50%] h-full">
@@ -98,7 +99,7 @@ export function DashboardPieChart({
             <CustomLegend chartData={chartData} />
           </div>
         </div>
-      </CardContent>
+      </CardContent>}
     </Card>
   );
 }

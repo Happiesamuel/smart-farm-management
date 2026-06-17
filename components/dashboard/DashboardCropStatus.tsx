@@ -1,6 +1,7 @@
 import { getProgressColor } from "@/lib/functions";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { NoResult } from "../loader/GeneralLoader";
 
 const statusStyles: Record<string, string> = {
   Growing: "bg-green-100 text-green-700",
@@ -40,7 +41,7 @@ export default function DashboardCropsStatus({
           View All
         </Link>
       </div>
-
+ {!crops.length ? <div className="h-full"><NoResult>No crop record found!</NoResult></div> :<>
       <div className="hidden md:block no-scroll overflow-x-auto">
         <table className="w-full no-scroll text-sm">
           <thead className="text-gray-500 text-left">
@@ -93,7 +94,7 @@ export default function DashboardCropsStatus({
         </table>
       </div>
 
-      {/* Mobile Cards */}
+   
       <div className="md:hidden overflow-scroll no-scroll space-y-3">
         {crops.map((c) => (
           <div key={c.id} className="border rounded-lg p-3">
@@ -122,6 +123,7 @@ export default function DashboardCropsStatus({
           </div>
         ))}
       </div>
+      </>}
     </div>
   );
 }

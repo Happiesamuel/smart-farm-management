@@ -16,6 +16,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { Dispatch, SetStateAction } from "react";
+import { NoResult } from "../loader/GeneralLoader";
 
 export const description = "An area chart with gradient fill";
 
@@ -96,7 +97,7 @@ export function DashboardAreachart({
             </Select>
           </div>
         </div>
-      </CardHeader>
+      </CardHeader> {!chartData.length ? <div className="h-full"><NoResult>No expense and revenue record found!</NoResult></div> :
       <CardContent className="">
         <ChartContainer
           config={chartConfig}
@@ -186,7 +187,7 @@ export function DashboardAreachart({
             </div>
           ))}
         </div>
-      </CardContent>
+      </CardContent>}
     </Card>
   );
 }

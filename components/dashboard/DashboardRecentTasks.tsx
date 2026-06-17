@@ -1,3 +1,4 @@
+import { NoResult } from "../loader/GeneralLoader";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 
@@ -28,6 +29,7 @@ export default function DashboardRecentTasks({
         <h6 className="text-base text-dark">Recent Tasks</h6>
         <p className="text-sm text-primary-green">View All</p>
       </div>
+       {!tasks.length ? <div className="h-full"><NoResult>No task record found!</NoResult></div>:
       <div className="flex overflow-scroll no-scroll  flex-col gap-3">
         {tasks.map((task) => (
           <div
@@ -75,6 +77,7 @@ export default function DashboardRecentTasks({
           </div>
         ))}
       </div>
+}
     </div>
   );
 }

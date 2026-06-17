@@ -25,6 +25,7 @@ const statusStyles: Record<string, string> = {
   in_progress: "bg-blue-100 text-blue-700",
   completed: "bg-green-100 text-green-700",
   cancelled: "bg-gray-100 text-gray-600",
+  delayed:"bg-purple-100 text-purple-600"
 };
 
 const formatLabel = (val: string) =>
@@ -109,13 +110,13 @@ export default function TaskIdHeader({
 
         {/* STATUS UPDATE */}
         <div className="w-fit self-end sm:block">
-          <Select onValueChange={handleChange} defaultValue={statusVal}>
+          <Select disabled={task.status === 'cancelled'} onValueChange={handleChange} defaultValue={statusVal}>
             <SelectTrigger className="text-dark/90 w-full border border-border bg-white rounded-lg flex items-center gap-2">
               <RxUpdate />
               <SelectValue placeholder="Update Status" />
             </SelectTrigger>
 
-            <SelectContent className="bg-white mt-6 border-border text-zinc-400">
+            <SelectContent  className="bg-white mt-6 border-border text-zinc-400">
               {statusOptions.map((x) => (
                 <SelectItem
                   key={x.value}
