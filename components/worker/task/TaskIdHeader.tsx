@@ -9,9 +9,25 @@ import {
 } from "../../ui/select";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { RxUpdate } from "react-icons/rx";
-import { TaskInfo } from "@/lib/types";
+const priorityStyles: Record<string, string> = {
+  Low: "bg-green-100 text-green-700",
+  Medium: "bg-yellow-100 text-yellow-700",
+  High: "bg-red-100 text-red-600",
+};
 
-export default function TaskIdHeader({ task }: { task: TaskInfo }) {
+const statusStyles: Record<string, string> = {
+  Pending: "bg-yellow-100 text-yellow-700",
+  In_progress: "bg-blue-100 text-blue-700",
+  Completed: "bg-green-100 text-green-700",
+  Cancelled: "bg-gray-100 text-gray-600",
+  Delayed: "bg-orange-100 text-orange-700",
+};
+
+export default function TaskIdHeader({
+  task,
+}: {
+  task: { [key: string]: string };
+}) {
   const [val, setVal] = useState("pending");
   const array = [
     {
@@ -27,6 +43,9 @@ export default function TaskIdHeader({ task }: { task: TaskInfo }) {
       value: "completed",
     },
   ];
+  const status = task.status?.charAt(0).toUpperCase() + task.status?.slice(1);
+  const priority =
+    task.priority?.charAt(0).toUpperCase() + task.priority?.slice(1);
   return (
     <div className="space-y-4">
       <div className="flex items-center text-sm text-zinc-500">
@@ -39,11 +58,15 @@ export default function TaskIdHeader({ task }: { task: TaskInfo }) {
           <div className="pb-3 flex flex-col md:flex-row md:items-center items-start gap-3">
             <p className="text-xl text-dark font-semibold ">{task.taskTitle}</p>
             <div className="flex items-center gap-2">
-              <p className="text-[#1058d6] w-fit text-sm px-3 py-1 rounded-md bg-[#1058d6]/15">
-                In Progress
+              <p
+                className={` ${statusStyles[status]}  w-fit text-sm px-3 py-1 rounded-md `}
+              >
+                {status}
               </p>
-              <p className="text-red-500 w-fit text-sm px-3 py-1 rounded-md bg-red-200/80">
-                High Prioity
+              <p
+                className={`${priorityStyles[priority]} w-fit text-sm px-3 py-1 rounded-md`}
+              >
+                {priority}
               </p>
             </div>
           </div>

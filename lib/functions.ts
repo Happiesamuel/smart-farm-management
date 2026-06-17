@@ -345,18 +345,17 @@ export const getGrowthStageData = (
 
 export function generateColors(count: number): string[] {
   const base = [
-    "#03732b",
-    "#4e8afd",
-    "#fcb304",
-    "#e45551",
-    "#bfbfc0",
-    "#ab75e0",
-    "#ff8c42",
-    "#00bcd4",
-    "#e91e8c",
-    "#8bc34a",
+    "#3f86ee", // blue
+    "#53bf62", // green
+    "#fdb214", // yellow
+    "#e9575a", // red
+    "#b893ed", // purple
+    "#c8c7ee", // lavender
+    "#ff8c42", // orange
+    "#00bcd4", // cyan
+    "#e91e8c", // pink
+    "#8bc34a", // lime
   ];
-
   if (count <= base.length) return base.slice(0, count);
 
   // generate extra colors by rotating hue

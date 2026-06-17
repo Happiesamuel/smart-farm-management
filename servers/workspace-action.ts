@@ -230,6 +230,7 @@ export const getWorkspaceUser = async (workspaceId: string) => {
       id: user?.$id ?? "",
       avatar: user?.avatar ?? "",
       email: user?.email ?? "",
+      role: m.role,
     };
   });
 };

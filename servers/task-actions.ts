@@ -37,5 +37,7 @@ export const getSingleTaskDocs = async ({
     id: d.$id,
     workspaces: d.workspaces,
     users: d.users,
+    createdAt: d.$createdAt,
+    updatedAt: d.$updatedAt,
   };
 };

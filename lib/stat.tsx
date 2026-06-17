@@ -1,4 +1,6 @@
+import { MdLabelImportantOutline } from "react-icons/md";
 import { generateColors } from "./functions";
+import { FaRegUser } from "react-icons/fa6";
 
 export function buildExpensePieData(
   expenses: { [key: string]: string | number }[],
@@ -456,4 +458,98 @@ export function buildFarmOverview({
     revenue,
     profit,
   };
+}
+
+function formatDate(date?: string | Date) {
+  if (!date) return "No date";
+
+  return new Date(date).toLocaleString("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+export function buildTaskActivities(
+  task: { [key: string]: string },
+  users: { [key: string]: string }[],
+) {
+  if (!task) return [];
+
+  const assignTo = users.find((x) => x.id === task?.assignTo);
+  const createdBy = users.find((x) => x.id === task?.users);
+
+  const acts = [];
+
+  // ✅ CREATED
+  acts.push({
+    id: `created-${task.$id}`,
+    title: `Task created by ${createdBy?.name ?? "Unknown user"}`,
+    date: task.$createdAt,
+    icon: FaRegUser,
+    iconColor: "bg-[#e8f5ec] text-[#2d8952]",
+  });
+
+  // ✅ ASSIGNED
+  if (task.assignTo) {
+    acts.push({
+      id: `assigned-${task.$id}`,
+      title: `Assigned to ${assignTo?.name ?? "Unknown user"}`,
+      date: task.updatedAt || task.createdAt,
+      icon: FaRegUser,
+      iconColor: "bg-[#e1eefd] text-[#1058d6]",
+    });
+  }
+
+  // ✅ STATUS
+  const statusMap: Record<string, { label: string; color: string }> = {
+    assigned: {
+      label: "Pending",
+      color: "bg-[#fee7e7] text-[#e82a2d]",
+    },
+    in_progress: {
+      label: "In Progress",
+      color: "bg-[#fff1dd] text-[#de852c]",
+    },
+    completed: {
+      label: "Completed",
+      color: "bg-[#e8f5ec] text-[#2d8952]",
+    },
+  };
+
+  if (task.status && statusMap[task.status]) {
+    acts.push({
+      id: `status-${task.$id}`,
+      title: `Status changed to ${statusMap[task.status].label}`,
+      date: task.updatedAt || task.$createdAt,
+      icon: MdLabelImportantOutline,
+      iconColor: statusMap[task.status].color,
+    });
+  }
+
+  // ✅ SORT (latest first)
+  return acts
+    .map((act) => ({
+      ...act,
+      dateFormatted: timeAgo(act.date),
+      timestamp: new Date(act.date || 0).getTime(),
+    }))
+    .sort((a, b) => b.timestamp - a.timestamp);
+}
+function timeAgo(date?: string | Date) {
+  if (!date) return "No date";
+
+  const diff = Date.now() - new Date(date).getTime();
+  const mins = Math.floor(diff / 60000);
+
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins} mins ago`;
+
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} hrs ago`;
+
+  const days = Math.floor(hrs / 24);
+  return `${days} days ago`;
 }

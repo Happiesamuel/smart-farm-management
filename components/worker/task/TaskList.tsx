@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { BiTask } from "react-icons/bi";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
-import TaskPagination from "./TaskPagination";
 import { NoResult } from "@/components/loader/GeneralLoader";
 import { useParams } from "next/navigation";
 const priorityStyles: Record<string, string> = {
