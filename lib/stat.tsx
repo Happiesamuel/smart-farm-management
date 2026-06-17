@@ -523,7 +523,7 @@ export function buildTaskActivities(
     acts.push({
       id: `status-${task.$id}`,
       title: `Status changed to ${statusMap[task.status].label}`,
-      date: task.updatedAt || task.$createdAt,
+      date: task.updatedAt || task.createdAt,
       icon: MdLabelImportantOutline,
       iconColor: statusMap[task.status].color,
     });

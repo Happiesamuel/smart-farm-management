@@ -9,80 +9,118 @@ import {
 } from "../../ui/select";
 import { MdOutlineKeyboardArrowRight } from "react-icons/md";
 import { RxUpdate } from "react-icons/rx";
+import { useUpdateDoc } from "@/hooks/useUpdate";
+import { TaskInfo } from "@/lib/types";
+import { useApp } from "@/stores/useAppStore";
+import { toast } from "sonner";
+
 const priorityStyles: Record<string, string> = {
-  Low: "bg-green-100 text-green-700",
-  Medium: "bg-yellow-100 text-yellow-700",
-  High: "bg-red-100 text-red-600",
+  low: "bg-green-100 text-green-700",
+  medium: "bg-yellow-100 text-yellow-700",
+  high: "bg-red-100 text-red-600",
 };
 
 const statusStyles: Record<string, string> = {
-  Pending: "bg-yellow-100 text-yellow-700",
-  In_progress: "bg-blue-100 text-blue-700",
-  Completed: "bg-green-100 text-green-700",
-  Cancelled: "bg-gray-100 text-gray-600",
-  Delayed: "bg-orange-100 text-orange-700",
+  pending: "bg-yellow-100 text-yellow-700",
+  in_progress: "bg-blue-100 text-blue-700",
+  completed: "bg-green-100 text-green-700",
+  cancelled: "bg-gray-100 text-gray-600",
 };
+
+const formatLabel = (val: string) =>
+  val.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 export default function TaskIdHeader({
   task,
 }: {
   task: { [key: string]: string };
 }) {
-  const [val, setVal] = useState("pending");
-  const array = [
-    {
-      name: "Pending",
-      value: "pending",
-    },
-    {
-      name: "In Progress",
-      value: "in-proggess",
-    },
-    {
-      name: "Completed",
-      value: "completed",
-    },
+  const { update, status } = useUpdateDoc();
+  const { user, workspace } = useApp();
+  const [statusVal, setStatusVal] = useState(task.status ?? "pending");
+
+  const statusOptions = [
+    { name: "Pending", value: "pending" },
+    { name: "In Progress", value: "in_progress" },
+    { name: "Completed", value: "completed" },
+    { name: "Delayed", value: "delayed" },
   ];
-  const status = task.status?.charAt(0).toUpperCase() + task.status?.slice(1);
-  const priority =
-    task.priority?.charAt(0).toUpperCase() + task.priority?.slice(1);
+  const priority = task.priority ?? "low";
+
+  const handleChange = (val: string) => {
+    if (!workspace?.id || !user?.id) return;
+    setStatusVal(val);
+    update(
+      {
+        collection: "tasks",
+        id: task.id,
+        workspaceId: workspace?.id,
+        userId: user?.id,
+        data: { status: val },
+      },
+      {
+        onSuccess: () => {
+          toast("Task updated successfully", {
+            description: "You've updated your task",
+          });
+        },
+        onError: (err) =>
+          toast("Error updating task", {
+            description: err.message,
+            duration: 4000,
+            closeButton: true,
+          }),
+      },
+    );
+  };
+
   return (
     <div className="space-y-4">
+      {/* Breadcrumb */}
       <div className="flex items-center text-sm text-zinc-500">
-        <p>My Tasks </p>
+        <p>My Tasks</p>
         <MdOutlineKeyboardArrowRight />
         <p>ID-{task.id}</p>
       </div>
+
+      {/* Header */}
       <div className="flex flex-col sm:flex-row items-start md:items-center justify-between">
         <div>
           <div className="pb-3 flex flex-col md:flex-row md:items-center items-start gap-3">
-            <p className="text-xl text-dark font-semibold ">{task.taskTitle}</p>
+            <p className="text-xl text-dark font-semibold">{task.taskTitle}</p>
+
             <div className="flex items-center gap-2">
+              {/* STATUS */}
               <p
-                className={` ${statusStyles[status]}  w-fit text-sm px-3 py-1 rounded-md `}
+                className={`${statusStyles[statusVal]} text-sm px-3 py-1 rounded-md`}
               >
-                {status}
+                {formatLabel(statusVal)}
               </p>
+
+              {/* PRIORITY */}
               <p
-                className={`${priorityStyles[priority]} w-fit text-sm px-3 py-1 rounded-md`}
+                className={`${priorityStyles[priority]} text-sm px-3 py-1 rounded-md`}
               >
-                {priority}
+                {formatLabel(priority)}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="w-fit self-end  flex  sm:block sm:w-fit">
-          <Select onValueChange={(e) => setVal(e)} defaultValue={val}>
-            <SelectTrigger className="text-dark/90 w-full md:w-full border border-border bg-white rounded-lg">
-              <RxUpdate /> <SelectValue placeholder="In Progress" />
+        {/* STATUS UPDATE */}
+        <div className="w-fit self-end sm:block">
+          <Select onValueChange={handleChange} defaultValue={statusVal}>
+            <SelectTrigger className="text-dark/90 w-full border border-border bg-white rounded-lg flex items-center gap-2">
+              <RxUpdate />
+              <SelectValue placeholder="Update Status" />
             </SelectTrigger>
-            <SelectContent className="bg-white border-border text-zinc-400">
-              {array.map((x) => (
+
+            <SelectContent className="bg-white mt-6 border-border text-zinc-400">
+              {statusOptions.map((x) => (
                 <SelectItem
                   key={x.value}
-                  value={x.value.toString()}
-                  className="hover:bg-zinc-900 text-dark/80 transition-all duration-500 cursor-pointer"
+                  value={x.value}
+                  className="hover:bg-zinc-100 text-dark/80 cursor-pointer"
                 >
                   {x.name}
                 </SelectItem>

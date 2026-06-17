@@ -8,7 +8,7 @@ export default function TaskDescription({ desc }: { desc: string }) {
         <RiFileTextLine className="text-lg text-primary-green" />
         <p className="text-base text-dark/90">Description</p>
       </div>
-      <p className="text-sm text-gray-500 font-normal leading-relaxed whitespace-pre-line">
+      <p className="text-[15px] text-dark/80 font-normal leading-relaxed whitespace-pre-line">
         {desc}
       </p>
     </div>
