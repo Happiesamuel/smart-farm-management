@@ -5,7 +5,6 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { signupFormSchema } from "@/lib/schemas";
-import Link from "next/link";
 import SignupField from "./SignupField";
 
 import { toast } from "sonner";
@@ -15,52 +14,55 @@ import { MdLockOutline, MdOutlineEmail } from "react-icons/md";
 import { useState } from "react";
 import { LuPhone } from "react-icons/lu";
 import { Checkbox } from "../ui/checkbox";
+import { useCreateManager } from "@/hooks/auth/useSignUp";
+import ButtonLoader from "../layout/ButtonLoader";
 
 export function OwnerSignupForm() {
-  //   const { create, status } = useCreateUser();
+  const { create: createManager, status } = useCreateManager();
   const router = useRouter();
   const form = useForm<z.infer<typeof signupFormSchema>>({
     resolver: zodResolver(signupFormSchema),
   });
+  const [checked, setChecked] = useState(false);
 
   async function onSubmit(values: z.infer<typeof signupFormSchema>) {
-    // try {
-    //   const newVal = {
-    //     email: values.email,
-    //     password: values.password,
-    //     name: values.username,
-    //   };
-    //   create(newVal, {
-    //     onSuccess: async () => {
-    //       await account.createEmailPasswordSession(
-    //         values.email,
-    //         values.password
-    //       );
-    //       await account.createVerification(
-    //         `${process.env.NEXT_PUBLIC_URL!}/verify`
-    //       );
-    //       toast("User created successfully", {
-    //         description:
-    //           "A verification link has been sent to your email address.",
-    //         duration: 4000,
-    //         closeButton: true,
-    //       });
-    //       router.push("/login");
-    //     },
-    //     onError: (err) =>
-    //       toast("Error Signing up", {
-    //         description: err.message,
-    //         duration: 4000,
-    //         closeButton: true,
-    //       }),
-    //   });
-    // } catch (error) {
-    //   toast("Error Signing up", {
-    //     description: (error as Error).message,
-    //     duration: 4000,
-    //     closeButton: true,
-    //   });
-    // }
+    try {
+      const { confirmPassword, ...rest } = values;
+
+      createManager(rest, {
+        onSuccess: async (user) => {
+          // await account.createEmailPasswordSession(
+          //   values.email,
+          //   values.password,
+          // );
+          // await account.createVerification(
+          //   `${process.env.NEXT_PUBLIC_URL!}/verify`,
+          // );
+          toast("User created successfully", {
+            description:
+              "A verification link has been sent to your email address.",
+            duration: 4000,
+            closeButton: true,
+          });
+          localStorage.setItem("manager-email", user.email);
+          localStorage.setItem("manager-id", user.id);
+          localStorage.setItem("manager-password", values.password);
+          router.push(`/owner/verify-otp`);
+        },
+        onError: (err) =>
+          toast("Error Signing up", {
+            description: err.message,
+            duration: 4000,
+            closeButton: true,
+          }),
+      });
+    } catch (error) {
+      toast("Error Signing up", {
+        description: (error as Error).message,
+        duration: 4000,
+        closeButton: true,
+      });
+    }
   }
   const [show, setShow] = useState(false);
   const [show2, setShow2] = useState(false);
@@ -68,7 +70,7 @@ export function OwnerSignupForm() {
     setShow(!show);
   }
   function handleClick2() {
-    setShow2(!show);
+    setShow2(!show2);
   }
   return (
     <Form {...form}>
@@ -123,7 +125,10 @@ export function OwnerSignupForm() {
         <div>
           <div className="flex items-end text-zinc-700 justify-between py-2">
             <div className="flex items-center gap-2">
-              <Checkbox className="border-primary-green" />
+              <Checkbox
+                onCheckedChange={() => setChecked(!checked)}
+                className="border-primary-green"
+              />
               <p className="text-zinc-500 text-center text-xs">
                 I agree to the
                 <span className="text-primary-green font-medium">
@@ -138,13 +143,20 @@ export function OwnerSignupForm() {
             </div>
           </div>
         </div>
+
         <Button
           type="submit"
-          className="text-white bg-primary-green h-10 rounded-md w-full cursor-pointer border-none"
+          disabled={status === "pending" || checked === false}
+          className="disabled:opacity-70 text-white transition-all duration-200 bg-primary-green h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2"
         >
-          {" "}
-          Create account
-          {/* {status === "pending" || load ? <ButtonLoader /> : "Submit"} */}
+          {status === "pending" ? (
+            <>
+              <ButtonLoader />
+              Creating...
+            </>
+          ) : (
+            "Create account"
+          )}
         </Button>
       </form>
     </Form>

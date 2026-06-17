@@ -11,6 +11,7 @@ export function FinanceModal({
   Icon,
   text,
   iconColor,
+  forWhat = "Add",
 }: {
   children: ReactNode;
   type: string;
@@ -19,6 +20,7 @@ export function FinanceModal({
   text: string;
   onClose(): void;
   open: boolean;
+  forWhat?: string;
 }) {
   useEffect(() => {
     if (open) {
@@ -42,7 +44,9 @@ export function FinanceModal({
       <div className="relative bg-white w-full max-w-[95%] md:max-w-2xl lg:max-w-3xl xl:max-w-4xl rounded-xl shadow-lg p-2.5 md:p-5 animate-fadeIn">
         <div>
           <div className="pb-3 flex items-center justify-between">
-            <div className="text-xl text-dark font-semibold ">Add {type}</div>
+            <div className="text-xl text-dark font-semibold ">
+              {forWhat} {type}
+            </div>
             <FaXmark onClick={onClose} className="text-xl cursor-pointer" />
           </div>
           <div className={`flex items-center  gap-4`}>

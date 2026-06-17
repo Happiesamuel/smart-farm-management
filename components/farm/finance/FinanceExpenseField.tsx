@@ -26,7 +26,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { Control, FieldPath } from "react-hook-form";
+import { Control, FieldPath, UseFormSetValue } from "react-hook-form";
 import { IconType } from "react-icons";
 
 import z from "zod";
@@ -46,6 +46,8 @@ interface Select {
   placeholder: string;
   array: { [key: string]: string }[];
   Icon: IconType;
+  disabled?: boolean;
+  setValue?: UseFormSetValue<z.infer<typeof financeExpenseSchema>>;
 }
 interface Dates {
   control: Control<z.infer<typeof financeExpenseSchema>>;
@@ -59,6 +61,8 @@ export function FinanceSelect({
   placeholder,
   Icon,
   array,
+  disabled,
+  setValue,
 }: Select) {
   return (
     <FormField
@@ -70,16 +74,29 @@ export function FinanceSelect({
             {label}
           </FormLabel>
           <div className="w-full flex justify-center items-center min-w-[2px]">
-            <Select onValueChange={field.onChange}>
+            <Select
+              onValueChange={(val) => {
+                if (name === "farm" && setValue) {
+                  setValue("farm", val);
+                  setValue("field", "");
+                } else if (name === "field" && setValue) {
+                  setValue("field", val);
+                  setValue("crop", "");
+                } else return field.onChange(val);
+              }}
+            >
               <FormControl>
-                <SelectTrigger className="cursor-pointer h-9! w-full  bg-transparent  focus-visible:outline-primary rounded-[8px] p-3 text-sm  focus:ring text-dark ring-green-500  data-[placeholder]:text-gray-500 ">
+                <SelectTrigger
+                  disabled={disabled}
+                  className="cursor-pointer h-9! w-full  bg-transparent  focus-visible:outline-primary rounded-[8px] p-3 text-sm  focus:ring text-dark ring-green-500  data-[placeholder]:text-gray-500 "
+                >
                   <div className="flex items-center  gap-2">
                     {Icon && <Icon className="text-primary-green" />}
                     <SelectValue placeholder={placeholder} className="" />
                   </div>
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="max-h-[160px] z-200 bg-[#fff] border border-border text-dark">
+              <SelectContent className="max-h-[160px] z-200 bg-white mt-6 border border-border text-dark">
                 {array.map((select) => (
                   <SelectItem
                     className="cursor-pointer text-sm hover:bg-primary hover:text-white"
@@ -160,7 +177,8 @@ export function FinanceDate({ control, name, label }: Dates) {
               <Calendar
                 mode="single"
                 selected={field.value ? new Date(field.value) : undefined}
-                onSelect={(date) => field.onChange(date?.toISOString())}
+                onSelect={(date) => field.onChange(date)}
+                disabled={(date) => date > new Date()}
               />
             </PopoverContent>
           </Popover>
@@ -225,64 +243,64 @@ export function FinanceText({ name, label, placeholder, control }: Input) {
   );
 }
 
-export function FinanceUpload({
-  control,
-}: {
-  control: Control<z.infer<typeof financeExpenseSchema>>;
-}) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
+// export function FinanceUpload({
+//   control,
+// }: {
+//   control: Control<z.infer<typeof financeExpenseSchema>>;
+// }) {
+//   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  return (
-    <FormField
-      control={control}
-      name="receipt"
-      render={({ field }) => (
-        <FormItem className="w-full">
-          <FormLabel className="text-sm text-dark">
-            Receipt (Optional)
-          </FormLabel>
+//   return (
+//     <FormField
+//       control={control}
+//       name="receipt"
+//       render={({ field }) => (
+//         <FormItem className="w-full">
+//           <FormLabel className="text-sm text-dark">
+//             Receipt (Optional)
+//           </FormLabel>
 
-          <FormControl>
-            <div
-              onClick={() => inputRef.current?.click()}
-              className="border border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition"
-            >
-              <input
-                type="file"
-                ref={inputRef}
-                className="hidden"
-                accept=".jpg,.jpeg,.png,.pdf"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  field.onChange(file);
-                }}
-              />
+//           <FormControl>
+//             <div
+//               onClick={() => inputRef.current?.click()}
+//               className="border border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition"
+//             >
+//               <input
+//                 type="file"
+//                 ref={inputRef}
+//                 className="hidden"
+//                 accept=".jpg,.jpeg,.png,.pdf"
+//                 onChange={(e) => {
+//                   const file = e.target.files?.[0];
+//                   field.onChange(file);
+//                 }}
+//               />
 
-              {/* Icon */}
-              <div className="flex flex-col items-center justify-center gap-2">
-                <Upload className="w-6 h-6 text-gray-500" />
+//               {/* Icon */}
+//               <div className="flex flex-col items-center justify-center gap-2">
+//                 <Upload className="w-6 h-6 text-gray-500" />
 
-                <p className="text-sm font-medium text-gray-700">
-                  Upload receipt
-                </p>
+//                 <p className="text-sm font-medium text-gray-700">
+//                   Upload receipt
+//                 </p>
 
-                <p className="text-xs text-gray-500">
-                  JPG, PNG or PDF (Max 5MB)
-                </p>
-              </div>
+//                 <p className="text-xs text-gray-500">
+//                   JPG, PNG or PDF (Max 5MB)
+//                 </p>
+//               </div>
 
-              {/* Show selected file */}
-              {field.value && (
-                <p className="mt-3 text-xs text-green-600">
-                  {field.value.name}
-                </p>
-              )}
-            </div>
-          </FormControl>
+//               {/* Show selected file */}
+//               {field.value && (
+//                 <p className="mt-3 text-xs text-green-600">
+//                   {field.value.name}
+//                 </p>
+//               )}
+//             </div>
+//           </FormControl>
 
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-}
+//           <FormMessage />
+//         </FormItem>
+//       )}
+//     />
+//   );
+// }

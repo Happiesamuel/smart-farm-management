@@ -5,13 +5,13 @@ import { FiDownload, FiShoppingCart } from "react-icons/fi";
 import { GoPlus } from "react-icons/go";
 import { FinanceModal } from "../modals/FinanceModal";
 import { GrMoney } from "react-icons/gr";
-import FinanceSalesForm from "../farm/finance/FinanceSalesForm";
-import FinanceExpenseFom from "../farm/finance/FinanceExpenseFom";
+import FinanceSalesFormFetch from "../farm/finance/FinanceSalesForm";
+import FinanceExpenseFormFetch from "../farm/finance/FinanceExpenseFom";
 
 export default function BothHeader({ type }: { type: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="pb-5 flex gap-3 md:flex-row flex-col md:items-center justify-between">
+    <div className="pb-5 flex gap-3 sm:flex-row flex-col sm:items-center justify-between">
       <div className=" space-y-1">
         <h6 className="text-dark font-semibold  text-2xl">
           {type === "sales" ? "Sales" : "Expenses"}
@@ -45,7 +45,11 @@ export default function BothHeader({ type }: { type: string }) {
           open={open}
           onClose={() => setOpen(false)}
         >
-          {type === "sales" ? <FinanceSalesForm /> : <FinanceExpenseFom />}
+          {type === "sales" ? (
+            <FinanceSalesFormFetch onClose={() => setOpen(false)} />
+          ) : (
+            <FinanceExpenseFormFetch onClose={() => setOpen(false)} />
+          )}
         </FinanceModal>
 
         <Button className="bg-transparent border border-dark/15 w-[48%] sm:w-fit cursor-pointer text-dark/90 rounded-sm">

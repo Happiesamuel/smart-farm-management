@@ -18,7 +18,7 @@ export default function page() {
         <div className="hidden lg:flex items-center font-medium text-dark/90 gap-1 text-sm"></div>
       </div>
 
-      <div className="flex flex-1 overflow-scroll no-scroll  lg:max-h-[91vh] lg:pt-6 relative items-center justify-center  flex-col">
+      <div className="flex flex-1 overflow-scroll no-scroll  lg:max-h-[91vh]  lg:pt-6 relative items-center justify-center  flex-col">
         <div className="flex items-center justify-center flex-col gap-2">
           <div className="bg-[#f0782d]/10 size-16 flex items-center justify-center rounded-full">
             <MdEngineering className="text-[#f0782d] text-3xl" />

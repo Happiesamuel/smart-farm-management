@@ -4,7 +4,7 @@ import { GoPlus } from "react-icons/go";
 import { FinanceModal } from "../modals/FinanceModal";
 import { useState } from "react";
 import { TbPlant2 } from "react-icons/tb";
-import CreateCropForm from "../farm/crops/CreateCropForm";
+import CreateCropFormFetch from "../farm/crops/CreateCropForm";
 
 export default function CropsHeader() {
   const [open, setOpen] = useState(false);
@@ -32,7 +32,7 @@ export default function CropsHeader() {
         open={open}
         onClose={() => setOpen(false)}
       >
-        <CreateCropForm />
+        <CreateCropFormFetch onClose={() => setOpen(false)} />
       </FinanceModal>
 
       {/* export crop button */}

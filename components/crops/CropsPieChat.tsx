@@ -8,16 +8,6 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 
-export const description = "A donut chart with text";
-
-const data = [
-  { food: "Maize", value: 33, fill: "#03732b", area: "80ac" },
-  { food: "Rice", value: 25, fill: "#4e8afd", area: "70ac" },
-  { food: "Tomatoes", value: 17, fill: "#fcb304", area: "50ac" },
-  { food: "Pepper", value: 15, fill: "#e45551", area: "40ac" },
-  { food: "Others", value: 10, fill: "#bfbfc0", area: "72ac" },
-];
-
 const chartConfig = {
   value: { label: "Value" },
   Maize: { label: "Maize" },
@@ -27,7 +17,12 @@ const chartConfig = {
   Others: { label: "Others" },
 } satisfies ChartConfig;
 
-export function CropsPieChart() {
+export function CropsPieChart({
+  data,
+}: {
+  data: { food: string; value: number; fill: string; area: string }[];
+  total: number;
+}) {
   return (
     <div className="w-full p-4  gap-0 bg-transparent flex-1 relative rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[300px] shrink-0">
       <div className="pb-0 shrink-0">

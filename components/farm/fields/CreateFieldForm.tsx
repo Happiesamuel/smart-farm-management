@@ -1,50 +1,175 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 
-import { useState } from "react";
 import { createFieldSchema } from "@/lib/schemas";
-import { PiFarm, PiPlant, PiPlantDuotone } from "react-icons/pi";
+import { PiFarm } from "react-icons/pi";
 import { ImDroplet } from "react-icons/im";
 import { FiUser } from "react-icons/fi";
 import { FaRegSave } from "react-icons/fa";
-import { GrFlag } from "react-icons/gr";
 import CreateFieldInput, {
-  CreateFieldCombo,
-  CreateFieldDate,
   CreateFieldInputSelect,
   CreateFieldSelect,
   CreateFieldText,
+  CreateFieldUpload,
 } from "./CreateFieldField";
 import { TbRipple } from "react-icons/tb";
-import { CreateCropCombo } from "../crops/CreateCropField";
-export default function CreateFieldForm() {
-  const [load, setLoad] = useState(false);
-  //   const { login, status } = useLogin();
+import { useCreateField } from "@/hooks/fields/useFields";
+import ButtonLoader from "@/components/layout/ButtonLoader";
+import { toast } from "sonner";
+import { useApp } from "@/stores/useAppStore";
+import { useGetFarm } from "@/hooks/farms/useFarm";
+import { FormLoader } from "@/components/loader/GeneralLoader";
+import { useParams, useRouter } from "next/navigation";
+import { useUpdateDocWithImg } from "@/hooks/useUpdate";
+
+export default function CreateFieldFormFetch({
+  onClose,
+  def,
+}: {
+  onClose?(): void;
+  def?: { [key: string]: string | number };
+}) {
+  const { workspace, user, ready } = useApp();
+
+  const { farms, status, error } = useGetFarm(
+    workspace?.id ?? null,
+    user?.id ?? null,
+  );
+  const { farmId: x } = useParams();
+  if (!ready)
+    return (
+      <div className="h-100">
+        <FormLoader>Loading...</FormLoader>
+      </div>
+    );
+  if (!user && ready) return <p>error</p>;
+  if (status === "pending")
+    return (
+      <div className="h-100">
+        <FormLoader>Loading form...</FormLoader>
+      </div>
+    );
+  if (status === "error") return <p>{error?.message}</p>;
+
+  const farmId = farms?.find((y) => y.$id === x)?.$id ?? undefined;
+
+  const farmOptions =
+    farms?.map((f) => ({
+      name: f.farmName,
+      value: f.$id,
+    })) ?? [];
+  return (
+    <CreateFieldForm
+      farmId={farmId as string}
+      workspaceId={workspace!.id}
+      userId={user!.id}
+      def={def}
+      onClose={onClose}
+      farms={farmOptions}
+    />
+  );
+}
+
+function CreateFieldForm({
+  workspaceId,
+  userId,
+  farmId,
+  farms,
+  def,
+  onClose,
+}: {
+  workspaceId: string;
+  userId: string;
+  farmId: string;
+  farms: { name: string; value: string }[];
+  onClose?(): void;
+  def?: { [key: string]: string | number };
+}) {
+  const defaultValue = def?.id
+    ? {
+        fieldName: def?.name ?? "",
+        farm: farmId ?? def.farmId ?? "",
+        fieldImage: def?.image ?? "",
+        size: def?.size.toString(),
+        sizeUnit: def?.sizeUnit,
+        soilType: (def?.soilType as string).toLowerCase() ?? "",
+        irrigationType: (def?.irrigationType as string).toLowerCase() ?? "",
+        status: (def?.status as string).toLowerCase() ?? "",
+        description: def?.description ?? "",
+      }
+    : {
+        farm: farmId ? farmId : "",
+      };
+  const { update, status: upStat } = useUpdateDocWithImg();
+  const { createField, status } = useCreateField();
+  const { workspace } = useApp();
+  const router = useRouter();
   const form = useForm<z.infer<typeof createFieldSchema>>({
-    resolver: zodResolver(createFieldSchema),
+    resolver: zodResolver(createFieldSchema) as Resolver<
+      z.infer<typeof createFieldSchema>
+    >,
+    defaultValues: defaultValue as unknown as z.infer<typeof createFieldSchema>,
   });
+  async function onSubmit(values: z.infer<typeof createFieldSchema>) {
+    const { farm, ...val } = values;
+    const obj = {
+      userId: userId,
+      workspaceId: workspaceId,
+      data: {
+        ...val,
+        size: +values.size,
+        farms: farm,
+      },
+    };
+    if (def?.id) {
+      const o = obj.data;
 
-  async function onSubmit(values: z.infer<typeof createFieldSchema>) {}
+      update(
+        {
+          id: def.id as string,
+          data: o,
+          workspaceId: workspaceId,
+          userId: userId,
+          collection: "fields",
+        },
+        {
+          onSuccess: () => {
+            toast("Field updated successfully", {
+              description: "You've updated your field",
+            });
+            onClose?.();
+          },
+          onError: (err) =>
+            toast("Error updating field", {
+              description: err.message,
+              duration: 4000,
+              closeButton: true,
+            }),
+        },
+      );
+    } else {
+      createField(obj, {
+        onSuccess: () => {
+          toast("Field created successfully", {
+            description: "You can now proceed to managing your field",
+          });
+          router.push(`/user/${workspace?.workspaceId}/farms/${farmId}`);
+        },
+        onError: (err) =>
+          toast("Error creating field", {
+            description: err.message,
+            duration: 4000,
+            closeButton: true,
+          }),
+      });
+    }
+  }
 
-  const farm = [
-    {
-      value: "greenValley",
-      name: "Green Valley Farm",
-    },
-    {
-      value: "sunrise",
-      name: "Sunrise Farm",
-    },
-    {
-      value: "hilltop",
-      name: "Hilltop Farm ",
-    },
-  ];
   const soil = [
     {
       value: "sandy",
@@ -75,15 +200,26 @@ export default function CreateFieldForm() {
   const arrSize = [
     {
       name: "acres",
-      value: "acre",
+      value: "acres",
     },
     {
       name: "hectares",
-      value: "ha",
+      value: "hectares",
     },
     {
       name: "square.m",
-      value: "mm",
+      value: "square.m",
+    },
+  ];
+
+  const stat = [
+    {
+      name: "Active",
+      value: "active",
+    },
+    {
+      name: "Inactive",
+      value: "inactive",
     },
   ];
   const irrigation = [
@@ -112,18 +248,6 @@ export default function CreateFieldForm() {
       value: "pivot",
     },
   ];
-  const cropOptions = [
-    "🌽Maize",
-    "🌾Rice",
-    "🥔Yam",
-    "🍅Tomato",
-    "🫑Pepper",
-    "🥔Cassava",
-    "🌾Beans",
-    "🌱Wheat",
-    "🥜Sorghum",
-    "🌾Soyabean",
-  ];
 
   return (
     <div className="w-full lg:w-[90%] mx-auto ">
@@ -147,8 +271,13 @@ export default function CreateFieldForm() {
               name="farm"
               control={form.control}
               label="Select Farm"
-              placeholder="Select farm"
-              array={farm}
+              placeholder={
+                farmId
+                  ? (farms.find((x) => x.value === farmId)?.name ?? "")
+                  : "Select farm"
+              }
+              disabled={farmId ? true : false}
+              array={[]}
               Icon={PiFarm}
             />
           </div>
@@ -159,43 +288,68 @@ export default function CreateFieldForm() {
               control={form.control}
               label="Field Size"
               placeholder="e.g. 100"
-              placeholder2="arces"
+              placeholder2={
+                def?.id
+                  ? ((arrSize.find(
+                      (x) => x.value === (def.sizeUnit as string).toLowerCase(),
+                    )?.name ?? "arces") as string)
+                  : "arces"
+              }
+              type={"number"}
               name1="size"
-              name2="unit"
+              name2="sizeUnit"
             />
             <CreateFieldSelect
               name="soilType"
               control={form.control}
               label="Soil Type"
-              placeholder="Select soil type"
+              placeholder={
+                def?.id
+                  ? ((soil.find(
+                      (x) => x.value === (def.soilType as string).toLowerCase(),
+                    )?.name ?? "Select soil type") as string)
+                  : "Select soil type"
+              }
               array={soil}
               Icon={TbRipple}
             />
           </div>
-          <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
+          <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
             <CreateFieldSelect
               name="irrigationType"
               control={form.control}
               label="Irrigation Type (Optional)"
-              placeholder="Select irrigation type"
+              placeholder={
+                def?.id
+                  ? ((irrigation.find(
+                      (x) =>
+                        x.value ===
+                        (def.irrigationType as string).toLowerCase(),
+                    )?.name ?? "Select irrigation type") as string)
+                  : "Select irrigation type"
+              }
               array={irrigation}
               Icon={ImDroplet}
             />
-            <CreateFieldDate
-              label="Planting Date to Harvest Date"
-              name="plantingToHarvest"
+            <CreateFieldUpload
+              img={def?.image as string}
               control={form.control}
             />
           </div>
           <div className="flex gap-4 md:gap-6 items-start flex-col md:flex-row justify-between">
-            <CreateFieldCombo
-              Icon={PiPlantDuotone}
-              array={cropOptions}
-              label="Crop Type"
-              placeholder1="Select or search crop"
-              placeholder2="Select"
-              name="cropType"
+            <CreateFieldSelect
+              name="status"
               control={form.control}
+              label="Status"
+              placeholder={
+                def?.id
+                  ? ((stat.find(
+                      (x) => x.value === (def.status as string).toLowerCase(),
+                    )?.name ?? "Select Farm Status") as string)
+                  : "Select Farm Status"
+              }
+              array={stat}
+              Icon={TbRipple}
             />
             <CreateFieldText
               label="Description (optional)"
@@ -208,15 +362,26 @@ export default function CreateFieldForm() {
           <div className="flex items-center gap-4 relative justify-end">
             <Button
               type="reset"
+              onClick={() => (def?.id ? onClose?.() : router.back())}
               className="text-dark bg-transparent rounded-md w-fit px-6 h-9 cursor-pointer border-border border"
             >
               Cancel
             </Button>
             <Button
               type="submit"
+              disabled={status === "pending" || upStat === "pending"}
               className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              <FaRegSave /> Add Field
+              {status === "pending" || upStat === "pending" ? (
+                <>
+                  <ButtonLoader />
+                  {def?.id ? "Updating..." : "Creating..."}
+                </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <FaRegSave /> {def?.id ? "Update Field" : "Save Field"}
+                </div>
+              )}
             </Button>
           </div>
         </form>

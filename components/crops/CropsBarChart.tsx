@@ -9,14 +9,6 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-export const description = "A bar chart with a label";
-
-const chartData = [
-  { food: "Growing", value: 23, fill: "#03732b", area: "80ac" },
-  { food: "Flowering", value: 6, fill: "#4e8afd", area: "70ac" },
-  { food: "Harvested", value: 9, fill: "#fcb304", area: "50ac" },
-  { food: "Completed", value: 6, fill: "#e45551", area: "40ac" },
-];
 
 const chartConfig = {
   value: { label: "Value" },
@@ -26,7 +18,16 @@ const chartConfig = {
   Completed: { label: "Completed" },
 } satisfies ChartConfig;
 
-export function CropsBarChart() {
+export function CropsBarChart({
+  crop,
+}: {
+  crop: {
+    food: string;
+    value: number;
+    area: string;
+    fill: string;
+  }[];
+}) {
   return (
     <Card className="w-full gap-0  flex-1 relative rounded-xl border border-border/80 bg-transparent hover:shadow-sm transition flex flex-col h-[300px] shrink-0">
       <CardHeader className="pb-0 shrink-0">
@@ -38,7 +39,7 @@ export function CropsBarChart() {
       </CardHeader>
       <CardContent>
         <ChartContainer className="h-[250px] w-full" config={chartConfig}>
-          <BarChart accessibilityLayer data={chartData} margin={{ top: 20 }}>
+          <BarChart accessibilityLayer data={crop} margin={{ top: 20 }}>
             <CartesianGrid vertical={false} />
 
             <XAxis

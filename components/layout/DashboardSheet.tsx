@@ -14,15 +14,18 @@ import { GiDigDug } from "react-icons/gi";
 import { RiFileList3Line } from "react-icons/ri";
 import { IoSettingsOutline } from "react-icons/io5";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-("react-icons/fi");
+import { useParams, usePathname } from "next/navigation";
 import { GrMoney } from "react-icons/gr";
 import { GoTasklist } from "react-icons/go";
 import { FiActivity } from "react-icons/fi";
 
 export function DashboardSheet() {
+  const { workspaceId } = useParams();
   const pathname = usePathname();
-  const slug = pathname.slice(6).split("/").at(0);
+  const segments = pathname.split("/");
+  const slug = segments[3] || "";
+
+  if (!workspaceId) return null;
   const sidebarLinks = [
     {
       group: "Main",
@@ -110,10 +113,11 @@ export function DashboardSheet() {
               <div className="flex flex-col gap-1">
                 {section.items.map((link) => {
                   const Icon = link.icon;
+                  const href = `/user/${workspaceId}/${link.slug}`;
                   return (
                     <SheetClose asChild key={link.slug}>
                       <Link
-                        href={link.route}
+                        href={href}
                         className={`flex group items-center cursor-pointer text-dark/90 font-medium py-2 px-3 gap-3 ${
                           slug === link.slug && "bg-white text-primary-green"
                         } hover:text-primary-green text-sm rounded-md mx-2`}
@@ -142,8 +146,12 @@ export function DashboardSheet() {
   );
 }
 export function WorkerDashboardSheet() {
+  const { workspaceId } = useParams();
   const pathname = usePathname();
-  const slug = pathname.slice(8).split("/").at(0);
+  const segments = pathname.split("/");
+  const slug = segments[3] || "";
+
+  if (!workspaceId) return null;
   const sidebarLinks = [
     {
       group: "Main",
@@ -151,19 +159,16 @@ export function WorkerDashboardSheet() {
         {
           name: "Dashboard",
           slug: "dashboard",
-          route: "/worker/dashboard",
           icon: TbLayoutDashboard,
         },
         {
           name: "My Tasks",
           slug: "tasks",
-          route: "/worker/tasks",
           icon: GoTasklist,
         },
         {
           name: "Activity Log",
           slug: "activity",
-          route: "/worker/activity",
           icon: FiActivity,
         },
       ],
@@ -174,7 +179,6 @@ export function WorkerDashboardSheet() {
         {
           name: "Settings",
           slug: "settings",
-          route: "/worker/settings",
           icon: IoSettingsOutline,
         },
       ],
@@ -196,10 +200,11 @@ export function WorkerDashboardSheet() {
               <div className="flex flex-col gap-1">
                 {section.items.map((link) => {
                   const Icon = link.icon;
+                  const href = `/worker/${workspaceId}/${link.slug}`;
                   return (
                     <SheetClose asChild key={link.slug}>
                       <Link
-                        href={link.route}
+                        href={href}
                         className={`flex group items-center cursor-pointer text-dark/90 font-medium py-2 px-3 gap-3 ${
                           slug === link.slug && "bg-white text-primary-green"
                         } hover:text-primary-green text-sm rounded-md mx-2`}

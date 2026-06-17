@@ -1,6 +1,6 @@
 "use client";
+import { useParams } from "next/navigation";
 import Image from "next/image";
-import Logo from "../../public/logo.png";
 import { TbLayoutDashboard, TbMoneybagMove } from "react-icons/tb";
 import { PiFarm, PiPottedPlant } from "react-icons/pi";
 import { GiDigDug } from "react-icons/gi";
@@ -14,12 +14,11 @@ import { FiActivity, FiSidebar } from "react-icons/fi";
 import User from "../../public/user.png";
 import { GrMoney } from "react-icons/gr";
 import { GoTasklist } from "react-icons/go";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { MapPin, Phone, Plus, Settings } from "lucide-react";
+import { Plus } from "lucide-react";
+import { useApp } from "@/stores/useAppStore";
 export function ManagerSidebar() {
   const pathname = usePathname();
-  const slug = pathname.slice(6).split("/").at(0);
+  const { workspaceId } = useParams();
   const sidebarLinks = [
     {
       group: "Main",
@@ -27,7 +26,6 @@ export function ManagerSidebar() {
         {
           name: "Dashboard",
           slug: "dashboard",
-          route: "/user/dashboard",
           icon: TbLayoutDashboard,
         },
       ],
@@ -35,92 +33,53 @@ export function ManagerSidebar() {
     {
       group: "Management",
       items: [
-        {
-          name: "Farms",
-          slug: "farms",
-          route: "/user/farms",
-          icon: PiFarm,
-        },
-        {
-          name: "Crops",
-          slug: "crops",
-          route: "/user/crops",
-          icon: PiPottedPlant,
-        },
-        {
-          name: "Harvests",
-          slug: "harvests",
-          route: "/user/harvests",
-          icon: GiDigDug,
-        },
+        { name: "Farms", slug: "farms", icon: PiFarm },
+        { name: "Crops", slug: "crops", icon: PiPottedPlant },
+        { name: "Harvests", slug: "harvests", icon: GiDigDug },
       ],
     },
     {
       group: "Finance",
       items: [
-        {
-          name: "Sales",
-          slug: "sales",
-          route: "/user/sales",
-          icon: TbMoneybagMove,
-        },
-        {
-          name: "Expenses",
-          slug: "expenses",
-          route: "/user/expenses",
-          icon: GrMoney,
-        },
+        { name: "Sales", slug: "sales", icon: TbMoneybagMove },
+        { name: "Expenses", slug: "expenses", icon: GrMoney },
       ],
     },
     {
       group: "Others",
       items: [
-        {
-          name: "Reports",
-          slug: "reports",
-          route: "/user/reports",
-          icon: RiFileList3Line,
-        },
-        {
-          name: "Settings",
-          slug: "settings",
-          route: "/user/settings",
-          icon: IoSettingsOutline,
-        },
+        { name: "Reports", slug: "reports", icon: RiFileList3Line },
+        { name: "Settings", slug: "settings", icon: IoSettingsOutline },
       ],
     },
   ];
-
-  const router = useRouter();
 
   const navItems = [
     {
       name: "Dashboard",
       slug: "dashboard",
-      route: "/user/dashboard",
       icon: TbLayoutDashboard,
     },
     {
       name: "Farms",
       slug: "farms",
-      route: "/user/farms",
       icon: PiFarm,
     },
     {
       name: "Sales",
       slug: "sales",
-      route: "/user/sales",
       icon: TbMoneybagMove,
     },
     {
       name: "Expenses",
       slug: "expenses",
-      route: "/user/expenses",
       icon: GrMoney,
     },
   ];
   const { handleToogleCollapse, collaspe } = useCollaspe();
-
+  const { ready, user, role } = useApp();
+  if (!workspaceId) return null;
+  const slug = pathname.split("/")[3];
   return (
     <>
       <div
@@ -165,7 +124,7 @@ export function ManagerSidebar() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 mt-8">
+        <div className="flex h-[65vh] overflow-y-scroll no-scroll flex-col gap-4 mt-8">
           {sidebarLinks.map((section) => (
             <div key={section.group}>
               {!collaspe && (
@@ -177,13 +136,18 @@ export function ManagerSidebar() {
               <div className="flex flex-col gap-1">
                 {section.items.map((link) => {
                   const Icon = link.icon;
+
+                  const href = `/user/${workspaceId}/${link.slug}`;
+
                   return (
                     <Tooltip key={link.slug}>
                       <TooltipTrigger asChild>
                         <Link
-                          href={link.route}
+                          href={href}
                           className={`flex group items-center cursor-pointer text-dark/90 font-medium py-2 px-3 gap-3 ${
-                            slug === link.slug && "bg-white text-primary-green"
+                            slug === link.slug
+                              ? "bg-white text-primary-green"
+                              : ""
                           } hover:text-primary-green text-sm rounded-md mx-2`}
                         >
                           <Icon
@@ -222,38 +186,60 @@ export function ManagerSidebar() {
           ))}
         </div>
 
-        <div className="absolute bottom-6 px-3 w-full">
-          <div className="flex items-center gap-2 border-t border-zinc-300 w-full pt-5">
-            <Image
-              src={User}
-              width={35}
-              height={35}
-              alt="user"
-              className="rounded-full object-cover border-2 border-light-green"
-            />
-
-            <div>
-              <p
-                className={`transition-opacity text-dark text-xs font-semibold duration-200 ${
-                  collaspe
-                    ? "opacity-0 w-0 overflow-hidden"
-                    : "opacity-100 w-auto delay-300"
-                }`}
-              >
-                John Doe
-              </p>
-
-              <p
-                className={`transition-opacity text-zinc-500 text-[10px] font-semibold duration-200 ${
-                  collaspe
-                    ? "opacity-0 w-0 overflow-hidden"
-                    : "opacity-100 w-auto delay-300"
-                }`}
-              >
-                Farm Manager
-              </p>
+        <div className="absolute z-50 bg-[#f3f3f3]   bottom-6 px-3 w-full">
+          {!ready ? (
+            <div className="flex items-center gap-2">
+              <div className="size-9 bg-zinc-200 rounded-full animate-pulse" />
+              <div className="flex flex-col gap-1">
+                <div
+                  className={`  ${
+                    collaspe
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100 w-auto delay-300"
+                  } transition-opacity duration-200   h-3 w-24  bg-zinc-200 rounded-full animate-pulse`}
+                />
+                <div
+                  className={` ${
+                    collaspe
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100 w-auto delay-300"
+                  } transition-opacity duration-200 h-2 w-32 bg-zinc-200 rounded-full animate-pulse`}
+                />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex items-center gap-2 border-t border-zinc-300 w-full pt-5">
+              <Image
+                src={user?.avatar || User}
+                width={35}
+                height={35}
+                alt="user"
+                className="rounded-full object-cover "
+              />
+
+              <div>
+                <p
+                  className={`transition-opacity text-dark text-xs font-semibold duration-200 ${
+                    collaspe
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100 w-auto delay-300"
+                  }`}
+                >
+                  {user?.fullName}
+                </p>
+
+                <p
+                  className={`transition-opacity text-zinc-500 text-[10px] font-semibold duration-200 ${
+                    collaspe
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100 w-auto delay-300"
+                  }`}
+                >
+                  {`${role === "owner" && "Farm"} ${role!.slice(0, 1).toUpperCase() + role!.slice(1)}`}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className="lg:hidden block fixed bottom-1.5 left-1/2 -translate-x-1/2 z-50">
@@ -263,9 +249,10 @@ export function ManagerSidebar() {
           <div className="flex items-center gap-8">
             {navItems.slice(0, 2).map((item) => {
               const Icon = item.icon;
+              const href = `/user/${workspaceId}/${item.slug}`;
               return (
                 <Link
-                  href={item.route}
+                  href={href}
                   key={item.name}
                   className={`transition text-dark/90 ${
                     slug === item.slug && "text-primary-green"
@@ -280,9 +267,10 @@ export function ManagerSidebar() {
           <div className="flex items-center gap-8">
             {navItems.slice(2).map((item) => {
               const Icon = item.icon;
+              const href = `/user/${workspaceId}/${item.slug}`;
               return (
                 <Link
-                  href={item.route}
+                  href={href}
                   key={item.name}
                   className={`transition text-dark/90 ${
                     slug === item.slug && " text-primary-green"
@@ -308,9 +296,14 @@ export function ManagerSidebar() {
   );
 }
 export function WorkerSidebar() {
+  const { workspaceId } = useParams();
+  const { ready, user, role } = useApp();
   const pathname = usePathname();
+  const { handleToogleCollapse, collaspe } = useCollaspe();
+  const segments = pathname.split("/");
+  const slug = segments[3] || "";
 
-  const slug = pathname.slice(8).split("/").at(0);
+  if (!workspaceId) return null;
   const sidebarLinks = [
     {
       group: "Main",
@@ -318,19 +311,16 @@ export function WorkerSidebar() {
         {
           name: "Dashboard",
           slug: "dashboard",
-          route: "/worker/dashboard",
           icon: TbLayoutDashboard,
         },
         {
           name: "My Tasks",
           slug: "tasks",
-          route: "/worker/tasks",
           icon: GoTasklist,
         },
         {
           name: "Activity Log",
           slug: "activity",
-          route: "/worker/activity",
           icon: FiActivity,
         },
       ],
@@ -341,36 +331,30 @@ export function WorkerSidebar() {
         {
           name: "Settings",
           slug: "settings",
-          route: "/worker/settings",
           icon: IoSettingsOutline,
         },
       ],
     },
   ];
-  const { handleToogleCollapse, collaspe } = useCollaspe();
   const navItems = [
     {
       name: "Dashboard",
       slug: "dashboard",
-      route: "/worker/dashboard",
       icon: TbLayoutDashboard,
     },
     {
       name: "My Tasks",
       slug: "tasks",
-      route: "/worker/tasks",
       icon: GoTasklist,
     },
     {
       name: "Activity Log",
       slug: "activity",
-      route: "/worker/activity",
       icon: FiActivity,
     },
     {
       name: "Settings",
       slug: "settings",
-      route: "/worker/settings",
       icon: IoSettingsOutline,
     },
   ];
@@ -419,32 +403,34 @@ export function WorkerSidebar() {
           </div>
         </div>
 
-        {/* NAV */}
         <div className="flex flex-col gap-4 mt-8">
           {sidebarLinks.map((section) => (
             <div key={section.group}>
-              {/* GROUP TITLE */}
               {!collaspe && (
                 <p className="text-[10px] text-zinc-400 px-4 mb-1 uppercase">
                   {section.group}
                 </p>
               )}
 
-              {/* LINKS */}
               <div className="flex flex-col gap-1">
                 {section.items.map((link) => {
                   const Icon = link.icon;
+
+                  const href = `/worker/${workspaceId}/${link.slug}`;
+
                   return (
                     <Tooltip key={link.slug}>
                       <TooltipTrigger asChild>
                         <Link
-                          href={link.route}
-                          className={`flex group items-center  cursor-pointer text-dark/90 font-medium py-2 px-3 gap-3 ${
-                            slug === link.slug && "bg-white text-primary-green "
+                          href={href}
+                          className={`flex group items-center cursor-pointer text-dark/90 font-medium py-2 px-3 gap-3 ${
+                            slug === link.slug
+                              ? "bg-white text-primary-green"
+                              : ""
                           } hover:text-primary-green text-sm rounded-md mx-2`}
                         >
                           <Icon
-                            className={`text-xl  ${
+                            className={`text-xl ${
                               slug === link.slug
                                 ? "text-primary-green"
                                 : "text-dark"
@@ -452,7 +438,7 @@ export function WorkerSidebar() {
                           />
 
                           <p
-                            className={`transition-all  duration-200 ${
+                            className={`transition-all duration-200 ${
                               collaspe
                                 ? "opacity-0 w-0 overflow-hidden"
                                 : "opacity-100 w-auto delay-200"
@@ -479,39 +465,60 @@ export function WorkerSidebar() {
           ))}
         </div>
 
-        {/* USER */}
-        <div className="absolute bottom-6 px-3 w-full">
-          <div className="flex items-center gap-2 border-t border-zinc-300 w-full pt-5">
-            <Image
-              src={User}
-              width={35}
-              height={35}
-              alt="user"
-              className="rounded-full object-cover border-2 border-light-green"
-            />
-
-            <div>
-              <p
-                className={`transition-opacity text-dark text-xs font-semibold duration-200 ${
-                  collaspe
-                    ? "opacity-0 w-0 overflow-hidden"
-                    : "opacity-100 w-auto delay-300"
-                }`}
-              >
-                John Doe
-              </p>
-
-              <p
-                className={`transition-opacity text-zinc-500 text-[10px] font-semibold duration-200 ${
-                  collaspe
-                    ? "opacity-0 w-0 overflow-hidden"
-                    : "opacity-100 w-auto delay-300"
-                }`}
-              >
-                Farm Manager
-              </p>
+        <div className="absolute z-50 bg-[#f3f3f3]   bottom-6 px-3 w-full">
+          {!ready ? (
+            <div className="flex items-center gap-2">
+              <div className="size-9 bg-zinc-200 rounded-full animate-pulse" />
+              <div className="flex flex-col gap-1">
+                <div
+                  className={`  ${
+                    collaspe
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100 w-auto delay-300"
+                  } transition-opacity duration-200   h-3 w-24  bg-zinc-200 rounded-full animate-pulse`}
+                />
+                <div
+                  className={` ${
+                    collaspe
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100 w-auto delay-300"
+                  } transition-opacity duration-200 h-2 w-32 bg-zinc-200 rounded-full animate-pulse`}
+                />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex items-center gap-2 border-t border-zinc-300 w-full pt-5">
+              <Image
+                src={user?.avatar || User}
+                width={35}
+                height={35}
+                alt="user"
+                className="rounded-full object-cover "
+              />
+
+              <div>
+                <p
+                  className={`transition-opacity text-dark text-xs font-semibold duration-200 ${
+                    collaspe
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100 w-auto delay-300"
+                  }`}
+                >
+                  {user?.fullName}
+                </p>
+
+                <p
+                  className={`transition-opacity text-zinc-500 text-[10px] font-semibold duration-200 ${
+                    collaspe
+                      ? "opacity-0 w-0 overflow-hidden"
+                      : "opacity-100 w-auto delay-300"
+                  }`}
+                >
+                  {`${role === "owner" ? "Farm" : ""} ${role!.slice(0, 1).toUpperCase() + role!.slice(1)}`}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className="lg:hidden block fixed bottom-1.5 left-1/2 -translate-x-1/2 z-50">
@@ -521,9 +528,10 @@ export function WorkerSidebar() {
           <div className="flex items-center gap-8">
             {navItems.slice(0, 2).map((item) => {
               const Icon = item.icon;
+              const href = `/worker/${workspaceId}/${item.slug}`;
               return (
                 <Link
-                  href={item.route}
+                  href={href}
                   key={item.name}
                   className={`transition text-dark/90 ${
                     slug === item.slug && "text-primary-green"
@@ -538,9 +546,10 @@ export function WorkerSidebar() {
           <div className="flex items-center gap-8">
             {navItems.slice(2).map((item) => {
               const Icon = item.icon;
+              const href = `/worker/${workspaceId}/${item.slug}`;
               return (
                 <Link
-                  href={item.route}
+                  href={href}
                   key={item.name}
                   className={`transition text-dark/90 ${
                     slug === item.slug && " text-primary-green"

@@ -1,4 +1,5 @@
-import { useState } from "react";
+"use client";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -7,19 +8,26 @@ import {
   SelectValue,
 } from "../../ui/select";
 import { LuListFilter } from "react-icons/lu";
-
+const array = [
+  {
+    name: "All Tasks",
+    value: "all",
+  },
+  {
+    name: "Recent Tasks",
+    value: "recent",
+  },
+];
 export default function TaskHeader() {
-  const [val, setVal] = useState("all");
-  const array = [
-    {
-      name: "All Tasks",
-      value: "all",
-    },
-    {
-      name: "Recent Tasks",
-      value: "recent",
-    },
-  ];
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const val = searchParams.get("sort") || "all";
+
+  const handleChange = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("sort", value);
+    router.push(`?${params.toString()}`);
+  };
   return (
     <div className="flex gap-2 sm:flex-row flex-col sm:items-center justify-between">
       <div className="space-y-2">
@@ -29,11 +37,11 @@ export default function TaskHeader() {
         </p>
       </div>
       <div className="w-fit self-end  flex  sm:block sm:w-fit">
-        <Select onValueChange={(e) => setVal(e)} defaultValue={val}>
+        <Select onValueChange={(e) => handleChange(e)} defaultValue={val}>
           <SelectTrigger className="text-dark/90 w-full md:w-full border border-border bg-white rounded-lg">
             <LuListFilter /> <SelectValue placeholder="All Farms" />
           </SelectTrigger>
-          <SelectContent className="bg-white border-border text-zinc-400">
+          <SelectContent className="bg-white mt-6 border-border text-zinc-400">
             {array.map((x) => (
               <SelectItem
                 key={x.value}

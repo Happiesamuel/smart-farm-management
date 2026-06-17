@@ -24,7 +24,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import { Control, FieldPath } from "react-hook-form";
+import { Control, FieldPath, UseFormSetValue } from "react-hook-form";
 import { IconType } from "react-icons";
 import {
   Command,
@@ -80,11 +80,14 @@ interface Select {
   placeholder: string;
   array: { [key: string]: string }[];
   Icon?: IconType;
+  disabled?: boolean;
+  setValue?: UseFormSetValue<z.infer<typeof createHarvestSchema>>;
 }
 interface Dates {
   control: Control<z.infer<typeof createHarvestSchema>>;
   name: FieldPath<z.infer<typeof createHarvestSchema>>;
   label: string;
+  placeholder: string;
 }
 
 export function CreateHarvestSelect({
@@ -94,6 +97,8 @@ export function CreateHarvestSelect({
   placeholder,
   Icon,
   array,
+  disabled,
+  setValue,
 }: Select) {
   return (
     <FormField
@@ -101,20 +106,33 @@ export function CreateHarvestSelect({
       name={name}
       render={({ field }) => (
         <FormItem className=" w-full min-w-[2px]">
-          <FormLabel className="text-sm text-sidebar-content gap-1 font-normal">
+          <FormLabel className="text-dark text-sm text-sidebar-content gap-1 font-normal">
             {label}
           </FormLabel>
           <div className="w-full flex justify-center items-center min-w-[2px]">
-            <Select onValueChange={field.onChange}>
+            <Select
+              onValueChange={(val) => {
+                if (name === "farm" && setValue) {
+                  setValue("farm", val);
+                  setValue("field", "");
+                } else if (name === "field" && setValue) {
+                  setValue("field", val);
+                  setValue("crop", "");
+                } else return field.onChange(val);
+              }}
+            >
               <FormControl>
-                <SelectTrigger className="cursor-pointer h-9! w-full  bg-transparent  focus-visible:outline-primary rounded-[8px] p-3 text-sm  focus:ring text-dark ring-green-500  data-[placeholder]:text-gray-500 ">
+                <SelectTrigger
+                  disabled={disabled}
+                  className="cursor-pointer h-9! w-full  bg-transparent  focus-visible:outline-primary rounded-[8px] p-3 text-sm  focus:ring text-dark ring-green-500  data-[placeholder]:text-gray-500 "
+                >
                   <div className="flex items-center  gap-2">
                     {Icon && <Icon className="text-primary-green" />}
                     <SelectValue placeholder={placeholder} className="" />
                   </div>
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="max-h-[160px] z-200 bg-[#fff] border border-border text-dark">
+              <SelectContent className="max-h-[160px] z-200 bg-white mt-6 border border-border text-dark">
                 {array.map((select) => (
                   <SelectItem
                     className="cursor-pointer text-sm hover:bg-primary hover:text-white"
@@ -146,7 +164,7 @@ export function CreateHarvestInputSelect({
 }: InputSelect) {
   return (
     <div className="space-y-2 w-full">
-      <div className="text-sm  text-dark">{label}</div>
+      <div className="text-sm  text-dark text-start">{label}</div>
       <div className="flex items-cente">
         <FormField
           control={control}
@@ -212,7 +230,9 @@ export default function CreateHarvestInput({
       name={name}
       render={({ field }) => (
         <FormItem className="w-full">
-          <FormLabel className="text-sm  text-dark">{label}</FormLabel>
+          <FormLabel className="text-dark text-sm  text-dark">
+            {label}
+          </FormLabel>
           <FormControl>
             <div className="h-9! border border-border  px-2 rounded-md flex items-center gap-2">
               <Input
@@ -242,7 +262,9 @@ export function CreateHarvestText({
       name={name}
       render={({ field }) => (
         <FormItem className="w-full">
-          <FormLabel className="text-sm   text-dark">{label}</FormLabel>
+          <FormLabel className="text-dark text-sm   text-dark">
+            {label}
+          </FormLabel>
           <FormControl>
             <Textarea
               placeholder={placeholder}
@@ -261,49 +283,56 @@ export function CreateHarvestText({
   );
 }
 
-export function CreateHavestDate({ control, name, label }: Dates) {
+export function CreateHavestDate({ control, name, label, placeholder }: Dates) {
   return (
     <FormField
       control={control}
       name={name}
-      render={({ field }) => (
-        <FormItem className="w-full">
-          <FormLabel className="text-sm text-dark">{label}</FormLabel>
+      render={({ field }) => {
+        return (
+          <FormItem className="w-full">
+            <FormLabel className="text-dark text-sm text-dark">
+              {label}
+            </FormLabel>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <FormControl>
-                <Button
-                  variant="outline"
-                  className={`w-full h-9! justify-start text-dark/90 text-left font-normal ${
-                    !field.value && "text-muted-foreground"
-                  }`}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    className={`w-full h-9! justify-start text-dark/90 text-left font-normal ${
+                      !field.value && "text-muted-foreground"
+                    }`}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
 
-                  {field.value ? (
-                    format(field.value as string, "PPP")
-                  ) : (
-                    <span>Pick a date</span>
-                  )}
-                </Button>
-              </FormControl>
-            </PopoverTrigger>
+                    {field.value ? (
+                      format(field.value as string, "PPP")
+                    ) : (
+                      <span>{placeholder}</span>
+                    )}
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
 
-            <PopoverContent className="w-auto z-200 p-0">
-              <Calendar
-                mode="single"
-                selected={
-                  field.value ? new Date(field.value as string) : undefined
-                }
-                onSelect={(date) => field.onChange(date?.toISOString())}
-              />
-            </PopoverContent>
-          </Popover>
+              <PopoverContent className="w-auto z-200 p-0">
+                <Calendar
+                  mode="single"
+                  selected={
+                    field.value ? new Date(field.value as string) : undefined
+                  }
+                  onSelect={(date) => {
+                    field.onChange(date);
+                  }}
+                  disabled={(date) => date > new Date()}
+                />
+              </PopoverContent>
+            </Popover>
 
-          <FormMessage />
-        </FormItem>
-      )}
+            <FormMessage />
+          </FormItem>
+        );
+      }}
     />
   );
 }
@@ -417,7 +446,9 @@ export function CreateHarvestAmount({
       name={name}
       render={({ field }) => (
         <FormItem className="w-full">
-          <FormLabel className="text-sm  text-dark">{label}</FormLabel>
+          <FormLabel className="text-dark text-sm  text-dark">
+            {label}
+          </FormLabel>
           <FormControl>
             <div className="flex border border-border rounded-md h-9 px-3 items-center gap-2">
               <p className="text-dark/80 border-r pr-2 border-border">₦</p>

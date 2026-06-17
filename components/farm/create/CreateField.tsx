@@ -123,6 +123,7 @@ export function CreateFarmInputSelect({
             <FormItem className="flex-1">
               <FormControl>
                 <Input
+                  type="number"
                   className="text-sm h-9 rounded-r-none border-r-0"
                   placeholder={placeholder}
                   {...field}
@@ -228,10 +229,12 @@ export function CreateFarmText({ name, label, placeholder, control }: Inputs) {
 
 export function CreateLocationField({
   control,
+  val = "",
 }: {
   control: Control<z.infer<typeof createFarmSchema>>;
+  val?: string;
 }) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(val);
   const [results, setResults] = useState<LocationResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -475,19 +478,22 @@ export function CreateLocationField({
 
 export function CreateFarmUpload({
   control,
+  img,
 }: {
   control: Control<z.infer<typeof createFarmSchema>>;
+  img?: string;
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-
   return (
     <FormField
       control={control}
       name="farmImage"
       render={({ field }) => (
         <FormItem className="w-full">
-          <FormLabel className="text-sm text-dark">Farm Image</FormLabel>
+          <FormLabel className="text-sm text-dark">
+            Farm Image (optional)
+          </FormLabel>
 
           <FormControl>
             <div
@@ -516,7 +522,7 @@ export function CreateFarmUpload({
               />
 
               {/* Upload UI */}
-              {!preview && (
+              {!img && !preview && (
                 <div className="flex flex-col items-center justify-center gap-2">
                   <Upload className="w-6 h-6 text-gray-500" />
 
@@ -529,18 +535,32 @@ export function CreateFarmUpload({
               )}
 
               {/* IMAGE PREVIEW */}
-              {preview && (
+              {preview ? (
                 <img
                   src={preview}
                   alt="image preview"
                   className="mt-2 w-full h-40 object-cover object-center rounded-md"
                 />
+              ) : img ? (
+                <img
+                  src={img}
+                  alt="image preview"
+                  className="mt-2 w-full h-40 object-cover object-center rounded-md"
+                />
+              ) : img && preview ? (
+                <img
+                  src={preview}
+                  alt="image preview"
+                  className="mt-2 w-full h-40 object-cover object-center rounded-md"
+                />
+              ) : (
+                ""
               )}
 
               {/* File name fallback */}
               {field.value && !preview && (
                 <p className="mt-3 text-xs text-green-600">
-                  {field.value.name}
+                  {(field.value as File).name}
                 </p>
               )}
             </div>

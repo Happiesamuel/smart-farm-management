@@ -4,25 +4,30 @@ import { useCollaspe } from "@/context/SidebarCollasibleContext";
 import { FaRegCalendarCheck } from "react-icons/fa6";
 import { GrMoney } from "react-icons/gr";
 import { PiFarm, PiPlant, PiPackage, PiChartLine } from "react-icons/pi";
-import { TfiLayoutGrid4 } from "react-icons/tfi";
-export default function DashboardFarms() {
+import { TbPigMoney } from "react-icons/tb";
+interface Stat {
+  totalFarms: number;
+  totalFields: number;
+  totalCrops: number;
+  activeTasks: number;
+  completedTasks: number;
+
+  totalRevenue: number;
+  totalExpenses: number;
+  netProfit: number;
+  profitMargin: number;
+}
+export default function DashboardFarms({ stat }: { stat: Stat }) {
   const stats = [
     {
-      num: 2,
+      num: stat.totalFarms,
       name: "Total Farms",
       icon: <PiFarm />,
       iconColor: "bg-[#e8f5ec] text-[#2d8952] ",
       bg: "bg-[#f8fdf9]",
       border: "border-green-100",
     },
-    {
-      num: 12,
-      name: "Total Fields",
-      icon: <TfiLayoutGrid4 />,
-      iconColor: "bg-[#e1eefd] text-[#1058d6] ",
-      bg: "bg-[#f7fafe]",
-      border: "border-blue-100",
-    },
+
     {
       num: 18,
       name: "Total Crops",
@@ -40,7 +45,7 @@ export default function DashboardFarms() {
       border: "border-orange-100",
     },
     {
-      num: "₦1,250,000",
+      num: `₦${stat.totalRevenue.toLocaleString()}`,
       name: "Total Revenue",
       icon: <PiPackage />,
       iconColor: "bg-[#e7f5eb] text-[#056b36] ",
@@ -48,7 +53,7 @@ export default function DashboardFarms() {
       border: "border-green-100",
     },
     {
-      num: "₦620,000",
+      num: `₦${stat.totalExpenses.toLocaleString()}`,
       name: "Total Expenses",
       icon: <GrMoney />,
       iconColor: "bg-[#fee7e7] text-[#e82a2d] ",
@@ -56,12 +61,20 @@ export default function DashboardFarms() {
       border: "border-red-100",
     },
     {
-      num: "₦630,000",
+      num: `₦${stat.netProfit.toLocaleString()}`,
       name: "Net Profit",
       icon: <PiChartLine />,
       iconColor: "bg-[#e7f5eb] text-[#056b36] ",
       bg: "bg-[#f5faf6]",
       border: "border-green-100",
+    },
+    {
+      num: `${stat.profitMargin}%`,
+      name: "Profit Margin",
+      icon: <TbPigMoney />,
+      iconColor: "bg-[#e1eefd] text-[#1058d6] ",
+      bg: "bg-[#f7fafe]",
+      border: "border-blue-100",
     },
   ];
   const { collaspe } = useCollaspe();
@@ -97,3 +110,58 @@ export default function DashboardFarms() {
     </div>
   );
 }
+
+// const { data } = useDashboardStats(workspaceId, userId);
+
+// const stats = data?.stats.map((item) => {
+//   const uiMap: any = {
+//     "Total Farms": {
+//       icon: <PiFarm />,
+//       iconColor: "bg-[#e8f5ec] text-[#2d8952]",
+//       bg: "bg-[#f8fdf9]",
+//       border: "border-green-100",
+//     },
+//     "Total Fields": {
+//       icon: <TfiLayoutGrid4 />,
+//       iconColor: "bg-[#e1eefd] text-[#1058d6]",
+//       bg: "bg-[#f7fafe]",
+//       border: "border-blue-100",
+//     },
+//     "Total Crops": {
+//       icon: <PiPlant />,
+//       iconColor: "bg-[#f1ecfd] text-[#5837e8]",
+//       bg: "bg-[#f9f7fd]",
+//       border: "border-purple-100",
+//     },
+//     "Active Tasks": {
+//       icon: <FaRegCalendarCheck />,
+//       iconColor: "bg-[#fff1dd] text-[#de852c]",
+//       bg: "bg-[#fefaf2]",
+//       border: "border-orange-100",
+//     },
+//     "Total Revenue": {
+//       icon: <PiPackage />,
+//       iconColor: "bg-[#e7f5eb] text-[#056b36]",
+//       bg: "bg-[#f5faf6]",
+//       border: "border-green-100",
+//     },
+//     "Total Expenses": {
+//       icon: <GrMoney />,
+//       iconColor: "bg-[#fee7e7] text-[#e82a2d]",
+//       bg: "bg-[#fef5f5]",
+//       border: "border-red-100",
+//     },
+//     "Net Profit": {
+//       icon: <PiChartLine />,
+//       iconColor: "bg-[#e7f5eb] text-[#056b36]",
+//       bg: "bg-[#f5faf6]",
+//       border: "border-green-100",
+//     },
+//   };
+
+//   return {
+//     num: item.value,
+//     name: item.name,
+//     ...uiMap[item.name],
+//   };
+// });

@@ -31,12 +31,12 @@ export default function TaskGroup({
       slug: "pending",
     },
     {
-      name: "In-Progress",
+      name: "In Progress",
       num: 2,
       text: "text-[#1058d6]",
       bg: "bg-[#1058d6]/15",
       icon: RiProgress2Line,
-      slug: "in-progress",
+      slug: "in_progress",
     },
     {
       name: "Completed",
@@ -53,7 +53,7 @@ export default function TaskGroup({
   const pathname = usePathname();
   function handleClick(slug: string) {
     const params = new URLSearchParams(searchParams);
-    params.set("filter", slug);
+    params.set("worTask", slug);
     router.push(`${pathname}?${params.toString()}`);
     setActive(slug);
   }

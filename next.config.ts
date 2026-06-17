@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "5mb",
+    },
+  },
   images: {
     remotePatterns: [
       {
@@ -21,6 +26,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "cdn.weatherapi.com",
+        port: "",
+      },
+      {
+        protocol: "https",
+        hostname: "fra.cloud.appwrite.io",
         port: "",
       },
     ],

@@ -1,0 +1,95 @@
+"use client";
+import { TaskInfo } from "@/lib/types";
+import { createDoc, getDocs, getFarmDocs } from "@/servers/crud-actions";
+import { getSingleTaskDocs } from "@/servers/task-actions";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+export const useCreateTask = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate: createTask, status } = useMutation({
+    mutationFn: (data: {
+      workspaceId: string;
+      userId: string;
+      data: Omit<TaskInfo, "id" | "workspaces" | "users">;
+    }) =>
+      createDoc({
+        ...data,
+        collection: "tasks",
+      }),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["tasks", variables.workspaceId],
+      });
+    },
+  });
+  return { createTask, status };
+};
+
+export const useGetFarmTasks = (
+  workspaceId: string | null,
+  userId: string | null,
+  farmId: string,
+) => {
+  const {
+    data: tasks,
+    status,
+    error,
+  } = useQuery({
+    queryKey: ["tasks", workspaceId, farmId],
+    queryFn: () =>
+      getFarmDocs({
+        collection: "tasks",
+        workspaceId: workspaceId as string,
+        userId: userId as string,
+        farmId,
+      }),
+    enabled: !!workspaceId && !!userId && !!farmId,
+  });
+  return { tasks, error, status };
+};
+
+export const useGetTasks = (
+  workspaceId: string | null,
+  userId: string | null,
+) => {
+  const {
+    data: tasks,
+    status,
+    error,
+  } = useQuery({
+    queryKey: ["tasks", workspaceId],
+    queryFn: () =>
+      getDocs({
+        collection: "tasks",
+        workspaceId: workspaceId as string,
+        userId: userId as string,
+      }),
+    enabled: !!workspaceId && !!userId,
+  });
+  return { tasks, error, status };
+};
+
+export const useGetSingleTask = (
+  workspaceId: string | null,
+  userId: string | null,
+  taskId: string,
+) => {
+  const {
+    data: task,
+    status,
+    error,
+  } = useQuery({
+    queryKey: ["tasks", workspaceId, taskId],
+    queryFn: () =>
+      getSingleTaskDocs({
+        collection: "tasks",
+        workspaceId: workspaceId as string,
+        userId: userId as string,
+        taskId,
+      }),
+    enabled: !!workspaceId && !!userId && !!taskId,
+  });
+  return { task, error, status };
+};

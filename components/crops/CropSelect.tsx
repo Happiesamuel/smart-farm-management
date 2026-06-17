@@ -1,5 +1,3 @@
-import React, { Dispatch, SetStateAction } from "react";
-
 import {
   Select,
   SelectContent,
@@ -14,7 +12,7 @@ export default function CropSelect({
 }: {
   array: { [key: string]: string }[];
   val: string;
-  setVal: Dispatch<SetStateAction<string>>;
+  setVal: (e: string) => void;
 }) {
   return (
     <Select onValueChange={(e) => setVal(e)} defaultValue={val}>

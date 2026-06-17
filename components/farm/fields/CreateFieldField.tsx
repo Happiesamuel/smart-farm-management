@@ -30,13 +30,13 @@ import { Control, FieldPath } from "react-hook-form";
 import { IconType } from "react-icons";
 
 import z from "zod";
-import { createFieldSchema } from "@/lib/schemas";
+import { createFarmSchema, createFieldSchema } from "@/lib/schemas";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Check, Plus } from "lucide-react";
+import { CalendarIcon, Check, Plus, Upload } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { cn } from "@/lib/utils";
 interface InputCombo {
@@ -62,12 +62,8 @@ interface InputSelect {
   label: string;
   placeholder: string;
   placeholder2: string;
+  type?: string;
   array: { [key: string]: string }[];
-}
-interface Dates {
-  control: Control<z.infer<typeof createFieldSchema>>;
-  name: FieldPath<z.infer<typeof createFieldSchema>>;
-  label: string;
 }
 
 interface Select {
@@ -77,6 +73,7 @@ interface Select {
   placeholder: string;
   array: { [key: string]: string }[];
   Icon: IconType;
+  disabled?: boolean;
 }
 
 export function CreateFieldSelect({
@@ -86,6 +83,7 @@ export function CreateFieldSelect({
   placeholder,
   Icon,
   array,
+  disabled,
 }: Select) {
   return (
     <FormField
@@ -99,14 +97,17 @@ export function CreateFieldSelect({
           <div className="w-full flex justify-center items-center min-w-[2px]">
             <Select onValueChange={field.onChange}>
               <FormControl>
-                <SelectTrigger className="cursor-pointer h-9! w-full  bg-transparent  focus-visible:outline-primary rounded-[8px] p-3 text-sm  focus:ring text-dark ring-green-500  data-[placeholder]:text-gray-500 ">
+                <SelectTrigger
+                  disabled={disabled}
+                  className="cursor-pointer h-9! w-full  bg-transparent  focus-visible:outline-primary rounded-[8px] p-3 text-sm  focus:ring text-dark ring-green-500  data-[placeholder]:text-gray-500 "
+                >
                   <div className="flex items-center  gap-2">
                     {Icon && <Icon className="text-primary-green" />}
                     <SelectValue placeholder={placeholder} className="" />
                   </div>
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="max-h-[160px] z-200 bg-[#fff] border border-border text-dark">
+              <SelectContent className="max-h-[160px] mt-6 z-200 bg-white border border-border text-dark">
                 {array.map((select) => (
                   <SelectItem
                     className="cursor-pointer text-sm hover:bg-primary hover:text-white"
@@ -134,6 +135,7 @@ export function CreateFieldInputSelect({
   label,
   placeholder,
   placeholder2,
+  type = "text",
   array,
 }: InputSelect) {
   return (
@@ -147,6 +149,7 @@ export function CreateFieldInputSelect({
             <FormItem className="flex-1">
               <FormControl>
                 <Input
+                  type={type}
                   className="text-sm h-9 rounded-r-none border-r-0"
                   placeholder={placeholder}
                   {...field}
@@ -250,81 +253,6 @@ export function CreateFieldText({ name, label, placeholder, control }: Inputs) {
   );
 }
 
-export function CreateFieldDate({
-  control,
-  name,
-  label,
-}: {
-  control: Control<z.infer<typeof createFieldSchema>>;
-  label: string;
-  name: FieldPath<z.infer<typeof createFieldSchema>>;
-}) {
-  return (
-    <FormField
-      control={control}
-      name={name}
-      render={({ field }) => {
-        const value =
-          typeof field.value === "object" &&
-          field.value !== null &&
-          "from" in field.value
-            ? field.value
-            : undefined;
-        return (
-          <FormItem className="w-full">
-            <FormLabel className="text-sm text-dark">{label}</FormLabel>
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button
-                    variant="outline"
-                    className={`w-full h-9 justify-start text-left font-normal ${
-                      !value?.from && "text-muted-foreground"
-                    }`}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-
-                    {value?.from ? (
-                      value.to ? (
-                        <>
-                          {format(value.from, "PPP")} -{" "}
-                          {format(value.to, "PPP")}
-                        </>
-                      ) : (
-                        format(value.from, "PPP")
-                      )
-                    ) : (
-                      <span>Pick a date range</span>
-                    )}
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="range"
-                  selected={
-                    typeof value === "object" && value !== null
-                      ? value
-                      : undefined
-                  }
-                  disabled={undefined}
-                  onSelect={(range) => field.onChange(range)}
-                  numberOfMonths={2}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-
-            <FormMessage />
-          </FormItem>
-        );
-      }}
-    />
-  );
-}
-
 export function CreateFieldCombo({
   control,
   label,
@@ -341,79 +269,180 @@ export function CreateFieldCombo({
     <FormField
       control={control}
       name={name}
-      render={({ field }) => (
-        <FormItem className="flex flex-col w-full">
-          <FormLabel>{label}</FormLabel>
+      render={({ field }) => {
+        return (
+          <FormItem className="flex flex-col w-full">
+            <FormLabel>{label}</FormLabel>
 
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <FormControl>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  className={cn(
-                    "w-full justify-between text-sm",
-                    !field.value && "text-dark/80",
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    {Icon && <Icon className="text-primary-green" />}
-                    {(field.value as string) || (placeholder1 as string)}
-                  </div>
-                  <IoIosArrowDown className="ml-2 h-4 w-4 opacity-50" />
-                </Button>
-              </FormControl>
-            </PopoverTrigger>
-
-            <PopoverContent className="w-full p-0">
-              <Command>
-                <CommandInput
-                  placeholder={placeholder2}
-                  value={inputValue}
-                  onValueChange={setInputValue}
-                />
-
-                <CommandEmpty>
-                  <div
-                    className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-accent"
-                    onClick={() => {
-                      field.onChange(inputValue);
-                      setOpen(false);
-                    }}
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className={cn(
+                      "w-full justify-between text-sm",
+                      !field.value && "text-dark/80",
+                    )}
                   >
-                    <Plus className="w-4 h-4" />
-                    Add &quot;{inputValue}&quot;
-                  </div>
-                </CommandEmpty>
+                    <div className="flex items-center gap-2">
+                      {Icon && <Icon className="text-primary-green" />}
+                      {(field.value as string) || (placeholder1 as string)}
+                    </div>
+                    <IoIosArrowDown className="ml-2 h-4 w-4 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
 
-                <CommandGroup className="max-h-[200px] overflow-scroll no-scroll">
-                  {array
-                    .filter((crop) =>
-                      crop.toLowerCase().includes(inputValue.toLowerCase()),
-                    )
-                    .map((crop) => (
-                      <CommandItem
-                        key={crop}
-                        value={crop}
-                        className="pr-2 hover:bg-primary-green hover:text-white cursor-pointer"
-                        onSelect={() => {
-                          field.onChange(crop);
-                          setOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            field.value === crop ? "opacity-100" : "opacity-0",
-                          )}
-                        />
-                        {crop}
-                      </CommandItem>
-                    ))}
-                </CommandGroup>
-              </Command>
-            </PopoverContent>
-          </Popover>
+              <PopoverContent className="w-full p-0">
+                <Command>
+                  <CommandInput
+                    placeholder={placeholder2}
+                    value={inputValue}
+                    onValueChange={setInputValue}
+                  />
+
+                  <CommandEmpty>
+                    <div
+                      className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-accent"
+                      onClick={() => {
+                        field.onChange(inputValue);
+                        setOpen(false);
+                      }}
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add &quot;{inputValue}&quot;
+                    </div>
+                  </CommandEmpty>
+
+                  <CommandGroup className="max-h-[200px] overflow-scroll no-scroll">
+                    {array
+                      .filter((crop) =>
+                        crop.toLowerCase().includes(inputValue.toLowerCase()),
+                      )
+                      .map((crop) => (
+                        <CommandItem
+                          key={crop}
+                          value={crop}
+                          className="pr-2 hover:bg-primary-green hover:text-white cursor-pointer"
+                          onSelect={() => {
+                            field.onChange(crop);
+                            setOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              field.value === crop
+                                ? "opacity-100"
+                                : "opacity-0",
+                            )}
+                          />
+                          {crop}
+                        </CommandItem>
+                      ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
+
+            <FormMessage />
+          </FormItem>
+        );
+      }}
+    />
+  );
+}
+
+export function CreateFieldUpload({
+  control,
+  img,
+}: {
+  control: Control<z.infer<typeof createFieldSchema>>;
+  img?: string;
+}) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  return (
+    <FormField
+      control={control}
+      name="fieldImage"
+      render={({ field }) => (
+        <FormItem className="w-full">
+          <FormLabel className="text-sm text-dark">
+            Field Image (optional)
+          </FormLabel>
+
+          <FormControl>
+            <div
+              onClick={() => inputRef.current?.click()}
+              className="border border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition"
+            >
+              <input
+                type="file"
+                ref={inputRef}
+                className="hidden"
+                accept=".jpg,.jpeg,.png"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+
+                  field.onChange(file);
+
+                  // Create preview only for images
+                  if (file.type.startsWith("image/")) {
+                    const url = URL.createObjectURL(file);
+                    setPreview(url);
+                  } else {
+                    setPreview(null);
+                  }
+                }}
+              />
+
+              {!img && !preview && (
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <Upload className="w-6 h-6 text-gray-500" />
+
+                  <p className="text-sm font-medium text-gray-700">
+                    Upload Farm Image
+                  </p>
+
+                  <p className="text-xs text-gray-500">JPG, PNG (Max 5MB)</p>
+                </div>
+              )}
+
+              {/* IMAGE PREVIEW */}
+              {preview ? (
+                <img
+                  src={preview}
+                  alt="image preview"
+                  className="mt-2 w-full h-40 object-cover object-center rounded-md"
+                />
+              ) : img ? (
+                <img
+                  src={img}
+                  alt="image preview"
+                  className="mt-2 w-full h-40 object-cover object-center rounded-md"
+                />
+              ) : img && preview ? (
+                <img
+                  src={preview}
+                  alt="image preview"
+                  className="mt-2 w-full h-40 object-cover object-center rounded-md"
+                />
+              ) : (
+                ""
+              )}
+
+              {/* File name fallback */}
+              {field.value && !preview && (
+                <p className="mt-3 text-xs text-green-600">
+                  {(field.value as File).name}
+                </p>
+              )}
+            </div>
+          </FormControl>
 
           <FormMessage />
         </FormItem>

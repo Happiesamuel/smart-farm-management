@@ -15,55 +15,59 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
-import { useState } from "react";
+import { Dispatch, SetStateAction } from "react";
+import { NoResult } from "../loader/GeneralLoader";
 
 export const description = "An area chart with gradient fill";
 
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-];
-
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "#e9575a",
-  },
-  mobile: {
-    label: "Mobile",
+  revenue: {
+    label: "Revenue",
     color: "#53bf62",
+  },
+  expenses: {
+    label: "Expenses",
+    color: "#e9575a",
   },
 } satisfies ChartConfig;
 
-export function DashboardAreachart() {
-  const [val, setVal] = useState("year");
-
+export function DashboardAreachart({
+  val,
+  setVal,
+  chartData,
+  revenue,
+  expense,
+  profit,
+}: {
+  val: "year" | "month";
+  setVal: Dispatch<SetStateAction<"year" | "month">>;
+  chartData: { month: string; revenue: number; expenses: number }[];
+  revenue: number;
+  expense: number;
+  profit: number;
+}) {
   const year = [
     { id: 1, value: "year", name: "This Year" },
     { id: 2, value: "month", name: "This Month" },
   ];
   const arr = [
     {
-      num: "₦1,250,000",
+      num: `₦${revenue.toLocaleString()}`,
       name: "Total Revenue",
       bg: "bg-[#f5faf6]",
       border: "border-green-100",
     },
     {
-      num: "₦620,000",
+      num: `₦${expense.toLocaleString()}`,
       name: "Total Expenses",
       bg: "bg-[#fef5f5]",
       border: "border-red-100",
     },
     {
-      num: "₦630,000",
+      num: `₦${profit.toLocaleString()}`,
       name: "Net Profit",
-      bg: "bg-[#f5faf6]",
-      border: "border-green-100",
+      bg: profit >= 0 ? "bg-[#f5faf6]" : "bg-[#fff4f4]",
+      border: profit >= 0 ? "border-green-100" : "border-red-100",
     },
   ];
   return (
@@ -72,11 +76,14 @@ export function DashboardAreachart() {
         <div className="flex justify-between items-center">
           <h3 className="text-dark  text-base">Farm Overview</h3>
           <div className="flex items-center gap-3">
-            <Select onValueChange={(e) => setVal(e)} defaultValue={val}>
+            <Select
+              onValueChange={(e: "year" | "month") => setVal(e)}
+              defaultValue={val}
+            >
               <SelectTrigger className="text-dark border border-border bg-white rounded-lg">
                 <SelectValue placeholder="2024" />
               </SelectTrigger>
-              <SelectContent className="bg-white border-border text-zinc-400">
+              <SelectContent className="bg-white mt-6 border-border text-zinc-400">
                 {year.map((x) => (
                   <SelectItem
                     key={x.id}
@@ -90,7 +97,7 @@ export function DashboardAreachart() {
             </Select>
           </div>
         </div>
-      </CardHeader>
+      </CardHeader> {!chartData.length ? <div className="h-full"><NoResult>No expense and revenue record found!</NoResult></div> :
       <CardContent className="">
         <ChartContainer
           config={chartConfig}
@@ -115,45 +122,45 @@ export function DashboardAreachart() {
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <defs>
-              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillRevenue" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-desktop)"
+                  stopColor="var(--color-revenue)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-desktop)"
+                  stopColor="var(--color-revenue)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
-              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillExpenses" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="var(--color-expenses)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="var(--color-expenses)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
             </defs>
             <Area
-              dataKey="mobile"
-              type="natural"
-              fill="url(#fillMobile)"
               fillOpacity={0.4}
-              stroke="var(--color-mobile)"
               stackId="a"
+              dataKey="revenue"
+              type="natural"
+              fill="url(#fillRevenue)"
+              stroke="var(--color-revenue)"
             />
             <Area
-              dataKey="desktop"
+              dataKey="expenses"
+              fill="url(#fillExpenses)"
+              stroke="var(--color-expenses)"
               type="natural"
-              fill="url(#fillDesktop)"
               fillOpacity={0.4}
-              stroke="var(--color-desktop)"
               stackId="a"
             />
           </AreaChart>
@@ -180,7 +187,7 @@ export function DashboardAreachart() {
             </div>
           ))}
         </div>
-      </CardContent>
+      </CardContent>}
     </Card>
   );
 }

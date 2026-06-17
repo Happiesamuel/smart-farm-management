@@ -9,17 +9,9 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart";
+import { NoResult } from "../loader/GeneralLoader";
 
 export const description = "A donut chart with text";
-
-const chartData = [
-  { food: "Fertilizer", value: 40, fill: "#3f86ee", exp: "₦248,000" },
-  { food: "Labour", value: 25, fill: "#53bf62", exp: "₦155,000" },
-  { food: "Seeds", value: 15, fill: "#fdb214", exp: "₦93,000" },
-  { food: "Transport", value: 10, fill: "#e9575a", exp: "₦62,000" },
-  { food: "Pesticides", value: 6, fill: "#b893ed", exp: "₦37,000" },
-  { food: "Others", value: 4, fill: "#c8c7ee", exp: "₦24,000" },
-];
 
 const chartConfig = {
   value: { label: "Value" },
@@ -31,7 +23,13 @@ const chartConfig = {
   Others: { label: "Others" },
 } satisfies ChartConfig;
 
-export function DashboardPieChart() {
+export function DashboardPieChart({
+  chartData,
+  total,
+}: {
+  chartData: { food: string; value: number; fill: string; exp: string }[];
+  total: number;
+}) {
   return (
     <Card className="w-full gap-0 bg-white flex-1 relative rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col h-[300px] shrink-0">
       <CardHeader className="pb-0 shrink-0">
@@ -40,7 +38,7 @@ export function DashboardPieChart() {
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1    min-h-0 relative overflow-hidden">
+  {!chartData.length ? <div className="h-full"><NoResult>No expense record found!</NoResult></div> :    <CardContent className="flex-1    min-h-0 relative overflow-hidden">
         <div className="flex sm:flex-row xl:flex-row lg:flex-col flex-col items-center h-full">
           {/* LEFT → PIE CHART */}
           <div className="w-full sm:w-[65%] lg:w-full xl:w-[50%] h-full">
@@ -76,7 +74,7 @@ export function DashboardPieChart() {
                               dy="-0.3em"
                               className="text-base sm:text-lg font-semibold"
                             >
-                              ₦620,000
+                              ₦{total.toLocaleString()}
                             </tspan>
 
                             <tspan
@@ -98,14 +96,18 @@ export function DashboardPieChart() {
           </div>
 
           <div className="w-full sm:w-[35%] lg:w-full xl:w-[50%] ">
-            <CustomLegend />
+            <CustomLegend chartData={chartData} />
           </div>
         </div>
-      </CardContent>
+      </CardContent>}
     </Card>
   );
 }
-const CustomLegend = () => {
+const CustomLegend = ({
+  chartData,
+}: {
+  chartData: { food: string; value: number; fill: string; exp: string }[];
+}) => {
   return (
     <div className="flex overflow-scroll no-scroll lg:gap-4 xl:gap-2 sm:justify-start justify-center flex-row lg:flex-row xl:flex-col sm:flex-col gap-2 text-sm">
       {chartData.map((item, index) => (
@@ -117,9 +119,9 @@ const CustomLegend = () => {
           <div className="flex items-center gap-2">
             <span
               className="w-2 h-2 rounded-full text-dark/80"
-              style={{ backgroundColor: item.fill }}
+              style={{ backgroundColor: item.fill as unknown as string }}
             />
-            {item.food}
+            {item.food.slice(0, 1).toUpperCase() + item.food.slice(1)}
           </div>
 
           {/* Right */}
