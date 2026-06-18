@@ -6,13 +6,51 @@ import { z } from "zod";
 import InfoField from "./InfoField";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { FaRegSave } from "react-icons/fa";
-export default function ProfileInformation() {
+import { UserObjId } from "@/lib/types";
+import { useApp } from "@/stores/useAppStore";
+import { updateName, updateUserData } from "@/servers/user-action";
+import { useState } from "react";
+import { toast } from "sonner";
+import ButtonLoader from "@/components/layout/ButtonLoader";
+import { useRouter } from "next/navigation";
+export default function ProfileInformation({ user }: { user: UserObjId }) {
+  const { role, setUser } = useApp();
+  const router = useRouter();
+  const [load, setLoad] = useState(false);
   const form = useForm<z.infer<typeof infoFormSchema>>({
     resolver: zodResolver(infoFormSchema),
+    defaultValues: {
+      email: user.email,
+      fullName: user.fullName,
+      role: role
+        ? `${role === "owner" ? "Farm" : ""} ${role?.slice(0, 1).toUpperCase() + role?.slice(1)}`
+        : "",
+    },
   });
+  async function onSubmit(values: z.infer<typeof infoFormSchema>) {
+    try {
+      setLoad(true);
 
-  async function onSubmit(values: z.infer<typeof infoFormSchema>) {}
+      const updateObj: Record<string, string | undefined> = {
+        fullName: values.fullName,
+        avatar: user.avatar,
+      };
+
+      await updateName(values.fullName);
+      const u = await updateUserData(updateObj, user.id);
+      setUser(u);
+      toast("Profile updated successfully", {
+        description: "Your name has been updated",
+      });
+      setLoad(false);
+      router.refresh();
+    } catch (error) {
+      setLoad(false);
+      toast("Error updating profile", {
+        description: (error as Error).message,
+      });
+    }
+  }
   return (
     <div className="flex flex-col  gap-4 border border-border  rounded-md  p-4 shadow-xs bg-white">
       <div className="space-y-1">
@@ -49,10 +87,17 @@ export default function ProfileInformation() {
           />
           <div className="flex items-center gap-4 relative justify-start">
             <Button
-              type="submit"
-              className="text-white bg-dark-green rounded-md w-fit px-4 h-9 cursor-pointer border-none"
+              disabled={load}
+              className="bg-primary-green w-[48%] sm:w-fit font-medium cursor-pointer text-white rounded-sm"
             >
-              <FaRegSave /> Save Changes
+              {load ? (
+                <>
+                  <ButtonLoader />
+                  Saving...
+                </>
+              ) : (
+                <div className="flex items-center gap-2">Save Changes</div>
+              )}
             </Button>
           </div>
         </form>

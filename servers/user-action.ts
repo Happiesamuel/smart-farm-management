@@ -36,12 +36,76 @@ export const updateUser = async (
 ) => {
   try {
     const { database } = await createAdminClient();
-    await database.updateDocument(
+    const x = await database.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.userCollectionId,
       userId,
       obj,
     );
+    return {
+      fullName: x.fullName,
+      phone: x.phone,
+      email: x.email,
+      password: x.password,
+      id: x.$id,
+      avatar: x.avatar,
+    };
+  } catch (err) {
+    throw new Error(
+      err instanceof Error ? err.message : "Failed to update user",
+    );
+  }
+};
+export const updateUserData = async (
+  obj: Record<string, string | undefined>,
+  userId: string,
+) => {
+  try {
+    const { database, avatar } = await createAdminClient();
+
+    // If fullName is being updated and avatar is initials-based, regenerate avatar
+    if (
+      obj.fullName &&
+      obj.avatar?.startsWith(
+        "https://fra.cloud.appwrite.io/v1/avatars/initials",
+      )
+    ) {
+      const newAvatar = avatar.getInitials({
+        name: obj.fullName,
+        width: 200,
+        height: 200,
+      });
+      obj.avatar = newAvatar.toString();
+    }
+
+    const x = await database.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      userId,
+      obj,
+    );
+
+    return {
+      fullName: x.fullName,
+      phone: x.phone,
+      email: x.email,
+      password: x.password,
+      id: x.$id,
+      avatar: x.avatar,
+    };
+  } catch (err) {
+    throw new Error(
+      err instanceof Error ? err.message : "Failed to update user",
+    );
+  }
+};
+
+export const updateName = async (fullName: string) => {
+  try {
+    const { account } = await createSessionClient();
+
+    await account.updateName(fullName);
+
     return { update: true };
   } catch (err) {
     throw new Error(

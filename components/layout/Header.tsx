@@ -10,12 +10,10 @@ import { usePathname } from "next/navigation";
 import User from "../../public/user.png";
 import { MdArrowForwardIos } from "react-icons/md";
 import Image from "next/image";
-import { IoMdNotificationsOutline } from "react-icons/io";
 import { useCollaspe } from "@/context/SidebarCollasibleContext";
 import { GoTasklist } from "react-icons/go";
 import { FiActivity } from "react-icons/fi";
 import { DashboardSheet, WorkerDashboardSheet } from "./DashboardSheet";
-import { useLogout } from "@/hooks/auth/useLogout";
 import { useApp } from "@/stores/useAppStore";
 
 export default function Header() {
@@ -96,10 +94,11 @@ export default function Header() {
   ];
   const route = usePathname();
   const { collaspe } = useCollaspe();
-  const { logoutUser } = useLogout();
-  const { ready, user } = useApp();
-  const segments = route.split("/");
 
+  const { ready, user, role } = useApp();
+  const segments = route.split("/");
+  const ownerPath = route.startsWith("/user");
+  const workerPath = route.startsWith("/worker");
   const base = segments[1];
   const workspaceId = segments[2];
   const slug = segments[3];
@@ -127,14 +126,7 @@ export default function Header() {
         >
           <IoSettingsOutline className="text-lg text-dark" />
         </Link>
-        <Link
-          onClick={() => logoutUser()}
-          href={`#`}
-          className="relative hidden lg:block"
-        >
-          <IoMdNotificationsOutline className="text-2xl text-dark" />
-          <div className="size-1.5 bg-light-green rounded-full absolute bottom-[70%] left-[50%]" />
-        </Link>
+
         {!ready ? (
           <div className="flex items-center gap-2">
             <div className="size-9 bg-zinc-200 rounded-full animate-pulse" />
@@ -153,8 +145,15 @@ export default function Header() {
               className="rounded-full object-center object-cover "
             />
             <div className="lg:hidden">
-              <DashboardSheet />
-              {/* <WorkerDashboardSheet /> */}
+              {role === "owner" || ownerPath ? (
+                <DashboardSheet />
+              ) : role === "worker" || workerPath ? (
+                <WorkerDashboardSheet />
+              ) : (
+                ""
+              )}
+
+              {/* */}
             </div>
             <div className="hidden lg:block">
               <p className="text-dark text-xs font-semibold">
