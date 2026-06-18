@@ -29,7 +29,7 @@ export default function DashboardFarms({ stat }: { stat: Stat }) {
     },
 
     {
-      num: 18,
+      num: stat.totalCrops,
       name: "Total Crops",
       icon: <PiPlant />,
       iconColor: "bg-[#f1ecfd] text-[#5837e8] ",
@@ -37,7 +37,7 @@ export default function DashboardFarms({ stat }: { stat: Stat }) {
       border: "border-purple-100",
     },
     {
-      num: 8,
+      num: stat.activeTasks,
       name: "Active Tasks",
       icon: <FaRegCalendarCheck />,
       iconColor: "bg-[#fff1dd] text-[#de852c] ",

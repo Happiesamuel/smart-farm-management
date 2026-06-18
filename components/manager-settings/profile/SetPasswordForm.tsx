@@ -1,9 +1,9 @@
 "use client";
-import { profileFormSchema } from "@/lib/schemas";
+import { setPasswordFormSchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import ProfileFormField from "./PofileFormField";
+import { SetPasswordFormField } from "./PofileFormField";
 import { Form } from "@/components/ui/form";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,24 +13,22 @@ import { updateUser } from "@/servers/user-action";
 import { UserObjId } from "@/lib/types";
 import ButtonLoader from "@/components/layout/ButtonLoader";
 
-export default function ProfileForm({ user }: { user: UserObjId }) {
-  const form = useForm<z.infer<typeof profileFormSchema>>({
-    resolver: zodResolver(profileFormSchema),
+export default function SetPasswordForm({ user }: { user: UserObjId }) {
+  const form = useForm<z.infer<typeof setPasswordFormSchema>>({
+    resolver: zodResolver(setPasswordFormSchema),
     defaultValues: {
       password: "",
       confirmPassword: "",
-      curPassword: "",
     },
   });
-  const [currentPassword, setCurrentPassword] = useState(false);
   const [newPassword, setNewPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState(false);
   const [load, setLoad] = useState(false);
-  async function onSubmit(values: z.infer<typeof profileFormSchema>) {
+  async function onSubmit(values: z.infer<typeof setPasswordFormSchema>) {
     try {
       setLoad(true);
 
-      await changePassword(values.curPassword, values.password);
+      await changePassword(user.password, values.password);
       await updateUser({ password: values.password }, user.id);
       toast("Password changed successfully", {
         description: "You can continue with your new password",
@@ -46,9 +44,7 @@ export default function ProfileForm({ user }: { user: UserObjId }) {
   }
   return (
     <div className="w-full p-4 mt-2 cursor-pointer  bg-white  relative rounded-md border border-border/80 hover:shadow-sm transition shrink-0">
-      <h6 className="text-base text-dark/90 pb-4 font-medium">
-        Change Password
-      </h6>
+      <h6 className="text-base text-dark/90 pb-4 font-medium">Set Password</h6>
 
       <Form {...form}>
         <form
@@ -56,15 +52,7 @@ export default function ProfileForm({ user }: { user: UserObjId }) {
           className="pt-2 space-y-5 w-full"
         >
           <div className="flex md:flex-row flex-col items-center gap-5 md:gap-10 justify-between">
-            <ProfileFormField
-              name="curPassword"
-              placeholder="Enter your password"
-              type={currentPassword ? "text" : "password"}
-              label="Current Password"
-              control={form.control}
-              onClick={() => setCurrentPassword(!currentPassword)}
-            />
-            <ProfileFormField
+            <SetPasswordFormField
               name="password"
               type={newPassword ? "text" : "password"}
               placeholder="Enter your password"
@@ -72,7 +60,7 @@ export default function ProfileForm({ user }: { user: UserObjId }) {
               control={form.control}
               onClick={() => setNewPassword(!newPassword)}
             />
-            <ProfileFormField
+            <SetPasswordFormField
               name="confirmPassword"
               placeholder="Enter your password"
               label="Confirm Password"
