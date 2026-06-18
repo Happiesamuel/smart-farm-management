@@ -25,8 +25,7 @@ import FarmMap from "./FarmMap";
 export default function FarmOverview() {
   const { farmId } = useParams();
   const { workspace, user, ready } = useApp();
-  const [val, setVal] = useState<"year" | "month">("year");
-  const [farmVal, setFarmVal] = useState<"year" | "month">("year");
+  const [val, setVal] = useState<"year" | "month">("month");
 
   const { crops, status, error } = useGetFarmCrops(
     workspace?.id ?? null,
