@@ -30,8 +30,8 @@ const NOW = Date.now();
 
 export default function Dashboard() {
   const { workspace, user, ready } = useApp();
-  const [val, setVal] = useState<"year" | "month">("year");
-  const [farmVal, setFarmVal] = useState<"year" | "month">("year");
+  const [val, setVal] = useState<"year" | "month">("month");
+  const [farmVal, setFarmVal] = useState<"year" | "month">("month");
   const { crops, status, error } = useGetCrops(
     workspace?.id ?? null,
     user?.id ?? null,

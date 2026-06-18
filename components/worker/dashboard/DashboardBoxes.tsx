@@ -1,40 +1,49 @@
+import { buildWorkerStats } from "@/lib/workerFn";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { LuFolderCheck } from "react-icons/lu";
 import { PiPlantBold } from "react-icons/pi";
 import { RiTaskLine } from "react-icons/ri";
 
-export default function DashboardBoxes() {
+export default function DashboardBoxes({
+  tasks,
+  id,
+}: {
+  tasks: { [key: string]: string }[];
+  id: string;
+}) {
+  const newTask = tasks?.filter((x) => x.assignTo === id);
+  const stats = buildWorkerStats(newTask ?? []);
   const boxes = [
     {
-      num: 8,
+      num: stats.assigned,
       icon: RiTaskLine,
-      iconColor: "bg-[#e7f5eb] text-[#056b36]/80 ",
+      iconColor: "bg-[#e7f5eb] text-[#056b36]/80",
       text: "Tasks Assigned",
-      sub: "3 pending",
+      sub: `${stats.pending} pending`,
       color: "text-[#de852c]",
     },
     {
-      num: 3,
+      num: stats.completedTotal,
       icon: LuFolderCheck,
-      iconColor: "bg-[#e7f5eb] text-[#056b36] ",
+      iconColor: "bg-[#e7f5eb] text-[#056b36]",
       text: "Tasks Completed",
-      sub: "Today",
+      sub: `${stats.completedToday} today`,
       color: "text-[#056b36]",
     },
     {
-      num: 2,
+      num: stats.activeFields,
       icon: PiPlantBold,
-      iconColor: "bg-[#e1eefd] text-[#1058d6] ",
+      iconColor: "bg-[#e1eefd] text-[#1058d6]",
       text: "Fields Working On",
       sub: "Active",
       color: "text-[#056b36]/80",
     },
     {
-      num: "92%",
+      num: `${stats.attendance}%`,
       icon: FaRegCheckCircle,
-      iconColor: "bg-[#f1ecfd] text-[#5837e8] ",
+      iconColor: "bg-[#f1ecfd] text-[#5837e8]",
       text: "Attendance",
-      sub: "This week",
+      sub: "Completion rate",
       color: "text-zinc-500",
     },
   ];
