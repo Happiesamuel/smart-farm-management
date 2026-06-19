@@ -137,13 +137,14 @@ export default function Header() {
           </div>
         ) : (
           <div className="flex items-center gap-3 lg:gap-2">
-            <Image
-              src={user?.avatar || User}
-              width={35}
-              height={35}
-              alt="user"
-              className="rounded-full object-center object-cover "
-            />
+            <div className="relative size-9 aspect-video">
+              <Image
+                src={user?.avatar || User}
+                fill
+                alt="user"
+                className="rounded-full object-top object-cover "
+              />
+            </div>
             <div className="lg:hidden">
               {role === "owner" || ownerPath ? (
                 <DashboardSheet />
