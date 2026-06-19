@@ -85,7 +85,7 @@ export default function CreateFarmForm({
               toast("Farm updated successfully", {
                 description: "You've updated your farm",
               });
-              onClose?.();
+              return onClose ? onClose?.() : router.back();
             },
             onError: (err) =>
               toast("Error updating farm", {
@@ -255,7 +255,13 @@ export default function CreateFarmForm({
           <div className="flex items-center gap-4 relative justify-end">
             <Button
               type="reset"
-              onClick={() => (def?.id ? onClose?.() : router.back())}
+              onClick={() =>
+                def?.id && onClose
+                  ? onClose?.()
+                  : def?.id
+                    ? router.back()
+                    : router.back()
+              }
               className="text-dark bg-transparent rounded-md w-fit px-6 h-9 cursor-pointer border-border border"
             >
               Cancel

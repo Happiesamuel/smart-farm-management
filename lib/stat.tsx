@@ -1,5 +1,5 @@
 import { MdLabelImportantOutline } from "react-icons/md";
-import { generateColors } from "./functions";
+import { formatLocation, generateColors } from "./functions";
 import { FaRegUser } from "react-icons/fa6";
 
 export function buildExpensePieData(
@@ -553,3 +553,34 @@ function timeAgo(date?: string | Date) {
   const days = Math.floor(hrs / 24);
   return `${days} days ago`;
 }
+
+export const buildFarmList = ({
+  farms = [],
+  fields = [],
+  crops = [],
+}: {
+  farms?: { [key: string]: string }[];
+  fields?: { [key: string]: string }[];
+  crops?: { [key: string]: string }[];
+}) => {
+  return farms.map((farm) => {
+    const farmFields = fields.filter((f) => f.farms === farm.$id);
+
+    const fieldIds = farmFields.map((f) => f.$id);
+
+    const farmCrops = crops.filter((c) => fieldIds.includes(c.fields));
+    const status =
+      farm.status === "active" && farmFields.length > 0 && farmCrops.length > 0
+        ? "active"
+        : "inactive";
+    return {
+      id: farm.$id,
+      img: farm.farmImage,
+      name: farm.farmName,
+      location: formatLocation(farm.address) ?? "No location",
+      totalFields: farmFields.length,
+      totalCrops: farmCrops.length,
+      status: status,
+    };
+  });
+};
