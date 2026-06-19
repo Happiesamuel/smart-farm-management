@@ -66,7 +66,10 @@ export function useGetWorkspaceMembersWithWorkspaceId(
 
   return { workspaceMember, status, error, refetch };
 }
-export function useGetWorkspaceMembersWithRole(userId: string) {
+export function useGetWorkspaceMembersWithRole(
+  userId: string,
+  role: "owner" | "worker",
+) {
   const {
     data: workspace,
     status,
@@ -74,8 +77,8 @@ export function useGetWorkspaceMembersWithRole(userId: string) {
     refetch,
   } = useQuery({
     queryKey: ["workspace", userId],
-    queryFn: async () => await getUserWorkspacesWithRole({ userId }),
-    enabled: !!userId,
+    queryFn: async () => await getUserWorkspacesWithRole({ userId, role }),
+    enabled: !!userId && !!role,
   });
 
   return { workspace, status, error, refetch };

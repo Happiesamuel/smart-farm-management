@@ -131,15 +131,15 @@ export default function CreateFarmForm({
   const arrSize = [
     {
       name: "acres",
-      value: "acre",
+      value: "acres",
     },
     {
       name: "hectares",
-      value: "ha",
+      value: "hectares",
     },
     {
       name: "square.m",
-      value: "mm",
+      value: "square.m",
     },
   ];
   const stat = [
