@@ -9,9 +9,12 @@ import { useRouter } from "next/navigation";
 import { useApp } from "@/stores/useAppStore";
 export default function WorkerWorkspaceList({ user }: { user: UserObjId }) {
   const [active, setActive] = useState<string | null>(null);
-  const { setWorkspace, setUser } = useApp();
+  const { setWorkspace, setUser, role } = useApp();
   const router = useRouter();
-  const { workspace, status } = useGetWorkspaceMembersWithRole(user.id);
+  const { workspace, status } = useGetWorkspaceMembersWithRole(
+    user.id,
+    role as "worker" | "owner",
+  );
   function handleActive(id: string) {
     setActive(id);
   }

@@ -87,6 +87,7 @@ function WorkItem({
   const { workspaceMember, status } = useGetWorkspaceMembersWithWorkspaceId(
     work.id,
   );
+  const router = useRouter();
   const { farms, status: farmStat } = useGetFarmInWorkspace(userId, work.id);
   if (status === "pending" || farmStat === "pending")
     return <Skeleton className="h-28 w-full" />;
@@ -103,7 +104,7 @@ function WorkItem({
     if (!farms?.length) {
       localStorage.setItem("workspaceId", work.id);
       localStorage.setItem("manager-id", userId);
-      // handleClick(id);
+      router.push("/create-farm");
     } else handleClick(works);
   }
 

@@ -124,45 +124,84 @@ export const getWorkspaceMembers = async (workspaceId: string) => {
 
 export const getUserWorkspacesWithRole = async ({
   userId,
+  role,
 }: {
   userId: string;
+  role: "owner" | "worker";
 }) => {
   const { database } = await createAdminClient();
+
+  // 🔥 FILTER BY ROLE HERE
   const memberships = await database.listDocuments(
     appwriteConfig.databaseId,
     appwriteConfig.workspaceMembersCollectionId,
-    [Query.equal("users", userId)],
+    [
+      Query.equal("users", userId),
+      Query.equal("role", role), // ✅ KEY LINE
+    ],
   );
 
-  const workspaceIds = memberships.documents.map((m) => m.workspaces);
+  if (!memberships.documents.length) return [];
 
-  if (workspaceIds.length === 0) return [];
+  const workspaceIds = memberships.documents.map((m) => m.workspaces);
 
   const { documents } = await database.listDocuments(
     appwriteConfig.databaseId,
     appwriteConfig.workspaceCollectionId,
     [Query.equal("$id", workspaceIds)],
   );
-  const newWork = documents.map((doc) => {
-    return {
-      id: doc.$id,
-      name: doc.name,
-      users: doc.user,
-      workspaceId: doc.workspaceId,
-      inviteCode: doc.inviteCode,
-      createdAt: doc.$createdAt,
-    };
-  });
 
-  return newWork.map((ws) => {
-    const member = memberships.documents.find((m) => m.workspaces === ws.id);
-
-    return {
-      ...ws,
-      role: member?.role,
-    };
-  });
+  return documents.map((doc) => ({
+    id: doc.$id,
+    name: doc.name,
+    users: doc.user,
+    workspaceId: doc.workspaceId,
+    inviteCode: doc.inviteCode,
+    createdAt: doc.$createdAt,
+    role, // ✅ already known, no need to find again
+  }));
 };
+// export const getUserWorkspacesWithRole = async ({
+//   userId,
+// }: {
+//   userId: string;
+// }) => {
+//   const { database } = await createAdminClient();
+//   const memberships = await database.listDocuments(
+//     appwriteConfig.databaseId,
+//     appwriteConfig.workspaceMembersCollectionId,
+//     [Query.equal("users", userId)],
+//   );
+
+//   const workspaceIds = memberships.documents.map((m) => m.workspaces);
+
+//   if (workspaceIds.length === 0) return [];
+
+//   const { documents } = await database.listDocuments(
+//     appwriteConfig.databaseId,
+//     appwriteConfig.workspaceCollectionId,
+//     [Query.equal("$id", workspaceIds)],
+//   );
+//   const newWork = documents.map((doc) => {
+//     return {
+//       id: doc.$id,
+//       name: doc.name,
+//       users: doc.user,
+//       workspaceId: doc.workspaceId,
+//       inviteCode: doc.inviteCode,
+//       createdAt: doc.$createdAt,
+//     };
+//   });
+
+//   return newWork.map((ws) => {
+//     const member = memberships.documents.find((m) => m.workspaces === ws.id);
+
+//     return {
+//       ...ws,
+//       role: member?.role,
+//     };
+//   });
+// };
 
 export const getWorkspaceAssignOptions = async (workspaceId: string) => {
   const { database } = await createAdminClient();

@@ -15,6 +15,7 @@ import { createOtp } from "./email-actions";
 import { appwriteConfig } from "./appwrite-client";
 import { cookies } from "next/headers";
 import { checkUserInWorkspace } from "./workspace-action";
+import { redirect } from "next/navigation";
 
 export const loginWithGoogle = async () => {
   const { account } = await createAdminClient();
@@ -53,21 +54,20 @@ export const logout = async () => {
   try {
     const { account } = await createSessionClient();
     await account.deleteSession("current");
+
+    cookieStore
+      .getAll()
+      .filter((c) => c.name.startsWith("a_session"))
+      .forEach((c) => cookieStore.delete(c.name));
+    cookieStore.delete("session");
+    cookieStore.delete("activeWorkspace");
+    cookieStore.delete("role");
+
+    return { success: true };
   } catch (err) {
     console.log(err);
     throw new Error(err instanceof Error ? err.message : "Unknown error");
   }
-
-  cookieStore
-    .getAll()
-    .filter((c) => c.name.startsWith("a_session"))
-    .forEach((c) => cookieStore.delete(c.name));
-
-  cookieStore.delete("session");
-  cookieStore.delete("activeWorkspace");
-  cookieStore.delete("role");
-
-  return { success: true };
 };
 export const changePassword = async (
   oldPassword: string,
