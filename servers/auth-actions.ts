@@ -30,22 +30,26 @@ export const loginWithGoogle = async () => {
   return { url: redirectUrl };
 };
 export const login = async (email: string, password: string) => {
-  const { account } = await createAdminClient();
+  try {
+    const { account } = await createAdminClient();
 
-  const session = await account.createEmailPasswordSession(email, password);
-  const cookieStore = await cookies();
+    const session = await account.createEmailPasswordSession(email, password);
+    const cookieStore = await cookies();
 
-  cookieStore.set("a_session", session.secret, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-  });
+    cookieStore.set("a_session", session.secret, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+    });
 
-  return {
-    id: session.$id,
-    secret: session.secret,
-  };
+    return {
+      id: session.$id,
+      secret: session.secret,
+    };
+  } catch (err) {
+    throw new Error(err instanceof Error ? err.message : "Unknown error");
+  }
 };
 
 export const logout = async () => {
