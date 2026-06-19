@@ -94,7 +94,7 @@ export const updateUserData = async (
       password: x.password,
       id: x.$id,
       avatar: x.avatar,
-      lastseen: x.lastSeen,
+      lastSeen: x.lastSeen,
     };
   } catch (err) {
     throw new Error(
