@@ -15,7 +15,6 @@ import { createOtp } from "./email-actions";
 import { appwriteConfig } from "./appwrite-client";
 import { cookies } from "next/headers";
 import { checkUserInWorkspace } from "./workspace-action";
-import { redirect } from "next/navigation";
 
 export const loginWithGoogle = async () => {
   const { account } = await createAdminClient();

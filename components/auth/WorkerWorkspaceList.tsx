@@ -7,6 +7,7 @@ import { UserObjId, WorkerWorspace, WorkspaceObjId } from "@/lib/types";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/stores/useAppStore";
+import { safeUpdateLastSeen } from "@/hooks/useLastSeen";
 export default function WorkerWorkspaceList({ user }: { user: UserObjId }) {
   const [active, setActive] = useState<string | null>(null);
   const { setWorkspace, setUser, role } = useApp();
@@ -21,6 +22,7 @@ export default function WorkerWorkspaceList({ user }: { user: UserObjId }) {
   function handleClick(works: WorkspaceObjId) {
     setWorkspace(works);
     setUser(user);
+    safeUpdateLastSeen(user.id);
     Cookies.set("activeWorkspace", works.workspaceId);
     router.refresh();
   }

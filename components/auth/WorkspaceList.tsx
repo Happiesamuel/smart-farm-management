@@ -13,6 +13,7 @@ import { Skeleton } from "../ui/skeleton";
 import { useRouter } from "next/navigation";
 import { GoPlus } from "react-icons/go";
 import { useApp } from "@/stores/useAppStore";
+import { safeUpdateLastSeen } from "@/hooks/useLastSeen";
 export default function WorkspaceList({ user }: { user: UserObjId }) {
   const [active, setActive] = useState<string | null>(null);
   const { setWorkspace, setUser } = useApp();
@@ -25,6 +26,7 @@ export default function WorkspaceList({ user }: { user: UserObjId }) {
   function handleClick(works: WorkspaceObjId) {
     setWorkspace(works);
     setUser(user);
+    safeUpdateLastSeen(user.id);
     Cookies.set("activeWorkspace", works.workspaceId);
     router.refresh();
   }

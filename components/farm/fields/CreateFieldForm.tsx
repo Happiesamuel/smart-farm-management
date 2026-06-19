@@ -26,6 +26,7 @@ import { useGetFarm } from "@/hooks/farms/useFarm";
 import { FormLoader } from "@/components/loader/GeneralLoader";
 import { useParams, useRouter } from "next/navigation";
 import { useUpdateDocWithImg } from "@/hooks/useUpdate";
+import { safeUpdateLastSeen } from "@/hooks/useLastSeen";
 
 export default function CreateFieldFormFetch({
   onClose,
@@ -126,6 +127,7 @@ function CreateFieldForm({
         farms: farm,
       },
     };
+    safeUpdateLastSeen(userId);
     if (def?.id) {
       const o = obj.data;
 

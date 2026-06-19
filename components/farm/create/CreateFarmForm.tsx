@@ -24,6 +24,7 @@ import ButtonLoader from "@/components/layout/ButtonLoader";
 import { useCreateFarm } from "@/hooks/farms/useCreateFarm";
 import { useRouter } from "next/navigation";
 import { useUpdateDocWithImg } from "@/hooks/useUpdate";
+import { safeUpdateLastSeen } from "@/hooks/useLastSeen";
 export default function CreateFarmForm({
   onClose,
   def,
@@ -69,6 +70,7 @@ export default function CreateFarmForm({
       workspaces: workspace!.id,
     };
     try {
+      safeUpdateLastSeen(user!.id);
       if (def?.id) {
         const o = newObj;
 

@@ -2,6 +2,7 @@ import React from "react";
 import { MdOutlineArrowRightAlt } from "react-icons/md";
 import { PiFarm } from "react-icons/pi";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 export default function CTASection() {
   return (
@@ -27,7 +28,9 @@ export default function CTASection() {
           </div>
 
           <Button className="bg-white  px-6 h-9 sm:w-fit cursor-pointer font-medium text-dark rounded-sm">
-            <p>Get Started Free</p>
+            <Link href={"/onboard"} className="w-full">
+              Get Started Free
+            </Link>
             <MdOutlineArrowRightAlt />
           </Button>
         </div>

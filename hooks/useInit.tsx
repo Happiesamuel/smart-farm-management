@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useApp } from "@/stores/useAppStore";
 import { useGetUser } from "./useGetSession";
+import { safeUpdateLastSeen } from "./useLastSeen";
 
 export function useInitApp() {
   const { setUser, setReady } = useApp();
@@ -11,7 +12,8 @@ export function useInitApp() {
   useEffect(() => {
     if (userStat === "success" && data) {
       setUser(data);
-      setReady(true); // ✅ only ready after user is confirmed
+      setReady(true);
+      safeUpdateLastSeen(data.id);
     }
 
     if (userStat === "error" || error?.message) {

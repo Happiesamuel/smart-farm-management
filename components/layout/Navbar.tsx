@@ -55,7 +55,9 @@ export default function Navbar() {
           </div>
           <div className="hidden lg:flex items-center gap-2">
             <Button className="bg-transparent w-[48%] text-xs px-6 h-9 sm:w-fit cursor-pointer text-dark border border-zinc-300 rounded-sm">
-              Login
+              <Link href={"/onboard"} className="w-full">
+                Login
+              </Link>
             </Button>
             <Button className="bg-primary-green w-[48%] text-xs px-6 h-9 sm:w-fit cursor-pointer text-white rounded-sm">
               <Link href={"/onboard"} className="w-full">
@@ -96,10 +98,14 @@ function MobileNav() {
           </div>
           <div className="flex items-center flex-col  gap-2 mt-4">
             <Button className="bg-transparent w-full text-xs px-6 h-9  cursor-pointer text-dark border border-zinc-300 rounded-sm">
-              Login
+              <Link href={"/onboard"} className="w-full">
+                Login
+              </Link>
             </Button>
             <Button className="bg-primary-green w-full text-xs px-6 h-9  cursor-pointer text-white rounded-sm">
-              Get Started
+              <Link href={"/onboard"} className="w-full">
+                Get Started
+              </Link>
             </Button>
           </div>
         </div>

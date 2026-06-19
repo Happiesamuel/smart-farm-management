@@ -270,6 +270,20 @@ export const getWorkspaceUser = async (workspaceId: string) => {
       avatar: user?.avatar ?? "",
       email: user?.email ?? "",
       role: m.role,
+      lastSeen: user?.lastSeen ?? "",
     };
   });
+};
+
+export const updateLastSeen = async (userId: string) => {
+  const { database } = await createAdminClient();
+
+  await database.updateDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.userCollectionId,
+    userId,
+    {
+      lastSeen: new Date().toISOString(),
+    },
+  );
 };

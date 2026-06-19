@@ -29,6 +29,7 @@ import { useGetFarm } from "@/hooks/farms/useFarm";
 import { useGetFarmFields, useGetFields } from "@/hooks/fields/useFields";
 import { useUpdateDoc } from "@/hooks/useUpdate";
 import { format } from "date-fns";
+import { safeUpdateLastSeen } from "@/hooks/useLastSeen";
 
 export default function CreateCropFormFetch({
   onClose,
@@ -167,7 +168,7 @@ function CreateCropForm({
         expectedYield: +values.expectedYield,
       },
     };
-
+    safeUpdateLastSeen(userId);
     if (def?.id) {
       const o = obj.data;
       const newO = {

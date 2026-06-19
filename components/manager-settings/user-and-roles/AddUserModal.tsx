@@ -135,6 +135,7 @@ export function AddUserFormModal({
         ...values,
         phone: "",
         password: "hs_password",
+        lastSeen: new Date().toISOString(),
       };
 
       create(

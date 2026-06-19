@@ -29,6 +29,7 @@ import { useGetFarm } from "@/hooks/farms/useFarm";
 import { useWorkspaceAssignOptions } from "@/hooks/useAssign";
 import { format } from "date-fns";
 import { useUpdateDoc } from "@/hooks/useUpdate";
+import { safeUpdateLastSeen } from "@/hooks/useLastSeen";
 
 export default function CreateCropTaskFetch({
   onClose,
@@ -149,6 +150,7 @@ function CreateTaskForm({
         fields: field,
       },
     };
+    safeUpdateLastSeen(userId);
     if (def?.id) {
       const o = obj.data;
       const newO = { ...o, dueDate: format(o.dueDate, "PPP") };

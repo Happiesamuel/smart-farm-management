@@ -3,12 +3,14 @@ export interface UserObj {
   phone: string;
   email: string;
   password: string;
+  lastSeen: string;
 }
 
 export interface User extends UserObj {
   avatar: string;
   isVerified: boolean;
   userId: string;
+  lastSeen: string;
 }
 
 export interface WorkspaceObj {
@@ -20,6 +22,7 @@ export interface WorkspaceObj {
 export interface UserObjId extends UserObj {
   id: string;
   avatar?: string;
+  lastSeen: string;
 }
 export interface WorkspaceObjId extends WorkspaceObj {
   id: string;
