@@ -209,13 +209,14 @@ export function ManagerSidebar() {
             </div>
           ) : (
             <div className="flex items-center gap-2 border-t border-zinc-300 w-full pt-5">
-              <Image
-                src={user?.avatar || User}
-                width={35}
-                height={35}
-                alt="user"
-                className="rounded-full object-cover "
-              />
+              <div className="relative size-9 aspect-video">
+                <Image
+                  src={user?.avatar || User}
+                  fill
+                  alt="user"
+                  className="rounded-full object-top object-cover "
+                />
+              </div>
 
               <div>
                 <p
@@ -488,13 +489,14 @@ export function WorkerSidebar() {
             </div>
           ) : (
             <div className="flex items-center gap-2 border-t border-zinc-300 w-full pt-5">
-              <Image
-                src={user?.avatar || User}
-                width={35}
-                height={35}
-                alt="user"
-                className="rounded-full object-cover "
-              />
+              <div className="relative size-9 aspect-video">
+                <Image
+                  src={user?.avatar || User}
+                  fill
+                  alt="user"
+                  className="rounded-full object-top object-cover "
+                />
+              </div>
 
               <div>
                 <p

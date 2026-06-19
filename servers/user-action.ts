@@ -99,6 +99,112 @@ export const updateUserData = async (
     );
   }
 };
+export const updateUserAvatar = async (
+  obj: Record<string, string | undefined>,
+  userId: string,
+) => {
+  try {
+    const { database } = await createAdminClient();
+
+    const x = await database.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      userId,
+      obj,
+    );
+
+    return {
+      fullName: x.fullName,
+      phone: x.phone,
+      email: x.email,
+      password: x.password,
+      id: x.$id,
+      avatar: x.avatar,
+    };
+  } catch (err) {
+    throw new Error(
+      err instanceof Error ? err.message : "Failed to update user",
+    );
+  }
+};
+
+export const uploadAvatarToStorage = async (formData: FormData) => {
+  try {
+    const { storage } = await createAdminClient();
+    const file = formData.get("file") as File;
+
+    const uploaded = await storage.createFile(
+      appwriteConfig.bucketId, // your bucket id
+      ID.unique(),
+      file,
+    );
+
+    const url = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.bucketId}/files/${uploaded.$id}/view?project=${appwriteConfig.projectId}`;
+
+    return { url };
+  } catch (err) {
+    throw new Error(
+      err instanceof Error ? err.message : "Failed to upload avatar",
+    );
+  }
+};
+
+export const deleteAvatarFromStorage = async (fileId: string) => {
+  try {
+    const { storage } = await createAdminClient();
+    await storage.deleteFile(appwriteConfig.bucketId, fileId);
+    return { success: true };
+  } catch (err) {
+    throw new Error(
+      err instanceof Error ? err.message : "Failed to delete avatar",
+    );
+  }
+};
+
+export const removeUserAvatar = async (userId: string, fullName: string) => {
+  try {
+    const { database, avatar, storage } = await createAdminClient();
+
+    // Get current user to find existing file ID
+    const currentUser = await database.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      userId,
+    );
+
+    // Delete from storage if it's a real uploaded file
+    const match = currentUser.avatar?.match(/files\/([^/]+)\/view/);
+    const fileId = match?.[1];
+    if (fileId) await storage.deleteFile(appwriteConfig.bucketId, fileId);
+
+    // Generate initials avatar using Appwrite avatars
+    const newAvatar = avatar.getInitials({
+      name: fullName,
+      width: 200,
+      height: 200,
+    });
+
+    const x = await database.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      userId,
+      { avatar: newAvatar.toString() },
+    );
+
+    return {
+      fullName: x.fullName,
+      phone: x.phone,
+      email: x.email,
+      password: x.password,
+      id: x.$id,
+      avatar: x.avatar,
+    };
+  } catch (err) {
+    throw new Error(
+      err instanceof Error ? err.message : "Failed to remove avatar",
+    );
+  }
+};
 
 export const updateName = async (fullName: string) => {
   try {

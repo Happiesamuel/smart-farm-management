@@ -54,7 +54,7 @@ export default function Profile() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-[1fr_0.5fr] gap-4">
         <ProfileInformation user={user} />
-        <WorkersProfilePhoto />
+        <WorkersProfilePhoto user={user} />
       </div>
       {user.password === "hs_password" ? (
         <SetPasswordForm user={user} />
