@@ -30,6 +30,7 @@ import { useGetFarm } from "@/hooks/farms/useFarm";
 import { useGetCrops, useGetFarmCrops } from "@/hooks/crops/useCrops";
 import { TbPlant2 } from "react-icons/tb";
 import { useUpdateDoc } from "@/hooks/useUpdate";
+import { safeUpdateLastSeen } from "@/hooks/useLastSeen";
 
 export default function CreateHarvestFormFetch({
   onClose,
@@ -211,7 +212,7 @@ function CreateHarvestForm({
         farms: farm,
       },
     };
-
+    safeUpdateLastSeen(userId);
     if (def?.id) {
       const o = obj.data;
       const newO = { ...o, harvestDate: format(o.harvestDate, "PPP") };

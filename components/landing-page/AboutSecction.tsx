@@ -4,6 +4,7 @@ import { MdOutlineArrowRightAlt } from "react-icons/md";
 import { Button } from "../ui/button";
 import Photo from "../../public/img-1.png";
 import Image from "next/image";
+import Link from "next/link";
 const arr = [
   "Built for farmers, by developers",
   "Accessible anytime, anywhere",
@@ -43,7 +44,9 @@ export default function AboutSecction() {
           ))}
         </div>
         <Button className="bg-primary-green w-[48%] px-6 h-9 sm:w-fit cursor-pointer text-white rounded-sm">
-          <p>Get Started Free</p>
+          <Link href={"/onboard"} className="">
+            Get Started
+          </Link>
           <MdOutlineArrowRightAlt />
         </Button>
       </div>

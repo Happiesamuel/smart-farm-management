@@ -29,33 +29,36 @@ export function OwnerSignupForm() {
     try {
       const { confirmPassword, ...rest } = values;
 
-      createManager(rest, {
-        onSuccess: async (user) => {
-          // await account.createEmailPasswordSession(
-          //   values.email,
-          //   values.password,
-          // );
-          // await account.createVerification(
-          //   `${process.env.NEXT_PUBLIC_URL!}/verify`,
-          // );
-          toast("User created successfully", {
-            description:
-              "A verification link has been sent to your email address.",
-            duration: 4000,
-            closeButton: true,
-          });
-          localStorage.setItem("manager-email", user.email);
-          localStorage.setItem("manager-id", user.id);
-          localStorage.setItem("manager-password", values.password);
-          router.push(`/owner/verify-otp`);
+      createManager(
+        { ...rest, lastSeen: new Date().toISOString() },
+        {
+          onSuccess: async (user) => {
+            // await account.createEmailPasswordSession(
+            //   values.email,
+            //   values.password,
+            // );
+            // await account.createVerification(
+            //   `${process.env.NEXT_PUBLIC_URL!}/verify`,
+            // );
+            toast("User created successfully", {
+              description:
+                "A verification link has been sent to your email address.",
+              duration: 4000,
+              closeButton: true,
+            });
+            localStorage.setItem("manager-email", user.email);
+            localStorage.setItem("manager-id", user.id);
+            localStorage.setItem("manager-password", values.password);
+            router.push(`/owner/verify-otp`);
+          },
+          onError: (err) =>
+            toast("Error Signing up", {
+              description: err.message,
+              duration: 4000,
+              closeButton: true,
+            }),
         },
-        onError: (err) =>
-          toast("Error Signing up", {
-            description: err.message,
-            duration: 4000,
-            closeButton: true,
-          }),
-      });
+      );
     } catch (error) {
       toast("Error Signing up", {
         description: (error as Error).message,

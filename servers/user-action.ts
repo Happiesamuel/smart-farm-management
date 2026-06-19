@@ -23,6 +23,7 @@ export const createUser = async (obj: User) => {
       phone: document.phone,
       password: document.password,
       id: document.$id,
+      lastSeen: document.lastSeen,
     };
   } catch (err) {
     throw new Error(
@@ -49,6 +50,7 @@ export const updateUser = async (
       password: x.password,
       id: x.$id,
       avatar: x.avatar,
+      lastSeen: x.lastSeen,
     };
   } catch (err) {
     throw new Error(
@@ -92,6 +94,7 @@ export const updateUserData = async (
       password: x.password,
       id: x.$id,
       avatar: x.avatar,
+      lastSeen: x.lastSeen,
     };
   } catch (err) {
     throw new Error(
@@ -120,6 +123,7 @@ export const updateUserAvatar = async (
       password: x.password,
       id: x.$id,
       avatar: x.avatar,
+      lastSeen: x.lastSeen,
     };
   } catch (err) {
     throw new Error(
@@ -198,6 +202,7 @@ export const removeUserAvatar = async (userId: string, fullName: string) => {
       password: x.password,
       id: x.$id,
       avatar: x.avatar,
+      lastSeen: x.lastSeen,
     };
   } catch (err) {
     throw new Error(
@@ -254,6 +259,7 @@ export async function getGuestById(userId: string | undefined) {
       avatar: doc.avatar,
       phone: doc.phone,
       password: doc.password,
+      lastSeen: doc.lastSeen,
     };
   } catch (err) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");
@@ -278,6 +284,7 @@ export async function getGuestByGuestId(userId: string | undefined) {
       avatar: doc.avatar,
       phone: doc.phone,
       password: doc.password,
+      lastSeen: doc.lastSeen,
     };
   } catch (err) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");
@@ -301,6 +308,7 @@ export async function getGuestByEmail(email: string | undefined) {
       email: doc.email,
       avatar: doc.avatar,
       password: doc.password,
+      lastSeen: doc.lastSeen,
     };
   } catch (err) {
     throw new Error(err instanceof Error ? err.message : "Unknown error");

@@ -27,6 +27,7 @@ import { useGetFarmFields, useGetFields } from "@/hooks/fields/useFields";
 import { FormLoader } from "@/components/loader/GeneralLoader";
 import { useUpdateDoc } from "@/hooks/useUpdate";
 import { format } from "date-fns";
+import { safeUpdateLastSeen } from "@/hooks/useLastSeen";
 
 export default function FinanceExpenseFormFetch({
   onClose,
@@ -191,6 +192,7 @@ function FinanceExpenseFom({
         fields: field,
       },
     };
+    safeUpdateLastSeen(userId);
     if (def?.id) {
       const o = obj.data;
       const newO = {

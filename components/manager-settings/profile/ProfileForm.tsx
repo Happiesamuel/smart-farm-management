@@ -12,6 +12,7 @@ import { changePassword } from "@/servers/auth-actions";
 import { updateUser } from "@/servers/user-action";
 import { UserObjId } from "@/lib/types";
 import ButtonLoader from "@/components/layout/ButtonLoader";
+import { safeUpdateLastSeen } from "@/hooks/useLastSeen";
 
 export default function ProfileForm({ user }: { user: UserObjId }) {
   const form = useForm<z.infer<typeof profileFormSchema>>({
@@ -32,6 +33,7 @@ export default function ProfileForm({ user }: { user: UserObjId }) {
 
       await changePassword(values.curPassword, values.password);
       await updateUser({ password: values.password }, user.id);
+      safeUpdateLastSeen(user.id);
       toast("Password changed successfully", {
         description: "You can continue with your new password",
       });

@@ -29,6 +29,7 @@ import { PiPlant } from "react-icons/pi";
 import { FormLoader } from "@/components/loader/GeneralLoader";
 import { format } from "date-fns";
 import { useUpdateDoc } from "@/hooks/useUpdate";
+import { safeUpdateLastSeen } from "@/hooks/useLastSeen";
 export default function FinanceSalesFormFetch({
   onClose,
   def,
@@ -197,6 +198,7 @@ function FinanceSalesForm({
         farms: farm,
       },
     };
+    safeUpdateLastSeen(userId);
     if (def?.id) {
       const o = obj.data;
       const newO = {
