@@ -55,6 +55,7 @@ export async function GET(req: Request) {
         isVerified: true,
         phone: "",
         password: "hs_password",
+        lastSeen: new Date().toISOString(),
       });
     }
 
