@@ -87,27 +87,29 @@ export function DeleteModal({
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-150 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40 " />
+    <div className="fixed inset-0 z-150 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40" />
 
-      <div className="relative bg-white w-full max-w-[310px] sm:max-w-sm rounded-lg shadow-lg  animate-fadeIn">
-        <div>
-          <div className="pb-3 flex items-center pt-4 px-2.5 md:px-5  justify-end">
-            <FaXmark onClick={onClose} className="text-xl cursor-pointer" />
-          </div>
+      <div className="relative bg-white w-full max-w-[310px] sm:max-w-sm rounded-lg shadow-lg animate-fadeIn overflow-hidden">
+        <div className="pb-3 flex items-center pt-4 px-4 sm:px-5 justify-end">
+          <FaXmark
+            onClick={onClose}
+            className="text-xl cursor-pointer shrink-0"
+          />
         </div>
+
         <div className="space-y-3">
-          <div className="space-y-2 px-2.5 md:px-5">
-            <h6 className="text-base text-dark font-semibold">
+          <div className="space-y-2 px-4 sm:px-5">
+            <h6 className="text-base text-dark text-start font-semibold wrap-break-word">
               Are you absolutely sure?
             </h6>
-            <p className="text-sm text-zinc-500 font-medium">
+            <p className="text-sm text-zinc-500  text-start font-medium wrap-break-word">
               This action cannot be undone. This will permanently delete from
               our servers.
             </p>
           </div>
 
-          <div className="flex rounded-b-xl px-2.5 md:px-5  items-center gap-2 justify-end bg-zinc-100 py-3">
+          <div className="flex flex-wrap rounded-b-xl px-4 sm:px-5 items-center gap-2 justify-end bg-zinc-100 py-3">
             <Button
               onClick={onClose}
               className="cursor-pointer bg-transparent border border-border text-dark/90 px-6"
@@ -117,7 +119,7 @@ export function DeleteModal({
             <Button
               onClick={onClick}
               disabled={load}
-              className="cursor-pointer bg-red-600  text-white px-6"
+              className="cursor-pointer bg-red-600 text-white px-6"
             >
               {load ? (
                 <>
