@@ -270,6 +270,7 @@ export const getWorkspaceUser = async (workspaceId: string) => {
       avatar: user?.avatar ?? "",
       email: user?.email ?? "",
       role: m.role,
+      mId: m.$id,
       lastSeen: user?.lastSeen ?? "",
     };
   });
@@ -286,4 +287,34 @@ export const updateLastSeen = async (userId: string) => {
       lastSeen: new Date().toISOString(),
     },
   );
+};
+
+export const removeWorkspaceMember = async (memberId: string) => {
+  const { database } = await createAdminClient();
+  console.log(memberId, "sss");
+  await database.deleteDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.workspaceMembersCollectionId,
+    memberId,
+  );
+
+  return true;
+};
+export const updateWorkspaceMemberRole = async ({
+  memberId,
+  role,
+}: {
+  memberId: string;
+  role: "owner" | "manager" | "worker";
+}) => {
+  const { database } = await createAdminClient();
+
+  await database.updateDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.workspaceMembersCollectionId,
+    memberId,
+    { role },
+  );
+
+  return true;
 };

@@ -35,7 +35,7 @@ const statusStyles: Record<string, string> = {
   Delayed: "bg-orange-100 text-orange-700",
 };
 export default function FarmTaskTable() {
-  const { farmId,workspaceId } = useParams();
+  const { farmId, workspaceId } = useParams();
   const searchParams = useSearchParams();
   const { filterCrop } = useCropFilter();
   const { remove, status: deleteStat } = useDeleteDoc();
@@ -95,19 +95,19 @@ export default function FarmTaskTable() {
 
   if (!tasks?.length)
     return (
-        <div className="h-70 flex items-center justify-center">
-    <div className="flex items-center flex-col gap-1 ">
+      <div className="h-70 flex items-center justify-center">
+        <div className="flex items-center flex-col gap-1 ">
           <NoResult>No task record!</NoResult>
           <Button className="bg-primary-green mt-1 w-full sm:w-fit cursor-pointer text-white">
-                <Link
-                  href={`/user/${workspaceId}/farms/${farmId}/create-task`}
-                  className="flex items-center gap-1"
-                >
-                  <GoPlus />
-                  <p>Add task</p>
-                </Link>
-              </Button>
-    </div>
+            <Link
+              href={`/user/${workspaceId}/farms/${farmId}/create-task`}
+              className="flex items-center gap-1"
+            >
+              <GoPlus />
+              <p>Add task</p>
+            </Link>
+          </Button>
+        </div>
       </div>
     );
 
@@ -141,7 +141,7 @@ export default function FarmTaskTable() {
       const field = fieldMap.get(task.fields);
       const user = userMap.get(task.assignTo);
 
-      const assigneeName = user?.name ?? "Unassigned";
+      const assigneeName = user?.name ?? "Unknown User";
 
       let dueStatus: "Overdue" | "Today" | "Upcoming" | "Complete" = "Complete";
       let dueColor = "text-zinc-500";

@@ -1,9 +1,13 @@
 "use client";
 
+import { DeleteModal } from "@/components/layout/Modals";
+import TableActions from "@/components/layout/TableAction";
 import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
 import { useWorkspaceUser } from "@/hooks/useAssign";
+import { useRemoveWorkspaceMember } from "@/hooks/workspace/useWorkspace";
 import { useApp } from "@/stores/useAppStore";
-import { FaEllipsisV } from "react-icons/fa";
+import { LuPencil, LuTrash2 } from "react-icons/lu";
+import { toast } from "sonner";
 
 const statusStyles = {
   Online: "bg-green-100 text-green-700",
@@ -31,7 +35,7 @@ const getStatus = (lastSeen: string) => {
 };
 export default function UserTable() {
   const { workspace, user, ready } = useApp();
-
+  const { remove, status } = useRemoveWorkspaceMember();
   const {
     users,
     status: uStat,
@@ -82,6 +86,29 @@ export default function UserTable() {
       month: "short",
       year: "numeric",
     });
+  };
+
+  const handleRemoveMember = (member: { role: string; mId: string }) => {
+    if (member.role === "owner") {
+      toast("Action not allowed", {
+        description: "You cannot remove the workspace owner",
+      });
+      return;
+    } else
+      remove(member.mId, {
+        onSuccess: () => {
+          toast("Member removed successfully", {
+            description: "User has been removed from the workspace",
+          });
+        },
+        onError: (err) => {
+          toast("Error removing member", {
+            description: err.message,
+            duration: 4000,
+            closeButton: true,
+          });
+        },
+      });
   };
 
   return (
@@ -144,9 +171,33 @@ export default function UserTable() {
                 </td>
 
                 <td className="py-3 px-2 truncate font-medium max-w-[150px] px- text-[13px] text-zinc-600 text-right">
-                  <div className="flex justify-end gap-3 text-gray-500">
-                    <FaEllipsisV className="cursor-pointer hover:text-black" />
-                  </div>
+                  <TableActions
+                    actions={[
+                      {
+                        type: "callback",
+                        label:
+                          status === "pending"
+                            ? "Changinging..."
+                            : "Change Role",
+                        icon: <LuPencil className="text-sm" />,
+                        onClick: () => alert("Feature coming soon."),
+                      },
+                      {
+                        type: "modal",
+                        label: "Remove User",
+                        variant: "danger",
+                        icon: <LuTrash2 className="text-sm" />,
+                        modal: (onClose) => (
+                          <DeleteModal
+                            open={true}
+                            onClose={onClose}
+                            load={status === "pending"}
+                            onClick={() => handleRemoveMember(s)}
+                          />
+                        ),
+                      },
+                    ]}
+                  />
                 </td>
               </tr>
             ))}

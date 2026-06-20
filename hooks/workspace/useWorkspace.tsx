@@ -6,8 +6,10 @@ import {
   getWorkspace,
   getWorkspaceByWorkspaceId,
   getWorkspaceMembers,
+  removeWorkspaceMember,
+  updateWorkspaceMemberRole,
 } from "@/servers/workspace-action";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useCreateWorkspace() {
   const {
@@ -96,3 +98,39 @@ export function useCreateWorkspaceMember() {
 
   return { create, status, error };
 }
+
+export const useRemoveWorkspaceMember = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate: remove, status } = useMutation({
+    mutationFn: (id: string) => removeWorkspaceMember(id),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["workspaceMembers"],
+      });
+    },
+  });
+
+  return { remove, status };
+};
+
+export const useUpdateMemberRole = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate: update, status } = useMutation({
+    mutationFn: ({
+      memberId,
+      role,
+    }: {
+      memberId: string;
+      role: "worker" | "manager" | "owner";
+    }) => updateWorkspaceMemberRole({ memberId, role }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["workspaceMembers"],
+      });
+    },
+  });
+  return { update, status };
+};
