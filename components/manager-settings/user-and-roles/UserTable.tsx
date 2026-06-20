@@ -4,6 +4,7 @@ import { DeleteModal } from "@/components/layout/Modals";
 import TableActions from "@/components/layout/TableAction";
 import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
 import { useWorkspaceUser } from "@/hooks/useAssign";
+import { safeUpdateLastSeen } from "@/hooks/useLastSeen";
 import { useRemoveWorkspaceMember } from "@/hooks/workspace/useWorkspace";
 import { useApp } from "@/stores/useAppStore";
 import { LuPencil, LuTrash2 } from "react-icons/lu";
@@ -89,6 +90,7 @@ export default function UserTable() {
   };
 
   const handleRemoveMember = (member: { role: string; mId: string }) => {
+    safeUpdateLastSeen(user.id);
     if (member.role === "owner") {
       toast("Action not allowed", {
         description: "You cannot remove the workspace owner",

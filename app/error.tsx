@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import Not from "../public/not-found.png";
+import Not from "../public/error.png";
 import { Button } from "@/components/ui/button";
 import { IoHomeOutline } from "react-icons/io5";
 import { BiSupport } from "react-icons/bi";
@@ -9,11 +9,11 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import { useApp } from "@/stores/useAppStore";
 import { useRouter } from "next/navigation";
 
-export default function NotFound() {
+export default function Error() {
   const { workspace, role } = useApp();
   const router = useRouter();
   return (
-    <div className="bg-[#fffefc] w-full ">
+    <div className="bg-[#fffbfc] w-full ">
       <div className="w-[95%] md:w-[80%] min-h-screen py-4 mx-auto flex  flex-col justify-between gap-6">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
@@ -47,11 +47,10 @@ export default function NotFound() {
           </div>
           <div className="flex items-center flex-col justify-center gap-2">
             <h3 className="text-xl md:text-3xl text-dark/90 font-semibold ">
-              Page not found
+              Something went wrong
             </h3>
             <p className="text-center text-sm text-zinc-400">
-              The page you&apos;re looking for doesn&apos;t exist or has been
-              moved
+              An unexpected error occured. Please try again later.
             </p>
           </div>
           <div className="flex flex-col md:flex-row gap-2">
@@ -76,14 +75,14 @@ export default function NotFound() {
             </Button>
           </div>
 
-          <div className="flex mx-auto mt-3 w-fit items-start border border-border gap-3 bg-[#f7f8f6] p-4 rounded-md">
+          <div className="flex mx-auto mt-3 w-fit items-start border border-border gap-3 bg-[#fef5f4] p-4 rounded-md">
             <BiSupport className="text-lg text-primary-green" />
             <div className="space-y-1 text-sm">
               <p className="text-dark/90 font-semibold">Need help?</p>
               <p className="text-zinc-400 font-normal">
-                Contact our support team if the problem persists.
+                Our team has been notified and is working to fix the issue
               </p>
-              <div className="flex items-center gap-2 text-primary-green font-medium">
+              <div className="flex items-center gap-2 text-red-500 font-medium">
                 <p>Contact Support</p>
                 <FaArrowRightLong />
               </div>
