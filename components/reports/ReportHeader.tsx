@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { FiDownload } from "react-icons/fi";
-import { GoPlus } from "react-icons/go";
+import { FaChartBar } from "react-icons/fa";
 
 export default function ReportHeader() {
   return (
@@ -19,7 +19,7 @@ export default function ReportHeader() {
           <p>Export</p>
         </Button>
         <Button className="bg-primary-green w-[48%] sm:w-fit cursor-pointer text-white rounded-sm">
-          <GoPlus />
+          <FaChartBar />
           <p>Generate Report </p>
         </Button>
       </div>

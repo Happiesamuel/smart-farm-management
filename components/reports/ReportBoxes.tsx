@@ -18,6 +18,7 @@ export default function ReportBoxes({ stat }: { stat: Stat }) {
       icon: <PiPackage />,
       iconColor: "bg-[#e7f5eb] text-[#056b36] ",
       bg: "bg-[#f5faf6]",
+      sub: "18.6% vs Apr 1 - 30",
       border: "border-green-100",
     },
     {
@@ -26,6 +27,7 @@ export default function ReportBoxes({ stat }: { stat: Stat }) {
       icon: <GrMoney />,
       iconColor: "bg-[#fee7e7] text-[#e82a2d] ",
       bg: "bg-[#fef5f5]",
+      sub: "18.6% vs Apr 1 - 30",
       border: "border-red-100",
     },
     {
@@ -34,6 +36,7 @@ export default function ReportBoxes({ stat }: { stat: Stat }) {
       icon: <PiChartLine />,
       iconColor: "bg-[#e7f5eb] text-[#056b36] ",
       bg: "bg-[#f5faf6]",
+      sub: "18.6% vs Apr 1 - 30",
       border: "border-green-100",
     },
     {
@@ -42,13 +45,14 @@ export default function ReportBoxes({ stat }: { stat: Stat }) {
       icon: <TbPigMoney />,
       iconColor: "bg-[#e1eefd] text-[#1058d6] ",
       bg: "bg-[#f7fafe]",
+      sub: "18.6% vs Apr 1 - 30",
       border: "border-blue-100",
     },
   ];
   const { collaspe } = useCollaspe();
   return (
     <div className="pb-4">
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4  gap-2">
         {stats.map((item, i) => (
           <div
             key={i}
@@ -71,6 +75,11 @@ export default function ReportBoxes({ stat }: { stat: Stat }) {
               >
                 {item.num}
               </h3>
+              <p
+                className={`mt-2 text-gray-500 transition-all duration-500 ${collaspe ? "text-sm" : "text-xs"}`}
+              >
+                {item.sub}
+              </p>
             </div>
           </div>
         ))}

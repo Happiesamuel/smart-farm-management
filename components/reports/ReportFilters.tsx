@@ -8,7 +8,7 @@ export default function ReportFilters() {
   const router = useRouter();
 
   return (
-    <div className="flex gap-2 flex-col sm:flex-row items-center p-2 justify-between border-border border-b">
+    <div className="flex gap-2 flex-col sm:flex-row items-center p-2 justify-between">
       <div className="flex flex-col w-full sm:w-fit   sm:flex-row items-center gap-2 sm:gap-4">
         <ReportCalendar />
 
@@ -26,8 +26,10 @@ export default function ReportFilters() {
             Clear dates
           </Button>
         )}
+        <div>
+          <ReportSelect array={[{ name: "Farm", value: "farm" }]} />
+        </div>
       </div>
-      <ReportSelect array={[]} />
     </div>
   );
 }
