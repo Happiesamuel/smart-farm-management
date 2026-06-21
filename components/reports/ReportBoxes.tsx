@@ -1,49 +1,17 @@
 "use client";
 
 import { useCollaspe } from "@/context/SidebarCollasibleContext";
-import { FaRegCalendarCheck } from "react-icons/fa6";
 import { GrMoney } from "react-icons/gr";
-import { PiFarm, PiPlant, PiPackage, PiChartLine } from "react-icons/pi";
+import { PiPackage, PiChartLine } from "react-icons/pi";
 import { TbPigMoney } from "react-icons/tb";
 interface Stat {
-  totalFarms: number;
-  totalFields: number;
-  totalCrops: number;
-  activeTasks: number;
-  completedTasks: number;
-
   totalRevenue: number;
   totalExpenses: number;
   netProfit: number;
   profitMargin: number;
 }
-export default function DashboardFarms({ stat }: { stat: Stat }) {
+export default function ReportBoxes({ stat }: { stat: Stat }) {
   const stats = [
-    {
-      num: stat.totalFarms,
-      name: "Total Farms",
-      icon: <PiFarm />,
-      iconColor: "bg-[#e8f5ec] text-[#2d8952] ",
-      bg: "bg-[#f8fdf9]",
-      border: "border-green-100",
-    },
-
-    {
-      num: stat.totalCrops,
-      name: "Total Crops",
-      icon: <PiPlant />,
-      iconColor: "bg-[#f1ecfd] text-[#5837e8] ",
-      bg: "bg-[#f9f7fd]",
-      border: "border-purple-100",
-    },
-    {
-      num: stat.activeTasks,
-      name: "Active Tasks",
-      icon: <FaRegCalendarCheck />,
-      iconColor: "bg-[#fff1dd] text-[#de852c] ",
-      bg: "bg-[#fefaf2]",
-      border: "border-orange-100",
-    },
     {
       num: `₦${stat.totalRevenue.toLocaleString()}`,
       name: "Total Revenue",
