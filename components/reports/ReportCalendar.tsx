@@ -35,8 +35,7 @@ export default function ReportCalendar() {
     } else {
       params.delete("to");
     }
-    params.set("salesPage", "1");
-    params.set("expensePage", "1");
+
     router.push(`?${params.toString()}`);
   }
 

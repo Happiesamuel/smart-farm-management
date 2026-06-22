@@ -5,7 +5,7 @@ import { FaChartBar } from "react-icons/fa";
 
 export default function ReportHeader() {
   return (
-    <div className="pb-5 flex gap-3 sm:flex-row flex-col sm:items-center justify-between">
+    <div className="lg:pb-5 pb-2 flex gap-3 sm:flex-row flex-col sm:items-center justify-between">
       <div className=" space-y-1">
         <h6 className="text-dark font-semibold  text-2xl">Reports</h6>
         <p className="text-dark/80 text-sm">

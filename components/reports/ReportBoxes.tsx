@@ -10,42 +10,56 @@ interface Stat {
   netProfit: number;
   profitMargin: number;
 }
-export default function ReportBoxes({ stat }: { stat: Stat }) {
+export default function ReportBoxes({
+  stat,
+  changes,
+}: {
+  stat: Stat;
+  changes: {
+    revenueChange: number;
+    expenseChange: number;
+    profitChange: number;
+  };
+}) {
   const stats = [
     {
       num: `₦${stat.totalRevenue.toLocaleString()}`,
       name: "Total Revenue",
       icon: <PiPackage />,
-      iconColor: "bg-[#e7f5eb] text-[#056b36] ",
+      iconColor: "bg-[#e7f5eb] text-[#056b36]",
       bg: "bg-[#f5faf6]",
-      sub: "18.6% vs Apr 1 - 30",
+      sub: `${changes.revenueChange}% vs last period`,
+      positive: changes.revenueChange >= 0,
       border: "border-green-100",
     },
     {
       num: `₦${stat.totalExpenses.toLocaleString()}`,
       name: "Total Expenses",
       icon: <GrMoney />,
-      iconColor: "bg-[#fee7e7] text-[#e82a2d] ",
+      iconColor: "bg-[#fee7e7] text-[#e82a2d]",
       bg: "bg-[#fef5f5]",
-      sub: "18.6% vs Apr 1 - 30",
+      sub: `${changes.expenseChange}% vs last period`,
+      positive: changes.expenseChange <= 0, // lower expense is good
       border: "border-red-100",
     },
     {
       num: `₦${stat.netProfit.toLocaleString()}`,
       name: "Net Profit",
       icon: <PiChartLine />,
-      iconColor: "bg-[#e7f5eb] text-[#056b36] ",
+      iconColor: "bg-[#e7f5eb] text-[#056b36]",
       bg: "bg-[#f5faf6]",
-      sub: "18.6% vs Apr 1 - 30",
+      sub: `${changes.profitChange}% vs last period`,
+      positive: changes.profitChange >= 0,
       border: "border-green-100",
     },
     {
       num: `${stat.profitMargin}%`,
       name: "Profit Margin",
       icon: <TbPigMoney />,
-      iconColor: "bg-[#e1eefd] text-[#1058d6] ",
+      iconColor: "bg-[#e1eefd] text-[#1058d6]",
       bg: "bg-[#f7fafe]",
-      sub: "18.6% vs Apr 1 - 30",
+      sub: "Efficiency ratio",
+      positive: true,
       border: "border-blue-100",
     },
   ];
@@ -76,7 +90,9 @@ export default function ReportBoxes({ stat }: { stat: Stat }) {
                 {item.num}
               </h3>
               <p
-                className={`mt-2 text-gray-500 transition-all duration-500 ${collaspe ? "text-sm" : "text-xs"}`}
+                className={`mt-2 text-sm ${
+                  item.positive ? "text-green-600" : "text-red-500"
+                }`}
               >
                 {item.sub}
               </p>

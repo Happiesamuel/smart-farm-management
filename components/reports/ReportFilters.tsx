@@ -3,7 +3,11 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import ReportCalendar from "./ReportCalendar";
 import ReportSelect from "./ReportSelect";
-export default function ReportFilters() {
+export default function ReportFilters({
+  farms,
+}: {
+  farms: { name: string; value: string }[];
+}) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -26,8 +30,8 @@ export default function ReportFilters() {
             Clear dates
           </Button>
         )}
-        <div>
-          <ReportSelect array={[{ name: "Farm", value: "farm" }]} />
+        <div className="w-full md:w-fit">
+          <ReportSelect array={farms} />
         </div>
       </div>
     </div>

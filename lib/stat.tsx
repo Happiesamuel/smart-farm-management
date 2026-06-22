@@ -229,7 +229,7 @@ export function buildFarmPerformance(
   farms: { [key: string]: string | number }[],
   sales: { [key: string]: string | number }[],
   expenses: { [key: string]: string | number }[],
-  range: "year" | "month",
+  range?: "year" | "month",
 ) {
   const now = new Date();
 
@@ -584,3 +584,186 @@ export const buildFarmList = ({
     };
   });
 };
+
+export const buildPreviousStats = ({
+  sales,
+  expenses,
+  filter,
+}: {
+  sales: { [key: string]: string }[];
+  expenses: { [key: string]: string }[];
+  filter: "month" | "year";
+}) => {
+  const now = new Date();
+
+  let prevStart: Date;
+  let prevEnd: Date;
+
+  if (filter === "month") {
+    // previous month
+    prevStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    prevEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+  } else {
+    // previous year
+    prevStart = new Date(now.getFullYear() - 1, 0, 1);
+    prevEnd = new Date(now.getFullYear() - 1, 11, 31);
+  }
+
+  const inRange = (date: string) => {
+    const d = new Date(date);
+    return d >= prevStart && d <= prevEnd;
+  };
+
+  const prevSales = sales.filter((s) => inRange(s.saleDate));
+  const prevExpenses = expenses.filter((e) => inRange(e.expenseDate));
+
+  const revenue = prevSales.reduce((a, s) => a + Number(s.amount || 0), 0);
+  const expense = prevExpenses.reduce((a, e) => a + Number(e.amount || 0), 0);
+
+  return { revenue, expense };
+};
+const convertToKg = (quantity: number, unit: string) => {
+  switch (unit?.toLowerCase()) {
+    case "kg":
+      return quantity;
+
+    case "bag":
+    case "bags":
+      return quantity * 50; // ⚠️ assume 1 bag = 50kg (common in Nigeria)
+
+    case "ton":
+    case "tons":
+      return quantity * 1000;
+
+    default:
+      return quantity; // fallback (safe)
+  }
+};
+export const buildCropPerformance = ({
+  crops,
+  harvests,
+  sales,
+  expenses,
+}: {
+  crops: { [key: string]: string }[];
+  harvests: { [key: string]: string }[];
+  sales: { [key: string]: string }[];
+  expenses: { [key: string]: string }[];
+}) => {
+  // 👉 Group by cropId using harvests
+  const cropMap = new Map<
+    string,
+    {
+      id: string;
+      crop: string;
+      yield: number;
+      revenue: number;
+      expense: number;
+      profit: number;
+    }
+  >();
+
+  harvests.forEach((harvest) => {
+    const cropId = harvest.crops;
+
+    if (!cropMap.has(cropId)) {
+      const crop = crops.find((c) => c.$id === cropId);
+
+      cropMap.set(cropId, {
+        id: cropId,
+        crop: crop?.cropName || "Unknown",
+        yield: 0,
+        revenue: 0,
+        expense: 0,
+        profit: 0,
+      });
+    }
+
+    const entry = cropMap.get(cropId);
+
+    // ✅ 1. YIELD (convert to kg)
+    const qty = Number(harvest.quantity || 0);
+    const unit = harvest.unit || "kg";
+
+    entry!.yield += convertToKg(qty, unit);
+
+    // ✅ 2. SALES (linked to harvest)
+    const harvestSales = sales?.filter((s) => s.harvests === harvest.$id) ?? [];
+
+    const harvestRevenue = harvestSales.reduce(
+      (acc, s) => acc + Number(s.totalAmount || 0),
+      0,
+    );
+
+    entry!.revenue += harvestRevenue;
+  });
+
+  // ✅ 3. EXPENSES (linked to crop)
+  cropMap.forEach((entry, cropId) => {
+    const cropExpenses = expenses?.filter((e) => e.crops === cropId) ?? [];
+
+    const totalExpenses = cropExpenses.reduce(
+      (acc, e) => acc + Number(e.amount || 0),
+      0,
+    );
+
+    entry.expense = totalExpenses;
+    entry!.profit = entry.revenue - totalExpenses;
+  });
+
+  return Array.from(cropMap.values());
+};
+// export const buildCropPerformance = ({
+//   crops,
+//   harvests,
+//   sales,
+//   expenses,
+// }: {
+//   crops: { [key: string]: string }[];
+//   harvests: { [key: string]: string }[];
+//   sales: { [key: string]: string }[];
+//   expenses: { [key: string]: string }[];
+// }) => {
+//   return crops.map((crop) => {
+//     // 🟢 1. HARVESTS FOR THIS CROP
+//     const cropHarvests = harvests?.filter((h) => h.crops === crop.$id) ?? [];
+
+//     const harvestIds = cropHarvests.map((h) => h.$id);
+
+//     // 🟢 2. TOTAL YIELD (from harvests)
+//     const totalYield = cropHarvests.reduce((acc, h) => {
+//       const qty = Number(h.quantity || 0);
+//       const unit = h.unit || "kg";
+
+//       return acc + convertToKg(qty, unit);
+//     }, 0);
+
+//     // 🟢 3. SALES → must match harvest IDs (NOT crop ID)
+//     const cropSales =
+//       sales?.filter((s) => harvestIds.includes(s.harvests)) ?? [];
+
+//     const revenue = cropSales.reduce(
+//       (acc, s) => acc + Number(s.totalAmount || 0),
+//       0,
+//     );
+
+//     // 🔴 4. EXPENSES (if tied to crop)
+//     const cropExpenses = expenses?.filter((e) => e.crops === crop.$id) ?? [];
+
+//     const totalExpenses = cropExpenses.reduce(
+//       (acc, e) => acc + Number(e.amount || 0),
+//       0,
+//     );
+
+//     // 🟣 5. PROFIT
+//     const profit = revenue - totalExpenses;
+
+//     return {
+//       id: crop.$id,
+//       crop: crop.cropName,
+//       yield: totalYield,
+//       revenue,
+//       profit,
+//     };
+//   });
+// };

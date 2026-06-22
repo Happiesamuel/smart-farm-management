@@ -1,29 +1,28 @@
 "use client";
 
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { NoResult } from "../loader/GeneralLoader";
 
-const transactions = [
-  {
-    id: 1,
-    type: "sale",
-    description: "Maize harvest sale",
-    farm: "Green Acres Farm",
-    amount: 320000,
-    date: "May 31, 2025",
-  },
-  {
-    id: 2,
-    type: "expense",
-    description: "Fertilizer (NPK 15:15:15)",
-    farm: "Green Acres Farm",
-    amount: 85500,
-    date: "May 31, 2025",
-  },
-];
+const formatNaira = (amount: number) => `${amount.toLocaleString("en-NG")}`;
 
-const formatNaira = (amount: number) => `₦${amount.toLocaleString("en-NG")}`;
-
-export default function ReportTransactions() {
+export default function ReportTransactions({
+  transactions,
+  profit,
+  totalRevenue,
+  totalExpenses,
+}: {
+  transactions: {
+    id: string;
+    type: string;
+    description: string;
+    farm: string;
+    amount: number;
+    date: string;
+  }[];
+  profit: number;
+  totalRevenue: number;
+  totalExpenses: number;
+}) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 pt-4 gap-4">
       {/* ================= LEFT: TRANSACTIONS ================= */}
@@ -32,55 +31,69 @@ export default function ReportTransactions() {
           Recent Transactions
         </h3>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className=" bg-zinc-200/50 border rounded-t-2xl border-border text-gray-600">
-              <tr className="text-left  ">
-                <th className="py-2 px-2">Type</th>
-                <th className="py-2">Description</th>
-                <th className="py-2">Farm</th>
-                <th className="py-2">Amount (₦)</th>
-                <th className="py-2 px-2">Date</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {transactions.map((t) => (
-                <tr key={t.id} className="border-t">
-                  {/* TYPE */}
-                  <td className="py-3">
-                    <div className="flex items-center gap-2">
-                      {t.type === "sale" ? (
-                        <ArrowUpRight className="text-green-600" size={16} />
-                      ) : (
-                        <ArrowDownRight className="text-red-500" size={16} />
-                      )}
-                      <span className="capitalize text-zinc-700">{t.type}</span>
-                    </div>
-                  </td>
-
-                  {/* DESCRIPTION */}
-                  <td className="py-3 text-zinc-600">{t.description}</td>
-
-                  {/* FARM */}
-                  <td className="py-3 text-zinc-600">{t.farm}</td>
-
-                  {/* AMOUNT */}
-                  <td
-                    className={`py-3 font-medium ${
-                      t.type === "sale" ? "text-green-600" : "text-red-500"
-                    }`}
-                  >
-                    {t.type === "sale" ? "+" : "-"}
-                    {formatNaira(t.amount)}
-                  </td>
-
-                  {/* DATE */}
-                  <td className="py-3 text-zinc-500">{t.date}</td>
+        <div className="overflow-x-auto h-[200px] no-scroll">
+          {!transactions.length ? (
+            <div className="h-[90%]">
+              <NoResult>No transaction found</NoResult>
+            </div>
+          ) : (
+            <table className="w-full text-sm ">
+              <thead className=" bg-zinc-200/50 border rounded-t-2xl border-border text-gray-600">
+                <tr className="text-left  ">
+                  <th className="p-2">Type</th>
+                  <th className="p-2">Vendor/Category</th>
+                  <th className="p-2">Farm</th>
+                  <th className="p-2">Amount(₦)</th>
+                  <th className="p-2">Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody className="">
+                {transactions.map((t) => (
+                  <tr key={t.id} className="border-t">
+                    {/* TYPE */}
+                    <td className="py-3 px-2 max-w-full">
+                      <div className="flex items-center gap-2">
+                        {t.type === "sale" ? (
+                          <ArrowUpRight className="text-green-600" size={16} />
+                        ) : (
+                          <ArrowDownRight className="text-red-500" size={16} />
+                        )}
+                        <span className="capitalize text-zinc-700">
+                          {t.type}
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* DESCRIPTION */}
+                    <td className="py-3 px-2 max-w-full text-zinc-600">
+                      {t.description}
+                    </td>
+
+                    {/* FARM */}
+                    <td className="py-3 px-2 max-w-full text-zinc-600">
+                      {t.farm}
+                    </td>
+
+                    {/* AMOUNT */}
+                    <td
+                      className={`py-3 px-2 max-w-full font-medium ${
+                        t.type === "sale" ? "text-green-600" : "text-red-500"
+                      }`}
+                    >
+                      {t.type === "sale" ? "+" : "-"}
+                      {formatNaira(t.amount)}
+                    </td>
+
+                    {/* DATE */}
+                    <td className="py-3 px-2 max-w-full text-zinc-500">
+                      {t.date}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
@@ -100,10 +113,22 @@ export default function ReportTransactions() {
 
             <p>
               You earned{" "}
-              <span className="text-green-600 font-medium">₦2,220,000</span> in
-              profit, which is{" "}
-              <span className="text-green-600 font-medium">28.1% higher</span>{" "}
-              than the previous period.
+              <span className="text-green-600 font-medium">
+                ₦{formatNaira(profit)}
+              </span>{" "}
+              this period.
+            </p>
+
+            <p>
+              Total revenue:{" "}
+              <span className="font-medium text-green-600">
+                ₦{formatNaira(totalRevenue)}
+              </span>{" "}
+              and expenses:{" "}
+              <span className="font-medium text-red-500">
+                ₦{formatNaira(totalExpenses)}
+              </span>
+              .
             </p>
           </div>
         </div>

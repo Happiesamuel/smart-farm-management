@@ -27,15 +27,15 @@ export default function ReportTopPerforming({
       </div>
 
       {/* Desktop Table */}
-      <div className="hidden sm:block no-scroll overflow-x-auto">
-        <table className="w-full no-scroll text-sm">
+      <div className="hidden sm:block no-scroll overflow-x-auto pb-8">
+        <table className="w-full no-scroll text-sm ">
           <thead className=" bg-zinc-200/50 border rounded-t-2xl border-border text-gray-600">
             <tr className="text-left  ">
-              <th className="py-2 px-2">Farm</th>
-              <th className="py-2">Revenue (₦)</th>
-              <th className="py-2">Expenses (₦)</th>
-              <th className="py-2">Profit (₦)</th>
-              <th className="py-2 px-2">Margin</th>
+              <th className="p-2 ">Farm</th>
+              <th className="p-2">Revenue(₦)</th>
+              <th className="p-2">Expenses(₦)</th>
+              <th className="p-2">Profit(₦)</th>
+              <th className="p-2 ">Margin</th>
             </tr>
           </thead>
 
@@ -146,7 +146,7 @@ export default function ReportTopPerforming({
 
       <Link
         href={"#"}
-        className="flex items-center justify-between w-[90%] absolute bottom-3 text-primary-green text-sm pt-2"
+        className="flex bg-white items-center justify-between w-[90%] absolute bottom-3 text-primary-green text-sm pt-2"
       >
         <p>View all farms</p>
         <MdArrowForwardIos />
