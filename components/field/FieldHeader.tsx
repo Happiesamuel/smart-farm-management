@@ -33,7 +33,7 @@ export default function FieldHeader() {
           Field A
         </Link>
       </div>
-      <div className="flex gap-4 sm:flex-row flex-col sm:items-center justify-between">
+      <div className="flex gap-4 md:flex-row flex-col md:items-center justify-between">
         <div className="space-y-3.5 ">
           <div className="flex items-center gap-2">
             <h5 className="text-xl text-dark font-semibold">Field A</h5>
