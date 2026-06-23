@@ -9,7 +9,7 @@ import { ReportPieChart } from "./ReportPieChart";
 import ReportTaskProductivity from "./ReportTaskProductivity";
 import ReportTopPerforming from "./ReportTopPerforming";
 import ReportTransactions from "./ReportTransaction";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useGetCrops } from "@/hooks/crops/useCrops";
 import { useGetFarm } from "@/hooks/farms/useFarm";
 import { useGetFields } from "@/hooks/fields/useFields";
@@ -27,10 +27,11 @@ import {
   buildOverviewStats,
   buildPreviousStats,
 } from "@/lib/stat";
+import { exportToCSV } from "@/lib/reportStat";
 
 export default function Reports() {
   const { workspace, user, ready } = useApp();
-
+  const reportRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
 
   const from = searchParams.get("from");
@@ -247,7 +248,7 @@ export default function Reports() {
     profitMargin:
       totalRevenue > 0 ? Math.round((profitSum / totalRevenue) * 100) : 0,
   };
-  console.log(revenue, expense, filteredExpenses, filteredSales);
+
   const prev = buildPreviousStats({
     sales: filteredSales,
     expenses: filteredExpenses,
@@ -262,39 +263,104 @@ export default function Reports() {
   const revenueChange = calcChange(totalRevenue, prev.revenue);
   const expenseChange = calcChange(totalExpense, prev.expense);
   const profitChange = calcChange(profitSum, prev.revenue - prev.expense);
+
+  //   function handleExport() {
+  //     exportToCSV(
+  //       filteredSales.map((s) => ({
+  //         date: s.saleDate,
+  //         amount: s.totalAmount,
+  //         harvest: s.harvests,
+  //       })),
+  //       "sales-report",
+  //     );
+
+  //     exportToCSV(
+  //       filteredExpenses.map((e) => ({
+  //         date: e.expenseDate,
+  //         amount: e.amount,
+  //         vendor: e.vendor,
+  //       })),
+  //       "expenses-report",
+  //     );
+  //   }
+  //   const buildReportPayload = () => {
+  //   return {
+  //     generatedAt: new Date().toISOString(),
+  //     filters: {
+  //       from,
+  //       to,
+  //       farmName,
+  //     },
+
+  //     overview: {
+  //       revenue,
+  //       expense,
+  //       profit,
+  //     },
+
+  //     charts: {
+  //       area: chartData,
+  //     },
+
+  //     datasets: {
+  //       sales: filteredSales,
+  //       expenses: filteredExpenses,
+  //       tasks: filteredTasks,
+  //       harvests: filteredHarvests,
+  //     },
+  //   };
+  // };
+
+  // function handleGenerate(){
+  //     const report = buildReportPayload();
+
+  //     const blob = new Blob([JSON.stringify(report, null, 2)], {
+  //       type: "application/json",
+  //     });
+
+  //     const url = URL.createObjectURL(blob);
+
+  //     const link = document.createElement("a");
+  //     link.href = url;
+  //     link.download = "farm-report.json";
+  //     link.click();
+  //   }
+
   return (
     <div className="pt-18 px-2 sm:px-4 pb-8">
-      <ReportHeader />
-      <ReportFilters farms={allFarms} />
-      <ReportBoxes
-        stat={stat}
-        changes={{
-          revenueChange,
-          expenseChange,
-          profitChange,
-        }}
-      />
-      <div className=" grid grid-cols-1 lg:grid-cols-[1fr_0.5fr] xl:grid-cols-[1fr_0.8fr] items-stretch xl:h-[300px] justify-between gap-4">
-        <ReportAreachart
-          val={val}
-          setVal={setVal}
-          chartData={chartData}
-          revenue={revenue}
-          expense={expense}
+      <ReportHeader reportRef={reportRef} />
+      <div ref={reportRef}>
+        <ReportFilters farms={allFarms} />
+        <ReportBoxes
+          stat={stat}
+          changes={{
+            revenueChange,
+            expenseChange,
+            profitChange,
+          }}
         />
-        <ReportPieChart chartData={data} total={total} />
+        <div className=" grid grid-cols-1 lg:grid-cols-[1fr_0.5fr] xl:grid-cols-[1fr_0.8fr] items-stretch xl:h-[300px] justify-between gap-4">
+          <ReportAreachart
+            val={val}
+            setVal={setVal}
+            chartData={chartData}
+            revenue={revenue}
+            expense={expense}
+          />
+          <ReportPieChart chartData={data} total={total} />
+        </div>
+        <div className=" grid grid-cols-1 pt-4  md:grid-cols-2 xl:grid-cols-3 items-stretch  justify-between gap-4">
+          <ReportTopPerforming farmData={farmData.slice(0, 4)} />
+          <ReportCropPerfomance farmData={cropPerformance} />
+          <ReportTaskProductivity tasks={filteredTasks ?? []} />
+        </div>
+        <ReportTransactions
+          profit={profitSum}
+          totalRevenue={totalRevenue}
+          totalExpenses={totalExpense}
+          transactions={transactions}
+        />
       </div>
-      <div className=" grid grid-cols-1 pt-4  md:grid-cols-2 xl:grid-cols-3 items-stretch  justify-between gap-4">
-        <ReportTopPerforming farmData={farmData.slice(0, 4)} />
-        <ReportCropPerfomance farmData={cropPerformance} />
-        <ReportTaskProductivity tasks={filteredTasks ?? []} />
-      </div>
-      <ReportTransactions
-        profit={profitSum}
-        totalRevenue={totalRevenue}
-        totalExpenses={totalExpense}
-        transactions={transactions}
-      />
     </div>
   );
 }
