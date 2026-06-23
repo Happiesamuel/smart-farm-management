@@ -248,3 +248,44 @@ export const getSingleFarmDocs = async ({
     id: d.$id,
   };
 };
+export const getSingleFieldDocs = async ({
+  collection,
+  workspaceId,
+  userId,
+  farmId,
+  fieldId,
+}: {
+  collection: string;
+  workspaceId: string;
+  userId: string;
+  farmId: string;
+  fieldId: string;
+}) => {
+  await validateWorkspaceAccess({ userId, workspaceId });
+  const { database } = await createAdminClient();
+  const res = await database.listDocuments(
+    appwriteConfig.databaseId,
+    collection,
+    [
+      Query.equal("workspaces", workspaceId),
+      Query.equal("$id", fieldId),
+      Query.equal("farms", farmId),
+    ],
+  );
+  const d = res.documents.at(0);
+  if (!d?.$id) throw new Error("Field not found!");
+  return {
+    fieldName: d.fieldName,
+    size: d.size,
+    fieldImage: d.fieldImage,
+    sizeUnit: d.sizeUnit,
+    soilType: d.soilType,
+    irrigationType: d.irrigationType,
+    description: d.description,
+    status: d.status,
+    farms: d.farms,
+    id: d.$id,
+    workspaces: d.workspaces,
+    users: d.users,
+  };
+};

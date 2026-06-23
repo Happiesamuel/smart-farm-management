@@ -1,6 +1,7 @@
 "use client";
 import { FieldInfo } from "@/lib/types";
 import { createDoc, getDocs, getFarmDocs } from "@/servers/crud-actions";
+import { getSingleFieldDocs } from "@/servers/farm-actions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateField = () => {
@@ -66,4 +67,29 @@ export const useGetFields = (
     enabled: !!workspaceId && !!userId,
   });
   return { fields, error, status };
+};
+
+export const useGetSingleField = (
+  workspaceId: string | null,
+  userId: string | null,
+  farmId: string,
+  fieldId: string,
+) => {
+  const {
+    data: field,
+    status,
+    error,
+  } = useQuery({
+    queryKey: ["fields", workspaceId, farmId, fieldId],
+    queryFn: () =>
+      getSingleFieldDocs({
+        collection: "fields",
+        workspaceId: workspaceId as string,
+        userId: userId as string,
+        farmId,
+        fieldId,
+      }),
+    enabled: !!workspaceId && !!userId && !!farmId && !!fieldId,
+  });
+  return { field, error, status };
 };
