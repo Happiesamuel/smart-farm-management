@@ -264,68 +264,6 @@ export default function Reports() {
   const expenseChange = calcChange(totalExpense, prev.expense);
   const profitChange = calcChange(profitSum, prev.revenue - prev.expense);
 
-  //   function handleExport() {
-  //     exportToCSV(
-  //       filteredSales.map((s) => ({
-  //         date: s.saleDate,
-  //         amount: s.totalAmount,
-  //         harvest: s.harvests,
-  //       })),
-  //       "sales-report",
-  //     );
-
-  //     exportToCSV(
-  //       filteredExpenses.map((e) => ({
-  //         date: e.expenseDate,
-  //         amount: e.amount,
-  //         vendor: e.vendor,
-  //       })),
-  //       "expenses-report",
-  //     );
-  //   }
-  //   const buildReportPayload = () => {
-  //   return {
-  //     generatedAt: new Date().toISOString(),
-  //     filters: {
-  //       from,
-  //       to,
-  //       farmName,
-  //     },
-
-  //     overview: {
-  //       revenue,
-  //       expense,
-  //       profit,
-  //     },
-
-  //     charts: {
-  //       area: chartData,
-  //     },
-
-  //     datasets: {
-  //       sales: filteredSales,
-  //       expenses: filteredExpenses,
-  //       tasks: filteredTasks,
-  //       harvests: filteredHarvests,
-  //     },
-  //   };
-  // };
-
-  // function handleGenerate(){
-  //     const report = buildReportPayload();
-
-  //     const blob = new Blob([JSON.stringify(report, null, 2)], {
-  //       type: "application/json",
-  //     });
-
-  //     const url = URL.createObjectURL(blob);
-
-  //     const link = document.createElement("a");
-  //     link.href = url;
-  //     link.download = "farm-report.json";
-  //     link.click();
-  //   }
-
   return (
     <div className="pt-18 px-2 sm:px-4 pb-8">
       <ReportHeader reportRef={reportRef} />

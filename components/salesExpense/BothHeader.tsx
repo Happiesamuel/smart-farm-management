@@ -10,6 +10,7 @@ import FinanceExpenseFormFetch from "../farm/finance/FinanceExpenseFom";
 
 export default function BothHeader({ type }: { type: string }) {
   const [open, setOpen] = useState(false);
+
   return (
     <div className="pb-5 flex gap-3 sm:flex-row flex-col sm:items-center justify-between">
       <div className=" space-y-1">
@@ -51,12 +52,6 @@ export default function BothHeader({ type }: { type: string }) {
             <FinanceExpenseFormFetch onClose={() => setOpen(false)} />
           )}
         </FinanceModal>
-
-        <Button className="bg-transparent border border-dark/15 w-[48%] sm:w-fit cursor-pointer text-dark/90 rounded-sm">
-          <FiDownload />
-
-          <p>Export</p>
-        </Button>
       </div>
     </div>
   );
