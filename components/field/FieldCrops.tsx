@@ -1,6 +1,5 @@
 "use client";
 import { useParams, useSearchParams } from "next/navigation";
-import FieldsCropsTable from "./FieldCropsTable";
 import { useCropFilter } from "@/hooks/useCropFilter";
 import { useApp } from "@/stores/useAppStore";
 import { useDeleteDoc } from "@/hooks/useDelete";
@@ -87,7 +86,7 @@ export default function FieldCrops() {
         <NoResult>{errorMessage}</NoResult>
       </div>
     );
-  const newCrops = crops?.filter((c) => c.fields === fieldId);
+  const newCrops = crops?.filter((c) => c.fields === fieldId) ?? [];
 
   if (!newCrops?.length)
     return (

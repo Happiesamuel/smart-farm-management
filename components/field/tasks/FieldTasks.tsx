@@ -1,10 +1,9 @@
-import TaskFilter from "@/components/farm/tasks/TaskFilter";
+"use client";
 import FieldTaskTable from "./FieldTaskTable";
 
 export default function FieldTasks() {
   return (
     <div className="pt-4">
-      <TaskFilter assigns={[]} fields={[]} />
       <FieldTaskTable />
     </div>
   );

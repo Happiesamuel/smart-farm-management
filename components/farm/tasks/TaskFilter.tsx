@@ -33,7 +33,7 @@ export default function TaskFilter({
   fields,
 }: {
   assigns: { name: string; value: string }[];
-  fields: { name: string; value: string }[];
+  fields?: { name: string; value: string }[];
 }) {
   const searchParams = useSearchParams();
   const { farmId, workspaceId } = useParams();
@@ -110,25 +110,27 @@ export default function TaskFilter({
             ))}
           </SelectContent>
         </Select>
-        <Select
-          onValueChange={(e) => handleFieldChange(e)}
-          defaultValue={field}
-        >
-          <SelectTrigger className="text-dark/90 w-full border border-border bg-white rounded-lg">
-            <SelectValue placeholder="All Statuses" />
-          </SelectTrigger>
-          <SelectContent className="bg-white mt-6 border-border text-zinc-400">
-            {fields.map((x) => (
-              <SelectItem
-                key={x.value}
-                value={x.value}
-                className="hover:bg-zinc-900 text-dark/90 transition-all duration-500 cursor-pointer"
-              >
-                {x.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {fields && (
+          <Select
+            onValueChange={(e) => handleFieldChange(e)}
+            defaultValue={field}
+          >
+            <SelectTrigger className="text-dark/90 w-full border border-border bg-white rounded-lg">
+              <SelectValue placeholder="All Statuses" />
+            </SelectTrigger>
+            <SelectContent className="bg-white mt-6 border-border text-zinc-400">
+              {fields.map((x) => (
+                <SelectItem
+                  key={x.value}
+                  value={x.value}
+                  className="hover:bg-zinc-900 text-dark/90 transition-all duration-500 cursor-pointer"
+                >
+                  {x.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
         <Select
           onValueChange={(e) => handlePriorityChange(e)}
           defaultValue={priority}
