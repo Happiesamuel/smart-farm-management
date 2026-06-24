@@ -498,3 +498,131 @@ export function buildHarvestStats(
     thisMonth,
   };
 }
+
+export const buildActivityMessage = (
+  collection: string,
+  data: { [key: string]: string },
+) => {
+  switch (collection) {
+    case "tasks":
+      return `Task "${data.taskTitle}" created`;
+
+    case "fields":
+      return `Field "${data.fieldName}" added`;
+
+    case "crops":
+      return `Crop "${data.cropName}" planted`;
+
+    case "harvests":
+      return `Harvest recorded (${data.quantity} ${data.unit})`;
+
+    case "sales":
+      return `Sale recorded: ₦${Number(data.totalAmount).toLocaleString()}`;
+
+    case "expenses":
+      return `Expense added: ₦${Number(data.amount).toLocaleString()}`;
+
+    case "farms":
+      return `Farm "${data.farmName}" created`;
+
+    default:
+      return `New ${collection} created`;
+  }
+};
+
+export const getChangedFields = (
+  prev: Record<string, string>,
+  next: Record<string, string | number | File>,
+) => {
+  return Object.keys(next).reduce(
+    (acc, key) => {
+      if (prev[key] !== next[key]) {
+        acc[key] = {
+          from: prev[key],
+          to: next[key],
+        };
+      }
+      return acc;
+    },
+    {} as Record<string, { from: string; to: string | number | File }>,
+  );
+};
+
+const fieldLabels: Record<string, string> = {
+  taskTitle: "Task",
+  status: "Status",
+  priority: "Priority",
+  assignTo: "Assigned user",
+  farmName: "Farm",
+  cropName: "Crop",
+};
+
+export const buildUpdateMessage = ({
+  collection,
+  prev,
+  data,
+  userName,
+}: {
+  collection: string;
+  prev: Record<string, string>;
+  data: Record<string, string | number | File>;
+  userName?: string;
+}) => {
+  const name = userName || "Someone";
+
+  const changes = getChangedFields(prev, data);
+
+  const keys = Object.keys(changes);
+
+  if (keys.length === 0) {
+    return `${name} updated ${collection}`;
+  }
+
+  // 🧠 ENTITY NAME (task name, crop name, etc.)
+  const entityName =
+    prev.taskTitle ||
+    prev.cropName ||
+    prev.fieldName ||
+    prev.farmName ||
+    prev.name ||
+    "item";
+
+  // 🎯 SPECIAL CASES (optional but powerful)
+  if (collection === "tasks" && changes.status) {
+    return `${name} changed task "${entityName}" from ${changes.status.from} to ${changes.status.to}`;
+  }
+
+  if (collection === "tasks" && changes.assignTo) {
+    return `${name} reassigned task "${entityName}"`;
+  }
+
+  // 🧠 GENERIC FALLBACK (works for ALL tables)
+  const changeText = keys
+    .map((key) => {
+      const label = fieldLabels[key] || key;
+
+      return `${label}: ${changes[key].from ?? "-"} → ${changes[key].to}`;
+    })
+    .join(", ");
+
+  return `${name} updated "${entityName}" → ${changeText}`;
+};
+
+export const buildDeleteMessage = (
+  collection: string,
+  prev: Record<string, string>,
+  userName?: string,
+) => {
+  const name = userName || "Someone";
+
+  // 🧠 smart label detection
+  const label =
+    prev.taskTitle ||
+    prev.fieldName ||
+    prev.cropName ||
+    prev.farmName ||
+    prev.name ||
+    "item";
+
+  return `${name} deleted ${collection.slice(0, -1)} "${label}"`;
+};

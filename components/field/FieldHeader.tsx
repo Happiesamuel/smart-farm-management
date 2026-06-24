@@ -2,8 +2,6 @@
 import Link from "next/link";
 import { IoLocationOutline } from "react-icons/io5";
 import { MdArrowForwardIos } from "react-icons/md";
-import { Button } from "../ui/button";
-import { GoPlus } from "react-icons/go";
 import { LuMountain } from "react-icons/lu";
 import { useParams } from "next/navigation";
 import { useApp } from "@/stores/useAppStore";
@@ -123,20 +121,6 @@ export default function FieldHeader() {
                 </p>
               </div>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button className="bg-transparent w-[48%] sm:w-fit border border-border cursor-pointer text-dark">
-              <p>Edit Field</p>
-            </Button>
-            <Button className="bg-primary-green w-[48%] sm:w-fit cursor-pointer text-white">
-              <Link
-                href={`/user/${workspaceId}/farms/1/fieldId/create-activity`}
-                className="flex items-center gap-1"
-              >
-                <GoPlus />
-                <p>Record Activity</p>
-              </Link>
-            </Button>
           </div>
         </div>
       </div>

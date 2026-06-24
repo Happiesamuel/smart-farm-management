@@ -300,8 +300,8 @@ function CreateTaskForm({
                 def?.id
                   ? ((assign.find(
                       (x) => x.value === (def.assignTo as string).toLowerCase(),
-                    )?.name ?? "Select priority") as string)
-                  : "Select priority"
+                    )?.name ?? "Select assignee") as string)
+                  : "Select assignee"
               }
               disabled={def?.assignTo ? true : false}
               array={assign}

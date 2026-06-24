@@ -51,18 +51,21 @@ export default function TaskIdHeader({
 
   const handleChange = (val: string) => {
     if (!workspace?.id || !user?.id) return;
-    setStatusVal(val);
+
     safeUpdateLastSeen(user.id);
+
     update(
       {
         collection: "tasks",
         id: task.id,
-        workspaceId: workspace?.id,
-        userId: user?.id,
+        workspaceId: workspace.id,
+        userId: user.id,
         data: { status: val },
       },
       {
         onSuccess: () => {
+          setStatusVal(val);
+
           toast("Task updated successfully", {
             description: "You've updated your task",
           });
@@ -70,13 +73,10 @@ export default function TaskIdHeader({
         onError: (err) =>
           toast("Error updating task", {
             description: err.message,
-            duration: 4000,
-            closeButton: true,
           }),
       },
     );
   };
-
   return (
     <div className="space-y-4">
       {/* Breadcrumb */}

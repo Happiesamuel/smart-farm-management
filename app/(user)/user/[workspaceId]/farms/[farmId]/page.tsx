@@ -6,10 +6,18 @@ import FarmFinance from "@/components/farm/finance/FarmFinance";
 import FarmHarvest from "@/components/farm/harvest/FarmHarvest";
 import FarmOverview from "@/components/farm/overview/FarmOverview";
 import FarmTasks from "@/components/farm/tasks/FarmTasks";
+import FieldActivity from "@/components/field/activity/FieldActivity";
 import { useSearchParams } from "next/navigation";
 import { ReactNode } from "react";
 
-type Tab = "overview" | "fields" | "crops" | "tasks" | "finance" | "harvests";
+type Tab =
+  | "overview"
+  | "fields"
+  | "crops"
+  | "tasks"
+  | "finance"
+  | "harvests"
+  | "activity";
 export default function Page() {
   const tabs: Record<Tab, ReactNode> = {
     overview: <FarmOverview />,
@@ -17,6 +25,7 @@ export default function Page() {
     crops: <FarmCrops />,
     tasks: <FarmTasks />,
     harvests: <FarmHarvest />,
+    activity: <FieldActivity />,
     finance: <FarmFinance />,
   };
   const searchParmas = useSearchParams();
@@ -24,7 +33,7 @@ export default function Page() {
   return (
     <div className="pt-18 px-2 sm:px-4  pb-16 lg:pb-4">
       <FarmIdHeader />
-    
+
       <main>{tabs[tab]}</main>
     </div>
   );

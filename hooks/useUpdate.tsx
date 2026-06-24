@@ -3,7 +3,6 @@ import {
   CropInfo,
   ExpenseInfo,
   FarmInfo,
-  FarmObj,
   FieldInfo,
   HarvestInfo,
   SalesInfo,

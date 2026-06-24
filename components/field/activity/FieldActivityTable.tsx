@@ -1,150 +1,171 @@
-import { CheckCircle, PlayCircle, FileText, Image } from "lucide-react";
-import ActivityPagination from "./ActivityPagination";
-import { IconType } from "react-icons";
-
-const activities = [
-  {
-    id: 1,
-    type: "completed",
-    title: "Task Completed",
-    details: 'Completed task "Check drip system"',
-    time: "May 20, 6:30 AM",
-    by: "John Philips",
-  },
-  {
-    id: 2,
-    type: "started",
-    title: "Task Started",
-    details: 'Started task "Irrigate Field A"',
-    time: "May 20, 7:05 AM",
-    by: "Paul Peters",
-  },
-  {
-    id: 3,
-    type: "completed",
-    title: "Task Completed",
-    details: 'Completed task "Harvest lettuce"',
-    time: "May 19, 9:15 AM",
-    by: "You",
-  },
-  {
-    id: 4,
-    type: "started",
-    title: "Task Started",
-    details: 'Started task "Apply fertilizer"',
-    time: "May 19, 9:00 AM",
-    by: "John Farmer",
-  },
-  {
-    id: 5,
-    type: "note",
-    title: "Note Added",
-    details: 'Added note: "Plants look healthy"',
-    time: "May 18, 4:20 PM",
-    by: "Paul Peters",
-  },
-  {
-    id: 6,
-    type: "photo",
-    title: "Photo Uploaded",
-    details: "Uploaded a new photo",
-    time: "May 18, 3:45 PM",
-    by: "You",
-  },
-];
-
-const activityConfig: Record<
-  string,
-  { icon: IconType; color: string; bg: string }
-> = {
-  completed: {
-    icon: CheckCircle,
-    color: "text-green-600",
-    bg: "bg-green-100",
-  },
-  started: {
-    icon: PlayCircle,
-    color: "text-blue-600",
-    bg: "bg-blue-100",
-  },
-  note: {
-    icon: FileText,
-    color: "text-yellow-600",
-    bg: "bg-yellow-100",
-  },
-  photo: {
-    icon: Image,
-    color: "text-purple-600",
-    bg: "bg-purple-100",
-  },
-};
+"use client";
+import { useParams, useSearchParams } from "next/navigation";
+import { useApp } from "@/stores/useAppStore";
+import { useGetFarmActivity } from "@/hooks/activity/useActivity";
+import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
+import { activityConfig, mapActivityToUI } from "@/lib/activityHelper";
+import { useWorkspaceUser } from "@/hooks/useAssign";
+import FinancePagination from "@/components/layout/FinancePagination";
+import FieldActivityCalendar from "./FieldActivityCalendar";
 
 export default function FieldActivityTable() {
-  return (
-    <div className="w-full bg-white border rounded-xl overflow-hidden">
-      {/* Table */}
-      <div className="overflow-x-auto no-scroll">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
-            <tr>
-              <th className="text-left px-4 py-4">Activity</th>
-              <th className="text-left px-4 py-4">Details</th>
-              <th className="text-left px-4 py-4">Time</th>
-              <th className="text-left px-4 py-4">By</th>
-            </tr>
-          </thead>
+  const { farmId, workspaceId } = useParams();
+  const searchParams = useSearchParams();
 
-          <tbody>
-            {activities.map((a) => {
-              const config = activityConfig[a.type];
-              const Icon = config.icon;
+  const { workspace, user, ready } = useApp();
+  const {
+    users,
+    status: userStat,
+    error: userErr,
+  } = useWorkspaceUser(workspace?.id ?? null);
+  const { activity, status, error } = useGetFarmActivity(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
 
-              return (
-                <tr key={a.id} className="border-t hover:bg-gray-50 transition">
-                  {/* Activity */}
-                  <td
-                    title={a.title}
-                    className="px-4 py-3  flex items-center gap-2"
-                  >
-                    <span className={`p-1.5 rounded-full ${config.bg}`}>
-                      <Icon className={`w-4 h-4 ${config.color}`} />
-                    </span>
-                    <span className="font-medium max-w-[120px] truncate text-gray-800">
-                      {a.title}
-                    </span>
-                  </td>
-
-                  {/* Details */}
-                  <td
-                    title={a.details}
-                    className="px-4 py-3  text-gray-600 max-w-[250px] truncate"
-                  >
-                    {a.details}
-                  </td>
-
-                  {/* Time */}
-                  <td
-                    title={a.time}
-                    className="px-4 py-3 max-w-[120px] truncate text-gray-600"
-                  >
-                    {a.time}
-                  </td>
-
-                  {/* By */}
-                  <td
-                    title={a.by}
-                    className="px-4 py-3 max-w-[120px] truncate text-gray-600"
-                  >
-                    {a.by}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+  if (!ready)
+    return (
+      <div className="h-70">
+        <FormLoader>Loading app...</FormLoader>
       </div>
+    );
 
-      <ActivityPagination />
-    </div>
+  if (!user || !workspace)
+    return (
+      <div className="h-70">
+        <NoResult>Unauthorised</NoResult>
+      </div>
+    );
+
+  const isLoading = status === "pending" || userStat === "pending";
+
+  if (isLoading)
+    return (
+      <div className="h-70">
+        <FormLoader>Loading activity records...</FormLoader>
+      </div>
+    );
+
+  const errorMessage = error?.message || userErr?.message;
+
+  if (errorMessage)
+    return (
+      <div className="h-70">
+        <NoResult>{errorMessage}</NoResult>
+      </div>
+    );
+
+  if (!activity?.length)
+    return (
+      <div className="h-70 flex items-center justify-center">
+        <div className="flex items-center flex-col gap-1 ">
+          <NoResult>No activity record!</NoResult>
+        </div>
+      </div>
+    );
+  const userMap = new Map(users.map((u) => [u.id, u]));
+
+  const fromParam = searchParams.get("activityFrom");
+  const toParam = searchParams.get("activityTo");
+
+  const formattedActivities =
+    activity?.map((a) => mapActivityToUI(a, userMap)) ?? [];
+
+  const filteredActivities = formattedActivities.filter((a) => {
+    if (!fromParam && !toParam) return true;
+
+    const date = new Date(a.rawDate);
+
+    if (fromParam) {
+      const from = new Date(fromParam);
+      from.setHours(0, 0, 0, 0);
+      if (date < from) return false;
+    }
+
+    if (toParam) {
+      const to = new Date(toParam);
+      to.setHours(23, 59, 59, 999); // 👈 end of day, not midnight
+      if (date > to) return false;
+    }
+
+    return true;
+  });
+  const PAGE_SIZE = 10;
+  const currentPage = Number(searchParams.get("activityPage") || 1);
+  const paginatedActivity = filteredActivities.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+
+  // pass filteredActivities.length to pagination
+
+  return (
+    <>
+      <div className="flex w-full  mb-4">
+        <FieldActivityCalendar />
+      </div>
+      {!paginatedActivity.length ? (
+        <div className="h-100">
+          <NoResult>No activity record</NoResult>
+        </div>
+      ) : (
+        <div className="w-full bg-white border rounded-xl overflow-hidden">
+          <div className="overflow-x-auto no-scroll min-w-full">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
+                <tr>
+                  <th className="text-left px-4 py-4">Activity</th>
+                  <th className="text-left px-4 py-4">Details</th>
+                  <th className="text-left px-4 py-4">Time</th>
+                  <th className="text-left px-4 py-4">By</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {paginatedActivity.map((a) => {
+                  const config = activityConfig[a.type] || activityConfig.note;
+                  const Icon = config.icon;
+
+                  return (
+                    <tr
+                      key={a.id}
+                      className="border-t hover:bg-gray-50 transition"
+                    >
+                      <td className="px-4 py-3 flex items-center gap-2">
+                        <span className={`p-1.5 rounded-full ${config.bg}`}>
+                          <Icon className={`w-4 h-4 ${config.color}`} />
+                        </span>
+                        <span className="font-medium truncate text-gray-800">
+                          {a.title}
+                        </span>
+                      </td>
+
+                      <td
+                        title={a.details}
+                        className="px-4 py-3 max-w-[200px] text-gray-600 truncate"
+                      >
+                        {a.details}
+                      </td>
+
+                      <td className="px-4 py-3 text-gray-600">{a.time}</td>
+
+                      <td className="px-4 py-3 text-gray-600">{a.by}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <FinancePagination
+            type="activities"
+            pageSize={PAGE_SIZE}
+            total={filteredActivities.length}
+            pageKey="activityPage"
+          />
+        </div>
+      )}
+    </>
   );
 }
