@@ -9,6 +9,7 @@ import {
   FarmInfo,
   FieldInfo,
   HarvestInfo,
+  NoteInfo,
   SalesInfo,
   TaskInfo,
 } from "@/lib/types";
@@ -145,7 +146,8 @@ export const createDoc = async ({
     | TaskInfo
     | SalesInfo
     | ExpenseInfo
-    | FarmInfo,
+    | FarmInfo
+    | NoteInfo,
     "id" | "workspaces" | "users"
   >;
 }) => {

@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { Control, FieldPath, UseFormSetValue } from "react-hook-form";
+import { Control, FieldPath } from "react-hook-form";
 import { IconType } from "react-icons";
 
 import z from "zod";
@@ -34,8 +34,6 @@ interface Select {
   placeholder: string;
   array: { [key: string]: string }[];
   Icon: IconType;
-  setValue?: UseFormSetValue<z.infer<typeof notesSchema>>;
-  disabled?: boolean;
 }
 
 export function NoteSelect({
@@ -45,8 +43,6 @@ export function NoteSelect({
   placeholder,
   Icon,
   array,
-  setValue,
-  disabled,
 }: Select) {
   return (
     <FormField
@@ -58,15 +54,7 @@ export function NoteSelect({
             {label}
           </FormLabel>
           <div className="w-full flex justify-center items-center min-w-[2px]">
-            <Select
-              disabled={disabled}
-              onValueChange={(val) => {
-                if (name === "farm" && setValue) {
-                  setValue("farm", val);
-                  setValue("field", "");
-                } else return field.onChange(val);
-              }}
-            >
+            <Select onValueChange={field.onChange}>
               <FormControl>
                 <SelectTrigger className="cursor-pointer h-9! w-full  bg-transparent  focus-visible:outline-primary rounded-[8px] p-3 text-sm  focus:ring text-dark ring-green-500  data-[placeholder]:text-gray-500 ">
                   <div className="flex items-center  gap-2">
@@ -75,7 +63,7 @@ export function NoteSelect({
                   </div>
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="max-h-[160px] mt-6 z-200 bg-white border border-border text-dark">
+              <SelectContent className="max-h-[160px] z-200 mt-6 bg-white border border-border text-dark">
                 {array.map((select) => (
                   <SelectItem
                     className="cursor-pointer text-sm hover:bg-primary hover:text-white"

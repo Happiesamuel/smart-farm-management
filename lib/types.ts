@@ -149,6 +149,25 @@ export interface TaskInfo {
   workspaces: string;
   users: string;
 }
+export interface NoteInfo {
+  title: string;
+  farms: string;
+  fields: string;
+  priority: "low" | "high" | "medium";
+  description: string;
+  type:
+    | "general"
+    | "crop"
+    | "pest"
+    | "harvest"
+    | "fertilizer"
+    | "maintenance"
+    | "weather"
+    | "irrigation";
+  id: string;
+  workspaces: string;
+  users: string;
+}
 export interface SalesInfo {
   quantity: number;
   unit: "kg" | "tons" | "bags";

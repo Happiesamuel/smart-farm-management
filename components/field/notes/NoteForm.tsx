@@ -12,50 +12,186 @@ import { notesSchema } from "@/lib/schemas";
 import { FaRegSave } from "react-icons/fa";
 import { RiFileList2Line } from "react-icons/ri";
 import NoteInput, { NoteSelect, NoteText } from "./NoteField";
-// import Field from "./Field";
-export default function NoteForm() {
-  const [load, setLoad] = useState(false);
-  //   const { login, status } = useLogin();
+import { useApp } from "@/stores/useAppStore";
+import { useParams, useRouter } from "next/navigation";
+import { useGetFarm } from "@/hooks/farms/useFarm";
+import { useGetFarmFields } from "@/hooks/fields/useFields";
+import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
+import { useUpdateDoc } from "@/hooks/useUpdate";
+import { useCreateNote } from "@/hooks/notes/useNotes";
+import ButtonLoader from "@/components/layout/ButtonLoader";
+import { PiFarm } from "react-icons/pi";
+import { IoMdGrid } from "react-icons/io";
+import { GrFlag } from "react-icons/gr";
+import { safeUpdateLastSeen } from "@/hooks/useLastSeen";
+import { toast } from "sonner";
+
+export default function CreateNoteFetch({
+  onClose,
+  def,
+}: {
+  onClose?(): void;
+  def?: { [key: string]: string };
+}) {
+  const { workspace, user, ready } = useApp();
+  const { farmId: x, fieldId: y } = useParams();
+  const { farms, status, error } = useGetFarm(
+    workspace?.id ?? null,
+    user?.id ?? null,
+  );
+
+  const {
+    error: fieldErr,
+    fields,
+    status: fieldStat,
+  } = useGetFarmFields(workspace?.id ?? null, user?.id ?? null, x as string);
+
+  if (!ready)
+    return (
+      <div className="h-100">
+        <FormLoader>Loading...</FormLoader>
+      </div>
+    );
+  if (!user && ready) return <p>error</p>;
+  const isLoading = fieldStat === "pending";
+  if (status === "pending" || isLoading)
+    return (
+      <div className="h-100">
+        <FormLoader>Loading form...</FormLoader>
+      </div>
+    );
+  const errMssg = fieldErr?.message || error?.message;
+  if (errMssg)
+    return (
+      <div className="h-100">
+        <NoResult>{errMssg}</NoResult>;
+      </div>
+    );
+  const farmId = farms?.find((y) => y.$id === x)?.$id ?? undefined;
+  const fieldId = fields?.find((x) => x.$id === y)?.$id ?? undefined;
+  const farmOptions =
+    farms?.map((f) => ({
+      name: f.farmName,
+      value: f.$id,
+    })) ?? [];
+
+  return (
+    <NoteForm
+      workspaceId={workspace!.id}
+      userId={user!.id}
+      farms={farmOptions}
+      field={fields}
+      farmId={farmId as string}
+      fieldId={fieldId as string}
+      onClose={onClose}
+      def={def}
+    />
+  );
+}
+
+export function NoteForm({
+  workspaceId,
+  userId,
+  farms,
+  field,
+  def,
+  farmId,
+  onClose,
+  fieldId,
+}: {
+  workspaceId: string;
+  userId: string;
+  farmId: string;
+  fieldId: string;
+  farms: { name: string; value: string }[];
+  field: { [key: string]: string }[] | undefined;
+  onClose?(): void;
+  def?: { [key: string]: string };
+}) {
+  const defaultValue = def?.id
+    ? {
+        title: def?.title ?? "",
+        farm: farmId ?? def.farmId ?? "",
+        description: def?.description ?? "",
+        field: fieldId ?? def?.fieldId ?? "",
+        priority: (def?.priority as string).toLowerCase() ?? "",
+        type: (def?.type as string).toLowerCase() ?? "",
+      }
+    : {
+        farm: farmId ? farmId : "",
+        field: fieldId ? fieldId : "",
+      };
   const form = useForm<z.infer<typeof notesSchema>>({
     resolver: zodResolver(notesSchema),
+    defaultValues: defaultValue as unknown as z.infer<typeof notesSchema>,
   });
-
+  const { update, status: upStat } = useUpdateDoc();
+  const { farmId: id, fieldId: fId } = useParams();
+  const router = useRouter();
+  const { createNote, status } = useCreateNote();
+  const { workspace, user } = useApp();
   async function onSubmit(values: z.infer<typeof notesSchema>) {
-    // get who chreated the note when form is selected
+    const { farm, field, ...val } = values;
+    const obj = {
+      userId: userId,
+      workspaceId: workspaceId,
+      data: {
+        ...val,
+        farms: farm,
+        fields: field,
+      },
+    };
+    safeUpdateLastSeen(userId);
+    if (def?.id) {
+      // const o = obj.data;
+      // const newO = { ...o, dueDate: format(o.dueDate, "PPP") };
+      // update(
+      //   {
+      //     collection: "tasks",
+      //     id: def.id as string,
+      //     data: newO,
+      //     workspaceId: workspaceId,
+      //     userId: userId,
+      //   },
+      //   {
+      //     onSuccess: () => {
+      //       toast("Task updated successfully", {
+      //         description: "You've updated your task",
+      //       });
+      //       onClose?.();
+      //     },
+      //     onError: (err) =>
+      //       toast("Error updating task", {
+      //         description: err.message,
+      //         duration: 4000,
+      //         closeButton: true,
+      //       }),
+      //   },
+      // );
+    } else {
+      createNote(obj, {
+        onSuccess: () => {
+          toast("Note created successfully", {
+            description: "You can now proceed to managing your farm",
+          });
+          onClose?.();
+        },
+        onError: (err) =>
+          toast("Error creating note", {
+            description: err.message,
+            duration: 4000,
+            closeButton: true,
+          }),
+      });
+    }
   }
 
-  const arrField = [
-    {
-      value: "fieldA",
-      name: "Field A ",
-    },
-    {
-      value: "fieldB",
-      name: "Field B ",
-    },
-    {
-      value: "fieldC",
-      name: "Field C ",
-    },
-    {
-      value: "fieldD",
-      name: "Field D ",
-    },
-  ];
-  const farm = [
-    {
-      value: "greenValley",
-      name: "Green Valley Farm",
-    },
-    {
-      value: "sunrise",
-      name: "Sunrise Farm",
-    },
-    {
-      value: "hilltop",
-      name: "Hilltop Farm ",
-    },
-  ];
+  const fields =
+    field?.map((f) => ({
+      name: f.fieldName,
+      value: f.$id,
+    })) ?? [];
+
   const priority = [
     {
       name: "High",
@@ -119,18 +255,33 @@ export default function NoteForm() {
             <NoteSelect
               name="farm"
               control={form.control}
-              label="Farm"
-              placeholder="Select Farm"
-              array={farm}
-              Icon={RiFileList2Line}
+              label="Select Farm"
+              placeholder={
+                farmId
+                  ? (farms.find((x) => x.value === farmId)?.name ?? "")
+                  : def?.id
+                    ? (farms.find((x) => x.value === def.farmId)?.name ?? "")
+                    : "Select farm"
+              }
+              array={farmId || id ? [] : farms}
+              Icon={PiFarm}
+              disabled={farmId ? true : false}
             />
             <NoteSelect
               name="field"
               control={form.control}
-              label="Field"
-              placeholder="Select Field"
-              array={arrField}
-              Icon={RiFileList2Line}
+              label="Select Field"
+              placeholder={
+                fieldId
+                  ? (fields.find((x) => x.value === fieldId)?.name ?? "")
+                  : def?.id
+                    ? ((fields.find((x) => x.value === def.fieldId)?.name ??
+                        "Select Field") as string)
+                    : "Select field"
+              }
+              array={fields as { [key: string]: string }[]}
+              Icon={IoMdGrid}
+              disabled={fieldId ? true : false}
             />
           </div>
           <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
@@ -138,17 +289,29 @@ export default function NoteForm() {
               name="priority"
               control={form.control}
               label="Priority"
-              placeholder="Select Priority"
+              placeholder={
+                def?.id
+                  ? ((priority.find(
+                      (x) => x.value === (def.priority as string).toLowerCase(),
+                    )?.name ?? "Select priority") as string)
+                  : "Select priority"
+              }
               array={priority}
-              Icon={RiFileList2Line}
+              Icon={GrFlag}
             />
             <NoteSelect
               name="type"
               control={form.control}
               label="Type"
-              placeholder="Select Type"
+              placeholder={
+                def?.id
+                  ? ((type.find(
+                      (x) => x.value === (def.type as string).toLowerCase(),
+                    )?.name ?? "Select Type") as string)
+                  : "Select Type"
+              }
               array={type}
-              Icon={RiFileList2Line}
+              Icon={GrFlag}
             />
           </div>
           <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
@@ -169,15 +332,26 @@ export default function NoteForm() {
           <div className="flex items-center gap-4 relative justify-end">
             <Button
               type="reset"
+              onClick={() => onClose?.()}
               className="text-dark bg-transparent rounded-md w-fit px-6 h-9 cursor-pointer border-border border"
             >
               Cancel
             </Button>
             <Button
               type="submit"
+              disabled={status === "pending" || upStat === "pending"}
               className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
             >
-              <FaRegSave /> Save Note
+              {status === "pending" || upStat === "pending" ? (
+                <>
+                  <ButtonLoader />
+                  {def?.id ? "Updating..." : "Creating..."}
+                </>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <FaRegSave /> {def?.id ? "Update Note" : "Save Note"}
+                </div>
+              )}
             </Button>
           </div>
         </form>
