@@ -18,28 +18,24 @@ import { Control, FieldPath } from "react-hook-form";
 import { IconType } from "react-icons";
 
 import z from "zod";
-import { activitySchema } from "@/lib/schemas";
+import { notesSchema } from "@/lib/schemas";
 import { Textarea } from "@/components/ui/textarea";
 interface Input {
-  control: Control<z.infer<typeof activitySchema>>;
-  name: FieldPath<z.infer<typeof activitySchema>>;
+  control: Control<z.infer<typeof notesSchema>>;
+  name: FieldPath<z.infer<typeof notesSchema>>;
   label: string;
   placeholder: string;
 }
 
 interface Select {
-  control: Control<z.infer<typeof activitySchema>>;
-  name: FieldPath<z.infer<typeof activitySchema>>;
+  control: Control<z.infer<typeof notesSchema>>;
+  name: FieldPath<z.infer<typeof notesSchema>>;
   label: string;
   placeholder: string;
   array: { [key: string]: string }[];
   Icon: IconType;
 }
-interface Dates {
-  control: Control<z.infer<typeof activitySchema>>;
-  name: FieldPath<z.infer<typeof activitySchema>>;
-  label: string;
-}
+
 export function NoteSelect({
   control,
   name,
@@ -67,7 +63,7 @@ export function NoteSelect({
                   </div>
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="max-h-[160px] z-200 bg-[#fff] border border-border text-dark">
+              <SelectContent className="max-h-[160px] z-200 mt-6 bg-white border border-border text-dark">
                 {array.map((select) => (
                   <SelectItem
                     className="cursor-pointer text-sm hover:bg-primary hover:text-white"
@@ -100,7 +96,7 @@ export function NoteText({ name, label, placeholder, control }: Input) {
             <Textarea
               placeholder={placeholder}
               maxLength={2000}
-              className="resize-none font-normal"
+              className="resize-none font-normal max-h-[200px]"
               {...field}
               onChange={(e) => field.onChange(e.target.value)}
               value={typeof field.value === "string" ? field.value : ""}

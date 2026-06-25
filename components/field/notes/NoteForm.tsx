@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 
 import { useState } from "react";
-import { activitySchema } from "@/lib/schemas";
+import { notesSchema } from "@/lib/schemas";
 
 import { FaRegSave } from "react-icons/fa";
 import { RiFileList2Line } from "react-icons/ri";
@@ -16,11 +16,11 @@ import NoteInput, { NoteSelect, NoteText } from "./NoteField";
 export default function NoteForm() {
   const [load, setLoad] = useState(false);
   //   const { login, status } = useLogin();
-  const form = useForm<z.infer<typeof activitySchema>>({
-    resolver: zodResolver(activitySchema),
+  const form = useForm<z.infer<typeof notesSchema>>({
+    resolver: zodResolver(notesSchema),
   });
 
-  async function onSubmit(values: z.infer<typeof activitySchema>) {
+  async function onSubmit(values: z.infer<typeof notesSchema>) {
     // get who chreated the note when form is selected
   }
 
@@ -56,14 +56,52 @@ export default function NoteForm() {
       name: "Hilltop Farm ",
     },
   ];
-  const notArr = [
+  const priority = [
     {
-      name: "Peter Ojo",
-      value: "peter-ojo",
+      name: "High",
+      value: "high",
     },
     {
-      name: "John Doe",
-      value: "john-doe",
+      name: "Medium",
+      value: "medium",
+    },
+    {
+      name: "Low",
+      value: "low",
+    },
+  ];
+  const type = [
+    {
+      name: "General",
+      value: "general",
+    },
+    {
+      name: "Crop",
+      value: "crop",
+    },
+    {
+      name: "Pest",
+      value: "pest",
+    },
+    {
+      name: "Irrigation",
+      value: "irrigation",
+    },
+    {
+      name: "Fertilizer",
+      value: "fertilizer",
+    },
+    {
+      name: "Harvest",
+      value: "harvest",
+    },
+    {
+      name: "Weather",
+      value: "weather",
+    },
+    {
+      name: "Maintenance",
+      value: "maintenance",
     },
   ];
   return (
@@ -96,10 +134,34 @@ export default function NoteForm() {
             />
           </div>
           <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
+            <NoteSelect
+              name="priority"
+              control={form.control}
+              label="Priority"
+              placeholder="Select Priority"
+              array={priority}
+              Icon={RiFileList2Line}
+            />
+            <NoteSelect
+              name="type"
+              control={form.control}
+              label="Type"
+              placeholder="Select Type"
+              array={type}
+              Icon={RiFileList2Line}
+            />
+          </div>
+          <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">
+            <NoteInput
+              label="Title"
+              placeholder="Note title..."
+              name="title"
+              control={form.control}
+            />
             <NoteText
-              label="Notes"
+              label="Description"
               placeholder="Write note..."
-              name="notes"
+              name="description"
               control={form.control}
             />
           </div>

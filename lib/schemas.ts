@@ -527,7 +527,6 @@ export const createCropSchema = z.object({
   description: z.string().optional(),
 });
 
-// export const createCropSchema = z.object({
 //   cropName: comboSchema("Crop is required"),
 //   plantingToHarvest: z
 //     .object(
@@ -637,14 +636,37 @@ export const activitySchema = z.object({
     .string({ message: " Date is required" })
     .min(1, "Date is required"),
 });
-export const noteSchema = z.object({
+
+export const notesSchema = z.object({
+  title: z.string({ message: "Task name is required" }).min(4, {
+    message: "Task name must be at least 4 characters.",
+  }),
   farm: z
     .string({ message: "Please select farm" })
     .min(1, "Please select a farm"),
   field: z
     .string({ message: "Please select farm field" })
     .min(1, "Please select farm field"),
-  notes: z
+  priority: z.enum(["low", "high", "medium"], {
+    message: "Please select a priority",
+  }),
+  type: z.enum(
+    [
+      "general",
+      "crop",
+      "pest",
+      "irrigation",
+      "fertilizer",
+      "harvest",
+      "weather",
+      "maintenance",
+    ],
+    {
+      message: "Please select a type",
+    },
+  ),
+
+  description: z
     .string({ message: "descripton is required" })
     .min(10, { message: "description must be at least 10 characters." }),
 });
@@ -689,51 +711,9 @@ export const financeExpenseSchema = z.object({
 
   description: z.string().optional(),
 });
-// export const financeExpenseSchema = z.object({
-//   category: z
-//     .string({ message: "Please select a category" })
-//     .min(1, "Please select a category"),
-//   farm: z
-//     .string({ message: "Please select a farm" })
-//     .min(1, "Please select a farm"),
 
-//   amount: z.string({ message: "Please enter total amount" }).min(2, {
-//     message: "Total amountt must be at least 2 characters.",
-//   }),
-//   date: z.string({ message: " Date is required" }).min(1, "Date is required"),
-
-//   paymentMethod: z
-//     .string({ message: "Please select payment method" })
-//     .min(1, "Please select a payment method"),
-//   notes: z.string().optional(),
-//   description: z
-//     .string({ message: "descripton is required" })
-//     .min(10, { message: "description must be at least 10 characters." }),
-//   receipt: z
-//     .any()
-//     .refine((file) => !file || file.size <= 5 * 1024 * 1024, {
-//       message: "Max file size is 5MB",
-//     })
-//     .refine(
-//       (file) =>
-//         !file ||
-//         ["image/jpeg", "image/png", "application/pdf"].includes(file.type),
-//       {
-//         message: "Only JPG, PNG or PDF allowed",
-//       },
-//     )
-//     .optional(),
-// });
 function comboSchema(message: string) {
   return z.string({ message: message });
-  // return z.object(
-  //   {
-  //     id: z.string().optional(),
-  //     name: z.string().min(1, message),
-  //     isCustom: z.boolean().optional(),
-  //   },
-  //   { message: message },
-  // );
 }
 export const infoFormSchema = z.object({
   fullName: z.string({ message: "Please enter your full name" }).min(4, {
