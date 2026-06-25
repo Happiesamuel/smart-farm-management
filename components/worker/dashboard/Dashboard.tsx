@@ -9,6 +9,7 @@ import { useGetTasks } from "@/hooks/tasks/useTask";
 import { useGetFarm } from "@/hooks/farms/useFarm";
 import { useGetFields } from "@/hooks/fields/useFields";
 import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
+import { useGetActivity } from "@/hooks/activity/useActivity";
 
 export default function Dashboard() {
   const { workspace, user, ready } = useApp();
@@ -27,6 +28,11 @@ export default function Dashboard() {
     status: fieldStat,
     error: fieldErr,
   } = useGetFields(workspace?.id ?? null, user?.id ?? null);
+  const {
+    activity,
+    status: actStat,
+    error: actErr,
+  } = useGetActivity(workspace?.id ?? null, user?.id ?? null);
 
   if (!ready)
     return (
@@ -43,7 +49,10 @@ export default function Dashboard() {
     );
 
   const isLoading =
-    status === "pending" || farmStat === "pending" || fieldStat === "pending";
+    status === "pending" ||
+    farmStat === "pending" ||
+    fieldStat === "pending" ||
+    actStat === "pending";
 
   if (isLoading)
     return (
@@ -52,7 +61,8 @@ export default function Dashboard() {
       </div>
     );
 
-  const errorMessage = error?.message || fieldErr?.message || farmErr?.message;
+  const errorMessage =
+    error?.message || fieldErr?.message || farmErr?.message || actErr?.message;
 
   if (errorMessage)
     return (
@@ -60,7 +70,9 @@ export default function Dashboard() {
         <NoResult>{errorMessage}</NoResult>
       </div>
     );
+  const newAct = activity?.filter((x) => x.users === user.id) ?? [];
 
+  console.log(tasks);
   return (
     <div className="pt-18 px-2 sm:px-4 pb-8">
       <DashboardHeader fullName={user.fullName} />
@@ -76,7 +88,7 @@ export default function Dashboard() {
           tasks={tasks as { [key: string]: string }[]}
         />
         <div className="space-y-2">
-          <DashoardRecentActivities />
+          <DashoardRecentActivities activities={newAct ?? []} />
           <DashboardTips />
         </div>
       </div>

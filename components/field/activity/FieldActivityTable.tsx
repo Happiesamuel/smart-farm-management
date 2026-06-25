@@ -9,7 +9,7 @@ import FinancePagination from "@/components/layout/FinancePagination";
 import FieldActivityCalendar from "./FieldActivityCalendar";
 
 export default function FieldActivityTable() {
-  const { farmId, workspaceId } = useParams();
+  const { farmId } = useParams();
   const searchParams = useSearchParams();
 
   const { workspace, user, ready } = useApp();

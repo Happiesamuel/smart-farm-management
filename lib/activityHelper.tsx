@@ -6,6 +6,7 @@ import {
   Edit,
   Plus,
   LucideIcon,
+  UserPlus,
 } from "lucide-react";
 
 export const mapActivityToUI = (
@@ -62,6 +63,13 @@ export const mapActivityToUI = (
       title: "Task Completed",
     };
   }
+  if (activity.action === "assigned") {
+    return {
+      ...base,
+      type: "assigned",
+      title: "Task Assigned",
+    };
+  }
 
   return {
     ...base,
@@ -103,5 +111,10 @@ export const activityConfig: Record<
     icon: FileText,
     color: "text-gray-600",
     bg: "bg-gray-100",
+  },
+  assigned: {
+    icon: UserPlus,
+    color: "text-blue-600",
+    bg: "bg-blue-100",
   },
 };

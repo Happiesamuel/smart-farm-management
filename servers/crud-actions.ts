@@ -63,6 +63,38 @@ const resolveFarmId = (collection: string, data: { [key: string]: string }) => {
   }
 };
 
+const createSecondaryActivities = async ({
+  collection,
+  data,
+  workspaceId,
+  docId,
+  creatorName,
+}: {
+  collection: string;
+  workspaceId: string;
+  docId: string;
+  creatorName: string;
+  data: Record<string, string>;
+}) => {
+  switch (collection) {
+    case "tasks":
+      if (data.assignTo) {
+        await createActivity({
+          workspaceId,
+          userId: data.assignTo, // worker receives this activity
+          farmId: data.farms,
+          entityType: "assignment",
+          entityId: docId,
+          action: "assigned",
+          message: `${creatorName} assigned you "${data.taskTitle}"`,
+        });
+      }
+      break;
+
+    default:
+      break;
+  }
+};
 export const createActivity = async ({
   workspaceId,
   userId,
@@ -140,8 +172,18 @@ export const createDoc = async ({
       users: userId,
     },
   );
-
-  // 🔥 ACTIVITY
+  const creator = await database.getDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.userCollectionId,
+    userId,
+  );
+  await createSecondaryActivities({
+    collection,
+    data: newData,
+    workspaceId,
+    docId: doc.$id,
+    creatorName: creator.fullName,
+  });
   await createActivity({
     workspaceId,
     userId,
@@ -279,7 +321,11 @@ export const getFarmDocs = async ({
   const res = await database.listDocuments(
     appwriteConfig.databaseId,
     collection,
-    [Query.equal("workspaces", workspaceId), Query.equal("farms", farmId)],
+    [
+      Query.equal("workspaces", workspaceId),
+      Query.equal("farms", farmId),
+      Query.orderDesc("$createdAt"),
+    ],
   );
   return res.documents.map((d) => {
     return { ...d };
@@ -299,7 +345,7 @@ export const getDocs = async ({
   const res = await database.listDocuments(
     appwriteConfig.databaseId,
     collection,
-    [Query.equal("workspaces", workspaceId)],
+    [Query.equal("workspaces", workspaceId), Query.orderDesc("$createdAt")],
   );
   return res.documents.map((d) => {
     return { ...d };
@@ -359,7 +405,21 @@ export const updateDoc = async ({
     data,
   );
   const user = await getGuestByGuestId(userId);
-
+  if (
+    collection === "tasks" &&
+    data.assignTo &&
+    data.assignTo !== prev.assignTo
+  ) {
+    await createActivity({
+      workspaceId,
+      userId: data.assignTo,
+      farmId: prev.farms,
+      entityType: "tasks",
+      entityId: id,
+      action: "assigned",
+      message: `You were assigned task "${prev.taskTitle}"`,
+    });
+  }
   await createActivity({
     workspaceId,
     userId,

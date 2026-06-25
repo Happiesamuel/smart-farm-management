@@ -1,64 +1,68 @@
+import { NoResult } from "@/components/loader/GeneralLoader";
+import { activityConfig } from "@/lib/constants";
 import Link from "next/link";
-import React from "react";
-import { TfiWrite } from "react-icons/tfi";
+import { useParams } from "next/navigation";
 
-export default function DashoardRecentActivities() {
-  const activities = [
-    {
-      name: "Task completed: Irrigate Field C",
-      time: "Today, 6:30 AM",
-      id: 1,
-      field: "Field A",
-    },
-    {
-      name: "Task started: Apply fertilizer",
-      time: "Today, 9:05 AM",
-      id: 2,
-      field: "Field A",
-    },
-    {
-      name: "Status updated: Weed control",
-      time: "Today, 8:05 AM",
-      id: 3,
-      field: "Field B",
-    },
-    {
-      name: "Status updated: Weed ontrol",
-      time: "Today, 8:05 AM",
-      id: 4,
-      field: "Field C",
-    },
-  ];
+const formatTimeAgo = (date: string) => {
+  const diff = Date.now() - new Date(date).getTime();
+  const mins = Math.floor(diff / 60000);
+  const hrs = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  if (mins < 60) return `${mins} mins ago`;
+  if (hrs < 24) return `${hrs} hours ago`;
+  return `${days} days ago`;
+};
+
+export default function DashoardRecentActivities({
+  activities,
+}: {
+  activities: { [key: string]: string }[];
+}) {
+  const { workspaceId } = useParams();
   return (
-    <div className="flex flex-col  gap-4 border border-border h-[320px] rounded-md  p-4 shadow-xs bg-white">
-      <div className="flex items-center justify-between gap-2  py-2 pb-4">
+    <div className="flex flex-col  gap-2 border border-border h-[320px] rounded-md  p-4 shadow-xs bg-white">
+      <div className="flex items-center justify-between gap-2  py-2">
         <h3 className="text-dark  text-base">Recent Activity</h3>
-        <Link className="text-[#1058d6] text-sm" href="/worker/tasks">
+        <Link
+          className="text-[#1058d6] text-sm"
+          href={`/worker/${workspaceId}/activity`}
+        >
           View all activity
         </Link>
       </div>
 
-      <div className="space-y-3 h-[300px] overflow-scroll no-scroll">
-        {activities.map((act) => (
-          <div
-            className="flex flex-col md:flex-row md:items-center md:justify-between"
-            key={act.id}
-          >
-            <div className="flex items-center gap-2">
-              <div className=" rounded-md text-base bg-[#fee7e7] text-[#e82a2d] size-8 flex items-center justify-center">
-                <TfiWrite />
+      {!activities.length ? (
+        <div className="h-[90%]">
+          <NoResult>No activity record</NoResult>
+        </div>
+      ) : (
+        <div className="space-y-4 overflow-y-auto no-scroll">
+          {activities?.slice(0, 6).map((act) => {
+            const config = activityConfig[act.action] ?? activityConfig.created;
+
+            return (
+              <div key={act.$id} className="flex items-center gap-3.5">
+                <div
+                  className={`flex items-center justify-center size-7 rounded ${config.bg} ${config.color}`}
+                >
+                  {config.icon}
+                </div>
+
+                <div className="space-y-1">
+                  <p className="text-dark/80 text-sm max-w-[300px] truncate">
+                    {act.message}
+                  </p>
+
+                  <p className="text-zinc-500 text-xs">
+                    {formatTimeAgo(act.$createdAt)}
+                  </p>
+                </div>
               </div>
-              <div className="space-y-1">
-                <h6 className="text-dark/80 font-medium text-sm">{act.name}</h6>
-                <p className="text-xs text-zinc-500 font-normal">{act.field}</p>
-              </div>
-            </div>
-            <p className="text-xs text-end text-zinc-500 font-normal">
-              {act.time}
-            </p>
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

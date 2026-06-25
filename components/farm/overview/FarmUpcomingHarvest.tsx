@@ -1,4 +1,5 @@
 import { NoResult } from "@/components/loader/GeneralLoader";
+import { useParams, useRouter } from "next/navigation";
 import { GiPlantRoots } from "react-icons/gi";
 
 export default function FarmUpcomingHarvest({
@@ -8,6 +9,8 @@ export default function FarmUpcomingHarvest({
   crops: { [key: string]: string }[];
   fields: { [key: string]: string }[];
 }) {
+  const { farmId, workspaceId } = useParams();
+  const router = useRouter();
   const upcomingHarvests =
     crops
       ?.filter((c) => {
@@ -55,7 +58,14 @@ export default function FarmUpcomingHarvest({
     <div className="w-full p-4 h-[300px] bg-white flex-1 rounded-xl border border-border/80 hover:shadow-sm transition flex flex-col  shrink-0">
       <div className="flex pb-4 items-center justify-between">
         <p className="text-dark text-base font-semibold">Upcoming Harvest</p>
-        <p className="text-sm text-primary-green font-normal">View All</p>
+        <p
+          onClick={() =>
+            router.push(`/user/${workspaceId}/farms/${farmId}?tab=harvests`)
+          }
+          className="text-sm text-primary-green font-normal"
+        >
+          View All
+        </p>
       </div>
 
       {!upcomingHarvests.length ? (

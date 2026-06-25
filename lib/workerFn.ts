@@ -1,3 +1,5 @@
+import { format } from "date-fns";
+
 export const normalizeTasks = (
   tasks: { [key: string]: string }[],
   fields: { [key: string]: string }[],
@@ -23,10 +25,7 @@ export const normalizeTasks = (
       priority: t.priority.charAt(0).toUpperCase() + t.priority.slice(1),
 
       date: t.dueDate,
-      time: new Date(t.dueDate).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      time: format(new Date(t.dueDate), "MMM d"),
     };
   });
 };

@@ -22,6 +22,8 @@ import { buildAreaChartData, buildOverviewStats } from "@/lib/stat";
 import { useGetSingleFarm } from "@/hooks/farms/useFarm";
 import { formatLocation } from "@/lib/functions";
 import FarmMap from "./FarmMap";
+import { useGetFarmActivity } from "@/hooks/activity/useActivity";
+import { useWorkspaceUser } from "@/hooks/useAssign";
 export default function FarmOverview() {
   const { farmId } = useParams();
   const { workspace, user, ready } = useApp();
@@ -41,11 +43,21 @@ export default function FarmOverview() {
     user?.id ?? null,
     farmId as string,
   );
-  // const {
-  //   farms,
-  // status: farmStat,
-  // error: farmErr,
-  // } = useGetFarm(workspace?.id ?? null, user?.id ?? null);
+  const {
+    users,
+    status: userStat,
+    error: userErr,
+  } = useWorkspaceUser(workspace?.id ?? null);
+  const {
+    activity,
+    status: actStat,
+    error: actErr,
+  } = useGetFarmActivity(
+    workspace?.id ?? null,
+    user?.id ?? null,
+    farmId as string,
+  );
+
   const {
     fields,
     status: fieldStat,
@@ -113,7 +125,9 @@ export default function FarmOverview() {
     taskStat === "pending" ||
     saleStat === "pending" ||
     expStat === "pending" ||
-    farmStat === "pending";
+    farmStat === "pending" ||
+    actStat === "pending" ||
+    userStat === "pending";
 
   if (isLoading)
     return (
@@ -129,7 +143,9 @@ export default function FarmOverview() {
     taskErr?.message ||
     saleErr?.message ||
     expErr?.message ||
-    farmErr?.message;
+    farmErr?.message ||
+    actErr?.message ||
+    userErr?.message;
 
   if (errorMessage)
     return (
@@ -163,6 +179,7 @@ export default function FarmOverview() {
         growthStage: crop?.growthStage ?? "idle",
       };
     }) ?? [];
+  const userMap = new Map(users.map((u) => [u.id, u]));
   return (
     <div>
       <FarmOvervewBoxes
@@ -197,7 +214,7 @@ export default function FarmOverview() {
       </div>
 
       <div className="flex lg:flex-row flex-col pt-4 items-center justify-between gap-4">
-        <FarmActivites />
+        <FarmActivites activities={activity ?? []} userMap={userMap} />
         <FarmFieldOverview fieldArr={fieldArr} />
         <FarmUpcomingHarvest
           crops={crops as { [key: string]: string }[]}
