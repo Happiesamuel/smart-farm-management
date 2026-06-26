@@ -50,6 +50,11 @@ export function ManagerSidebar() {
       group: "Others",
       items: [
         { name: "Reports", slug: "reports", icon: RiFileList3Line },
+        {
+          name: "Activity Log",
+          slug: "activity",
+          icon: FiActivity,
+        },
         { name: "Settings", slug: "settings", icon: IoSettingsOutline },
       ],
     },
@@ -125,7 +130,7 @@ export function ManagerSidebar() {
           </div>
         </div>
 
-        <div className="flex h-[65vh] overflow-y-scroll no-scroll flex-col gap-4 mt-8">
+        <div className="flex h-[70vh] overflow-y-scroll no-scroll flex-col gap-4 mt-8">
           {sidebarLinks.map((section) => (
             <div key={section.group}>
               {!collaspe && (

@@ -1,5 +1,5 @@
 "use client";
-import { useParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useApp } from "@/stores/useAppStore";
 import { useGetActivity } from "@/hooks/activity/useActivity";
 import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
@@ -54,7 +54,7 @@ export default function ActivityTable() {
       </div>
     );
 
-  const newAct = activity?.filter((x) => x.users === user.id) ?? [];
+  const newAct = activity ?? [];
   if (!newAct?.length)
     return (
       <div className="h-70 flex items-center justify-center">
@@ -63,6 +63,8 @@ export default function ActivityTable() {
         </div>
       </div>
     );
+
+  console.log(newAct);
   const userMap = new Map(users.map((u) => [u.id, u]));
 
   const fromParam = searchParams.get("activityFrom");

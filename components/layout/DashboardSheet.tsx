@@ -18,6 +18,7 @@ import { useParams, usePathname } from "next/navigation";
 import { GrMoney } from "react-icons/gr";
 import { GoTasklist } from "react-icons/go";
 import { FiActivity } from "react-icons/fi";
+import { LuNotepadText } from "react-icons/lu";
 
 export function DashboardSheet() {
   const { workspaceId } = useParams();
@@ -86,6 +87,11 @@ export function DashboardSheet() {
           slug: "reports",
           route: "/user/reports",
           icon: RiFileList3Line,
+        },
+        {
+          name: "Activity Log",
+          slug: "activity",
+          icon: FiActivity,
         },
         {
           name: "Settings",
@@ -165,6 +171,11 @@ export function WorkerDashboardSheet() {
           name: "My Tasks",
           slug: "tasks",
           icon: GoTasklist,
+        },
+        {
+          name: "Notes",
+          slug: "notes",
+          icon: LuNotepadText,
         },
         {
           name: "Activity Log",

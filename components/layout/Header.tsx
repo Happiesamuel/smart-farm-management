@@ -62,6 +62,12 @@ export default function Header() {
       svg: <RiFileList3Line className="text-lg text-dark" />,
     },
     {
+      name: "Activity Log",
+      base: "user",
+      slug: "activity",
+      svg: <FiActivity className="text-lg text-dark" />,
+    },
+    {
       name: "Settings",
       base: "user",
       slug: "settings",
