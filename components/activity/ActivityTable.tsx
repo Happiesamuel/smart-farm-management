@@ -7,6 +7,7 @@ import { activityConfig, mapActivityToUI } from "@/lib/activityHelper";
 import { useWorkspaceUser } from "@/hooks/useAssign";
 import FinancePagination from "@/components/layout/FinancePagination";
 import FieldActivityCalendar from "@/components/field/activity/FieldActivityCalendar";
+import { useGetFarm } from "@/hooks/farms/useFarm";
 
 export default function ActivityTable() {
   const searchParams = useSearchParams();
@@ -21,6 +22,11 @@ export default function ActivityTable() {
     workspace?.id ?? null,
     user?.id ?? null,
   );
+  const {
+    farms,
+    status: farmStat,
+    error: farmErr,
+  } = useGetFarm(workspace?.id ?? null, user?.id ?? null);
 
   if (!ready)
     return (
@@ -36,7 +42,8 @@ export default function ActivityTable() {
       </div>
     );
 
-  const isLoading = status === "pending" || userStat === "pending";
+  const isLoading =
+    status === "pending" || userStat === "pending" || farmStat === "pending";
 
   if (isLoading)
     return (
@@ -45,7 +52,7 @@ export default function ActivityTable() {
       </div>
     );
 
-  const errorMessage = error?.message || userErr?.message;
+  const errorMessage = error?.message || userErr?.message || farmErr?.message;
 
   if (errorMessage)
     return (
@@ -66,6 +73,7 @@ export default function ActivityTable() {
 
   console.log(newAct);
   const userMap = new Map(users.map((u) => [u.id, u]));
+  const farmMap = new Map(farms?.map((f) => [f.$id, f]));
 
   const fromParam = searchParams.get("activityFrom");
   const toParam = searchParams.get("activityTo");
@@ -73,25 +81,30 @@ export default function ActivityTable() {
   const formattedActivities =
     newAct?.map((a) => mapActivityToUI(a, userMap)) ?? [];
 
-  const filteredActivities = formattedActivities.filter((a) => {
-    if (!fromParam && !toParam) return true;
+  const filteredActivities = formattedActivities
+    .map((f) => {
+      const farm = farmMap.get(f.farms);
+      return { ...f, farmName: farm?.farmName ?? "Unknown farm" };
+    })
+    .filter((a) => {
+      if (!fromParam && !toParam) return true;
 
-    const date = new Date(a.rawDate);
+      const date = new Date(a.rawDate);
 
-    if (fromParam) {
-      const from = new Date(fromParam);
-      from.setHours(0, 0, 0, 0);
-      if (date < from) return false;
-    }
+      if (fromParam) {
+        const from = new Date(fromParam);
+        from.setHours(0, 0, 0, 0);
+        if (date < from) return false;
+      }
 
-    if (toParam) {
-      const to = new Date(toParam);
-      to.setHours(23, 59, 59, 999); // 👈 end of day, not midnight
-      if (date > to) return false;
-    }
+      if (toParam) {
+        const to = new Date(toParam);
+        to.setHours(23, 59, 59, 999); // 👈 end of day, not midnight
+        if (date > to) return false;
+      }
 
-    return true;
-  });
+      return true;
+    });
   const PAGE_SIZE = 10;
   const currentPage = Number(searchParams.get("activityPage") || 1);
   const paginatedActivity = filteredActivities.slice(
@@ -115,6 +128,7 @@ export default function ActivityTable() {
               <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
                 <tr>
                   <th className="text-left px-4 py-4">Activity</th>
+                  <th className="text-left px-4 py-4">Farm</th>
                   <th className="text-left px-4 py-4">Details</th>
                   <th className="text-left px-4 py-4">Time</th>
                   <th className="text-left px-4 py-4">By</th>
@@ -140,6 +154,12 @@ export default function ActivityTable() {
                         </span>
                       </td>
 
+                      <td
+                        title={a.farmName}
+                        className="px-4 py-3 max-w-[200px] text-gray-600 truncate"
+                      >
+                        {a.farmName}
+                      </td>
                       <td
                         title={a.details}
                         className="px-4 py-3 max-w-[200px] text-gray-600 truncate"

@@ -21,6 +21,7 @@ export const mapActivityToUI = (
     time: new Date(activity.$createdAt).toLocaleString(),
     by: user?.name || "Unknown",
     rawDate: activity.$createdAt,
+    farms: activity.farms,
   };
 
   // 🔥 Smart mapping
