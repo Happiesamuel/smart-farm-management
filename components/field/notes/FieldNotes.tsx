@@ -19,6 +19,8 @@ import { IoSearch } from "react-icons/io5";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "use-debounce";
 import Paginate from "@/components/layout/Pagination";
+import NoteHeader from "@/components/worker/notes/NoteHeader";
+import { useCropFilter } from "@/hooks/useCropFilter";
 
 const typeStyles: Record<string, string> = {
   general: "bg-gray-100 text-gray-700",
@@ -51,6 +53,7 @@ export default function FieldNotes() {
   const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>(
     {},
   );
+  const { filterCrop } = useCropFilter();
   const [val, setVal] = useState(searchFromUrl);
 
   const [debouncedValue] = useDebounce(val, 500);
@@ -115,7 +118,23 @@ export default function FieldNotes() {
         <NoResult>{errorMessage}</NoResult>
       </div>
     );
-  const newNotes = notes?.filter((n) => n.fields === fieldId) ?? [];
+  const newNotes =
+    notes
+      ?.filter((n) => n.fields === fieldId)
+      .map((n) => {
+        return {
+          title: n.title,
+          farms: n.farms,
+          fields: n.fields,
+          priority: n.priority,
+          description: n.description,
+          type: n.type,
+          $id: n.$id,
+          workspaces: n.workspaces,
+          users: n.users,
+          $createdAt: n.$createdAt,
+        };
+      }) ?? [];
   if (!newNotes?.length)
     return (
       <div className="h-70 flex items-center justify-center">
@@ -144,16 +163,7 @@ export default function FieldNotes() {
   function handleSearch(v: string) {
     setVal(v);
   }
-  const query = debouncedValue?.toLowerCase().replace(/\+/g, " ").trim();
 
-  const filteredNotes = newNotes.filter((note) => {
-    const matchesSearch = query
-      ? note.title.toLowerCase().startsWith(query) ||
-        note.title.toLowerCase().includes(query)
-      : true;
-
-    return matchesSearch;
-  });
   const toggleNote = (id: string) => {
     setExpandedNotes((prev) => ({
       ...prev,
@@ -163,16 +173,27 @@ export default function FieldNotes() {
   const PAGE_SIZE = 10;
 
   const currentPage = Number(searchParams.get("page") || 1);
-  const totalPages = Math.ceil(filteredNotes.length / PAGE_SIZE);
-  const paginatedNotes = filteredNotes.slice(
+  const filtered = filterCrop(newNotes ?? []);
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+
+  const paginatedNotes = filtered.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE,
   );
+  function handleClick() {
+    setEditingNote(null);
+    setOpen(true);
+  }
+
   const userMap = new Map(users?.map((u) => [u.id, u]));
   return (
     <div className=" pt-4">
       <div className="flex flex-col sm:flex-row w-full gap-2 sm:items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-dark/90">Field Notes</h2>
+        <NoteHeader
+          handleSearch={handleSearch}
+          val={val}
+          handleClick={handleClick}
+        />
 
         <FinanceModal
           text={
@@ -195,154 +216,141 @@ export default function FieldNotes() {
             }}
           />
         </FinanceModal>
-        <div className="flex w-full sm:w-[45%] items-center border border-border gap-2 rounded-lg px-2">
-          <IoSearch />
-          <Input
-            onChange={(e: ChangeEvent<HTMLInputElement, HTMLInputElement>) => {
-              handleSearch(e.target.value);
-            }}
-            value={val}
-            placeholder="Search notes..."
-            className="border-none p-0 group focus-visible:none shadow-none"
-          />
-        </div>
-        <Button
-          onClick={() => {
-            setEditingNote(null);
-            setOpen(true);
-          }}
-          className="bg-primary-green w-full  sm:w-fit cursor-pointer text-white rounded-sm"
-        >
-          <GoPlus />
-          <p>Add Notes</p>
-        </Button>
       </div>
-      <div className="space-y-4">
-        {paginatedNotes.map((note) => {
-          const user = userMap.get(note.users);
-          return (
-            <div
-              key={note.$id}
-              className="rounded-xl border border-border bg-white p-5 transition hover:border-primary-green/20 hover:shadow-sm"
-            >
-              {/* Header */}
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-2 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${
-                        typeStyles[note.type]
-                      }`}
-                    >
-                      {note.type}
-                    </span>
+      {!paginatedNotes.length ? (
+        <div className="h-110">
+          <NoResult>No notes found!</NoResult>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {paginatedNotes.map((note) => {
+            const user = userMap.get(note.users);
+            return (
+              <div
+                key={note.$id}
+                className="rounded-xl border border-border bg-white p-5 transition hover:border-primary-green/20 hover:shadow-sm"
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-2 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${
+                          typeStyles[note.type]
+                        }`}
+                      >
+                        {note.type}
+                      </span>
 
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${
-                        priorityStyles[note.priority]
-                      }`}
-                    >
-                      {note.priority}
-                    </span>
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${
+                          priorityStyles[note.priority]
+                        }`}
+                      >
+                        {note.priority}
+                      </span>
+                    </div>
+
+                    {note.title && (
+                      <h4 className="text-base font-semibold text-dark">
+                        {note.title}
+                      </h4>
+                    )}
                   </div>
 
-                  {note.title && (
-                    <h4 className="text-base font-semibold text-dark">
-                      {note.title}
-                    </h4>
+                  <div className="flex items-center gap-2">
+                    <TableActions
+                      actions={[
+                        {
+                          type: "callback",
+                          label: "Edit",
+                          icon: <LuPencil className="text-sm" />,
+                          onClick: () => {
+                            setEditingNote(note);
+                            setOpen(true);
+                          },
+                        },
+                        {
+                          type: "callback",
+                          label:
+                            deleteStat === "pending" ? "Deleting..." : "Delete",
+                          icon: <LuTrash2 className="text-sm" />,
+                          variant: "danger",
+                          onClick: () =>
+                            remove(
+                              {
+                                collection: "notes",
+                                id: note.$id,
+                                workspaceId: workspace.id,
+                                userId: user!.id,
+                              },
+                              {
+                                onSuccess: () => {
+                                  toast("Deleted successfully", {
+                                    description: "You've deleted a note record",
+                                  });
+                                },
+                                onError: (err) =>
+                                  toast("Error deleting note", {
+                                    description: err.message,
+                                    duration: 4000,
+                                    closeButton: true,
+                                  }),
+                              },
+                            ),
+                        },
+                      ]}
+                    />
+                  </div>
+                </div>
+
+                {/* Note */}
+                <div className="mt-2">
+                  <p
+                    className={`text-sm leading-7 text-zinc-700 whitespace-pre-wrap transition-all duration-300 ${
+                      expandedNotes[note.$id] ? "" : "line-clamp-4"
+                    }`}
+                  >
+                    {note.description}
+                  </p>
+
+                  {note.description.length > 250 && (
+                    <button
+                      onClick={() => toggleNote(note.$id)}
+                      className="mt-2 text-sm font-medium text-primary-green hover:underline"
+                    >
+                      {expandedNotes[note.$id] ? "See less" : "See more"}
+                    </button>
                   )}
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <TableActions
-                    actions={[
-                      {
-                        type: "callback",
-                        label: "Edit",
-                        icon: <LuPencil className="text-sm" />,
-                        onClick: () => {
-                          setEditingNote(note);
-                          setOpen(true);
-                        },
-                      },
-                      {
-                        type: "callback",
-                        label:
-                          deleteStat === "pending" ? "Deleting..." : "Delete",
-                        icon: <LuTrash2 className="text-sm" />,
-                        variant: "danger",
-                        onClick: () =>
-                          remove(
-                            {
-                              collection: "notes",
-                              id: note.$id,
-                              workspaceId: workspace.id,
-                              userId: user!.id,
-                            },
-                            {
-                              onSuccess: () => {
-                                toast("Deleted successfully", {
-                                  description: "You've deleted a note record",
-                                });
-                              },
-                              onError: (err) =>
-                                toast("Error deleting note", {
-                                  description: err.message,
-                                  duration: 4000,
-                                  closeButton: true,
-                                }),
-                            },
-                          ),
-                      },
-                    ]}
-                  />
-                </div>
-              </div>
+                {/* Footer */}
+                <div className="mt-3 flex items-center justify-between border-t pt-3">
+                  <div className="flex items-center gap-2 text-xs text-zinc-500">
+                    <img
+                      className="flex h-8 w-8 object-center object-cover rounded-full "
+                      src={user?.avatar}
+                    />
 
-              {/* Note */}
-              <div className="mt-2">
-                <p
-                  className={`text-sm leading-7 text-zinc-700 whitespace-pre-wrap transition-all duration-300 ${
-                    expandedNotes[note.$id] ? "" : "line-clamp-4"
-                  }`}
-                >
-                  {note.description}
-                </p>
-
-                {note.description.length > 250 && (
-                  <button
-                    onClick={() => toggleNote(note.$id)}
-                    className="mt-2 text-sm font-medium text-primary-green hover:underline"
-                  >
-                    {expandedNotes[note.$id] ? "See less" : "See more"}
-                  </button>
-                )}
-              </div>
-
-              {/* Footer */}
-              <div className="mt-3 flex items-center justify-between border-t pt-3">
-                <div className="flex items-center gap-2 text-xs text-zinc-500">
-                  <img
-                    className="flex h-8 w-8 object-center object-cover rounded-full "
-                    src={user?.avatar}
-                  />
-
-                  <div>
-                    <p className="font-medium text-zinc-700">
-                      {user?.name ?? "Guest"}
-                    </p>
-                    <p>{formatDistanceToNow(new Date(note.$createdAt))} ago</p>
+                    <div>
+                      <p className="font-medium text-zinc-700">
+                        {user?.name ?? "Guest"}
+                      </p>
+                      <p>
+                        {formatDistanceToNow(new Date(note.$createdAt))} ago
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <p className="text-xs text-zinc-400">
-                  {format(new Date(note.$createdAt), "MMM dd, yyyy")}
-                </p>
+                  <p className="text-xs text-zinc-400">
+                    {format(new Date(note.$createdAt), "MMM dd, yyyy")}
+                  </p>
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
       <Paginate totalPages={totalPages} />
     </div>
   );

@@ -10,6 +10,7 @@ export function useCropFilter() {
   const search = searchParams.get("search");
   const quality = searchParams.get("quality");
   const priority = searchParams.get("priority");
+  const type = searchParams.get("type");
   const assign = searchParams.get("assign");
   const worTask = searchParams.get("worTask");
 
@@ -25,6 +26,8 @@ export function useCropFilter() {
       assignTo?: string;
       taskTitle?: string;
       createdAt?: string;
+      type?: string;
+      title?: string;
     },
   >(items: T[]): T[] {
     const filtered = items.filter((item) => {
@@ -39,6 +42,8 @@ export function useCropFilter() {
         priority !== "all" &&
         item.priority?.toLowerCase() !== priority
       )
+        return false;
+      if (type && type !== "all" && item.type?.toLowerCase() !== type)
         return false;
       if (
         assign &&
@@ -62,9 +67,11 @@ export function useCropFilter() {
       if (search) {
         const q = search.toLowerCase();
         const matchesName = item.name?.toLowerCase().includes(q);
+        const matchesTitle = item.title?.toLowerCase().includes(q);
         const matchesTaskTitle = item.taskTitle?.toLowerCase().includes(q);
         const matchesCrop = item.crop?.toLowerCase().includes(q);
-        if (!matchesName && !matchesCrop && !matchesTaskTitle) return false;
+        if (!matchesName && !matchesCrop && !matchesTaskTitle && !matchesTitle)
+          return false;
       }
 
       return true;
