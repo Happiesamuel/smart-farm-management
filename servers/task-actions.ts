@@ -60,16 +60,18 @@ export const getWorkerNotes = async ({
     [Query.equal("workspaces", workspaceId), Query.equal("assignTo", userId)],
   );
 
-  const fieldIds = [...new Set(taskDocs.documents.map((t) => t.fields))];
+  const farmIds = [...new Set(taskDocs.documents.map((t) => t.farms))];
+  // const fieldIds = [...new Set(taskDocs.documents.map((t) => t.fields))];
 
-  if (!fieldIds.length) return [];
+  if (!farmIds.length) return [];
 
   const noteDocs = await database.listDocuments(
     appwriteConfig.databaseId,
     "notes",
     [
       Query.equal("workspaces", workspaceId),
-      Query.equal("fields", fieldIds),
+      Query.equal("farms", farmIds),
+      // Query.equal("fields", fieldIds),
       Query.orderDesc("$createdAt"),
     ],
   );

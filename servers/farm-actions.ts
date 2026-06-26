@@ -289,3 +289,37 @@ export const getSingleFieldDocs = async ({
     users: d.users,
   };
 };
+export const getAssignedFarms = async ({
+  workspaceId,
+  userId,
+}: {
+  workspaceId: string;
+  userId: string;
+}) => {
+  await validateWorkspaceAccess({ workspaceId, userId });
+
+  const { database } = await createAdminClient();
+
+  // Tasks assigned to worker
+  const taskDocs = await database.listDocuments(
+    appwriteConfig.databaseId,
+    "tasks",
+    [Query.equal("workspaces", workspaceId), Query.equal("assignTo", userId)],
+  );
+
+  // Unique farm ids
+  const farmIds = [...new Set(taskDocs.documents.map((t) => t.farms))];
+
+  if (!farmIds.length) return [];
+
+  // Fetch farms
+  const farmDocs = await database.listDocuments(
+    appwriteConfig.databaseId,
+    "farms",
+    [Query.equal("workspaces", workspaceId), Query.equal("$id", farmIds)],
+  );
+
+  return farmDocs.documents.map((x) => {
+    return { ...x };
+  });
+};

@@ -4,7 +4,7 @@ import { FinanceModal } from "@/components/modals/FinanceModal";
 import { RiFileList3Line } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
 import { GoPlus } from "react-icons/go";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useDeleteDoc } from "@/hooks/useDelete";
 import { useApp } from "@/stores/useAppStore";
 import { useWorkspaceUser } from "@/hooks/useAssign";
@@ -18,7 +18,9 @@ import { IoSearch } from "react-icons/io5";
 import { Input } from "@/components/ui/input";
 import { useDebounce } from "use-debounce";
 import Paginate from "@/components/layout/Pagination";
-import CreateNoteFetch from "@/components/field/notes/NoteForm";
+import { useGetFarm } from "@/hooks/farms/useFarm";
+import { useGetFields } from "@/hooks/fields/useFields";
+import CreateNoteWorkerFetch from "@/components/field/notes/NoteWorkerForm";
 
 const typeStyles: Record<string, string> = {
   general: "bg-gray-100 text-gray-700",
@@ -39,6 +41,7 @@ const priorityStyles: Record<string, string> = {
 
 export default function NoteList() {
   const [open, setOpen] = useState(false);
+  const { user: u } = useApp();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [editingNote, setEditingNote] = useState<{
@@ -82,6 +85,16 @@ export default function NoteList() {
     workspace?.id ?? null,
     user?.id ?? null,
   );
+  const {
+    farms,
+    status: farmStat,
+    error: farmErr,
+  } = useGetFarm(workspace?.id ?? null, user?.id ?? null);
+  const {
+    fields,
+    status: fieldStat,
+    error: fieldErr,
+  } = useGetFields(workspace?.id ?? null, user?.id ?? null);
 
   if (!ready)
     return (
@@ -97,7 +110,11 @@ export default function NoteList() {
       </div>
     );
 
-  const isLoading = status === "pending" || userStat === "pending";
+  const isLoading =
+    status === "pending" ||
+    userStat === "pending" ||
+    farmStat === "pending" ||
+    fieldStat === "pending";
 
   if (isLoading)
     return (
@@ -105,7 +122,8 @@ export default function NoteList() {
         <FormLoader>Loading notes record...</FormLoader>
       </div>
     );
-  const errorMessage = error?.message || userErr?.message;
+  const errorMessage =
+    error?.message || userErr?.message || fieldErr?.message || farmErr?.message;
 
   if (errorMessage)
     return (
@@ -134,7 +152,7 @@ export default function NoteList() {
             open={open}
             onClose={() => setOpen(false)}
           >
-            <CreateNoteFetch onClose={() => setOpen(false)} />
+            <CreateNoteWorkerFetch onClose={() => setOpen(false)} />
           </FinanceModal>
         </div>
       </div>
@@ -167,11 +185,12 @@ export default function NoteList() {
     currentPage * PAGE_SIZE,
   );
   const userMap = new Map(users?.map((u) => [u.id, u]));
+  const farmMap = new Map(farms?.map((f) => [f.$id, f]));
+  const fieldMap = new Map(fields?.map((f) => [f.$id, f]));
+
   return (
     <div className=" pt-4">
       <div className="flex flex-col sm:flex-row w-full gap-2 sm:items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-dark/90">Field Notes</h2>
-
         <FinanceModal
           text={
             editingNote ? "Update this note" : "Add a new note to your farm"
@@ -185,7 +204,7 @@ export default function NoteList() {
             setEditingNote(null);
           }}
         >
-          <CreateNoteFetch
+          <CreateNoteWorkerFetch
             def={editingNote ?? undefined}
             onClose={() => {
               setOpen(false);
@@ -218,6 +237,8 @@ export default function NoteList() {
       <div className="space-y-4">
         {paginatedNotes.map((note) => {
           const user = userMap.get(note.users);
+          const farm = farmMap.get(note.farms);
+          const field = fieldMap.get(note.fields);
           return (
             <div
               key={note.$id}
@@ -269,13 +290,21 @@ export default function NoteList() {
                           deleteStat === "pending" ? "Deleting..." : "Delete",
                         icon: <LuTrash2 className="text-sm" />,
                         variant: "danger",
-                        onClick: () =>
+
+                        onClick: () => {
+                          if (note.users !== u!.id) {
+                            return toast("You can't delete this note", {
+                              description:
+                                "You can only delete notes that you created.",
+                            });
+                          }
+
                           remove(
                             {
                               collection: "notes",
                               id: note.$id,
                               workspaceId: workspace.id,
-                              userId: user!.id,
+                              userId: u!.id,
                             },
                             {
                               onSuccess: () => {
@@ -290,7 +319,8 @@ export default function NoteList() {
                                   closeButton: true,
                                 }),
                             },
-                          ),
+                          );
+                        },
                       },
                     ]}
                   />
@@ -306,6 +336,12 @@ export default function NoteList() {
                 >
                   {note.description}
                 </p>
+
+                <div className="text-xs text-zinc-500 mt-2 flex items-center gap-2">
+                  <p>{farm?.farmName}</p>
+                  <p className="size-1 rounded-full bg-zinc-400" />
+                  <p>{field?.fieldName}</p>
+                </div>
 
                 {note.description.length > 250 && (
                   <button

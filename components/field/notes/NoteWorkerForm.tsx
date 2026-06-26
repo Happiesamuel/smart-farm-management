@@ -11,9 +11,8 @@ import { notesSchema } from "@/lib/schemas";
 import { FaRegSave } from "react-icons/fa";
 import NoteInput, { NoteSelect, NoteText } from "./NoteField";
 import { useApp } from "@/stores/useAppStore";
-import { useParams, useRouter } from "next/navigation";
-import { useGetFarm } from "@/hooks/farms/useFarm";
-import { useGetFarmFields } from "@/hooks/fields/useFields";
+import { useAssignedFarms } from "@/hooks/farms/useFarm";
+import { useGetFields } from "@/hooks/fields/useFields";
 import { FormLoader, NoResult } from "@/components/loader/GeneralLoader";
 import { useUpdateDoc } from "@/hooks/useUpdate";
 import { useCreateNote } from "@/hooks/notes/useNotes";
@@ -24,7 +23,7 @@ import { GrFlag } from "react-icons/gr";
 import { safeUpdateLastSeen } from "@/hooks/useLastSeen";
 import { toast } from "sonner";
 
-export default function CreateNoteFetch({
+export default function CreateNoteWorkerFetch({
   onClose,
   def,
 }: {
@@ -32,17 +31,17 @@ export default function CreateNoteFetch({
   def?: { [key: string]: string };
 }) {
   const { workspace, user, ready } = useApp();
-  const { farmId: x, fieldId: y } = useParams();
-  const { farms, status, error } = useGetFarm(
-    workspace?.id ?? null,
-    user?.id ?? null,
-  );
+  const {
+    data: farms,
+    status: assStat,
+    error: assErr,
+  } = useAssignedFarms(workspace?.id ?? null, user?.id ?? null);
 
   const {
     error: fieldErr,
     fields,
     status: fieldStat,
-  } = useGetFarmFields(workspace?.id ?? null, user?.id ?? null, x as string);
+  } = useGetFields(workspace?.id ?? null, user?.id ?? null);
 
   if (!ready)
     return (
@@ -51,22 +50,20 @@ export default function CreateNoteFetch({
       </div>
     );
   if (!user && ready) return <p>error</p>;
-  const isLoading = fieldStat === "pending";
+  const isLoading = fieldStat === "pending" || assStat === "pending";
   if (status === "pending" || isLoading)
     return (
       <div className="h-100">
         <FormLoader>Loading form...</FormLoader>
       </div>
     );
-  const errMssg = fieldErr?.message || error?.message;
+  const errMssg = fieldErr?.message || assErr?.message;
   if (errMssg)
     return (
       <div className="h-100">
         <NoResult>{errMssg}</NoResult>;
       </div>
     );
-  const farmId = farms?.find((y) => y.$id === x)?.$id ?? undefined;
-  const fieldId = fields?.find((x) => x.$id === y)?.$id ?? undefined;
   const farmOptions =
     farms?.map((f) => ({
       name: f.farmName,
@@ -79,8 +76,6 @@ export default function CreateNoteFetch({
       userId={user!.id}
       farms={farmOptions}
       field={fields}
-      farmId={farmId as string}
-      fieldId={fieldId as string}
       onClose={onClose}
       def={def}
     />
@@ -93,14 +88,10 @@ export function NoteForm({
   farms,
   field,
   def,
-  farmId,
   onClose,
-  fieldId,
 }: {
   workspaceId: string;
   userId: string;
-  farmId: string;
-  fieldId: string;
   farms: { name: string; value: string }[];
   field: { [key: string]: string }[] | undefined;
   onClose?(): void;
@@ -109,22 +100,18 @@ export function NoteForm({
   const defaultValue = def?.$id
     ? {
         title: def?.title ?? "",
-        farm: farmId ?? def.farms ?? "",
+        farm: def.farms ?? "",
         description: def?.description ?? "",
-        field: fieldId ?? def?.fields ?? "",
+        field: def?.fields ?? "",
         priority: (def?.priority as string).toLowerCase() ?? "",
         type: (def?.type as string).toLowerCase() ?? "",
       }
-    : {
-        farm: farmId ? farmId : "",
-        field: fieldId ? fieldId : "",
-      };
+    : {};
   const form = useForm<z.infer<typeof notesSchema>>({
     resolver: zodResolver(notesSchema),
     defaultValues: defaultValue as unknown as z.infer<typeof notesSchema>,
   });
   const { update, status: upStat } = useUpdateDoc();
-  const { farmId: id, fieldId: fId } = useParams();
   const { createNote, status } = useCreateNote();
   async function onSubmit(values: z.infer<typeof notesSchema>) {
     const { farm, field, ...val } = values;
@@ -180,12 +167,13 @@ export function NoteForm({
     }
   }
 
+  const watchedFarmId = form.watch("farm");
+  const filteredFields = field?.filter((f) => f.farms === watchedFarmId) ?? [];
   const fields =
-    field?.map((f) => ({
+    filteredFields?.map((f) => ({
       name: f.fieldName,
       value: f.$id,
     })) ?? [];
-
   const priority = [
     {
       name: "High",
@@ -251,33 +239,25 @@ export function NoteForm({
               control={form.control}
               label="Select Farm"
               placeholder={
-                farmId
-                  ? (farms.find((x) => x.value === farmId)?.name ?? "")
-                  : def?.$id
-                    ? (farms.find((x) => x.value === def.farms)?.name ?? "")
-                    : "Select farm"
+                def?.$id
+                  ? (farms.find((x) => x.value === def.farms)?.name ?? "")
+                  : "Select farm"
               }
-              array={farmId || id ? [] : farms}
+              array={farms}
               Icon={PiFarm}
-              disabled={farmId ? true : false}
             />
             <NoteSelect
               name="field"
               control={form.control}
               label="Select Field"
               placeholder={
-                fieldId
-                  ? (fields.find((x) => x.value === fieldId)?.name ?? "")
-                  : def?.$id
-                    ? ((fields.find((x) => x.value === def.fields)?.name ??
-                        "Select Field") as string)
-                    : "Select field"
+                def?.$id
+                  ? ((fields.find((x) => x.value === def.fields)?.name ??
+                      "Select Field") as string)
+                  : "Select field"
               }
-              array={
-                fieldId || fId ? [] : (fields as { [key: string]: string }[])
-              }
+              array={fields as { [key: string]: string }[]}
               Icon={IoMdGrid}
-              disabled={fieldId ? true : false}
             />
           </div>
           <div className="flex gap-4 md:gap-6 items-center flex-col md:flex-row justify-between">

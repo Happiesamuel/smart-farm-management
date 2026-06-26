@@ -4,6 +4,7 @@ import { getFarmFinanceStats } from "@/servers/analytics";
 import { createDoc, getDocs } from "@/servers/crud-actions";
 import {
   getAllFarmStats,
+  getAssignedFarms,
   getFarmsWithStats,
   getSingleFarmDocs,
 } from "@/servers/farm-actions";
@@ -132,6 +133,21 @@ export const useGetFarmFinanceStats = (
         userId: userId as string,
       }),
     enabled: !!workspaceId && !!farmId && !!userId,
+  });
+  return { data, status, error };
+};
+export const useAssignedFarms = (
+  workspaceId: string | null,
+  userId: string | null,
+) => {
+  const { data, status, error } = useQuery({
+    queryKey: ["farms", workspaceId, userId],
+    queryFn: () =>
+      getAssignedFarms({
+        workspaceId: workspaceId!,
+        userId: userId!,
+      }),
+    enabled: !!workspaceId && !!userId,
   });
   return { data, status, error };
 };

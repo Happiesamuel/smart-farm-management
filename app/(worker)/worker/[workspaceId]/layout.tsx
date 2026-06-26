@@ -5,6 +5,7 @@ import App from "@/App";
 import SidebarCollasibleProvider from "@/context/SidebarCollasibleContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import LayoutApp from "@/LayoutApp";
+import { Toaster } from "sonner";
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -17,6 +18,7 @@ export default function RootLayout({
         <SidebarCollasibleProvider>
           <TooltipProvider>
             <App>{children}</App>
+            <Toaster position="top-center" />
           </TooltipProvider>
         </SidebarCollasibleProvider>
       </LayoutApp>
