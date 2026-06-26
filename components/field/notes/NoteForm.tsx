@@ -108,7 +108,7 @@ export function NoteForm({
   onClose?(): void;
   def?: { [key: string]: string };
 }) {
-  const defaultValue = def?.id
+  const defaultValue = def?.$id
     ? {
         title: def?.title ?? "",
         farm: farmId ?? def.farmId ?? "",
@@ -142,32 +142,30 @@ export function NoteForm({
       },
     };
     safeUpdateLastSeen(userId);
-    if (def?.id) {
-      // const o = obj.data;
-      // const newO = { ...o, dueDate: format(o.dueDate, "PPP") };
-      // update(
-      //   {
-      //     collection: "tasks",
-      //     id: def.id as string,
-      //     data: newO,
-      //     workspaceId: workspaceId,
-      //     userId: userId,
-      //   },
-      //   {
-      //     onSuccess: () => {
-      //       toast("Task updated successfully", {
-      //         description: "You've updated your task",
-      //       });
-      //       onClose?.();
-      //     },
-      //     onError: (err) =>
-      //       toast("Error updating task", {
-      //         description: err.message,
-      //         duration: 4000,
-      //         closeButton: true,
-      //       }),
-      //   },
-      // );
+    if (def?.$id) {
+      update(
+        {
+          collection: "notes",
+          id: def.$id as string,
+          data: obj.data,
+          workspaceId: workspaceId,
+          userId: userId,
+        },
+        {
+          onSuccess: () => {
+            toast("Note updated successfully", {
+              description: "You've updated your note",
+            });
+            onClose?.();
+          },
+          onError: (err) =>
+            toast("Error updating note", {
+              description: err.message,
+              duration: 4000,
+              closeButton: true,
+            }),
+        },
+      );
     } else {
       createNote(obj, {
         onSuccess: () => {
@@ -259,7 +257,7 @@ export function NoteForm({
               placeholder={
                 farmId
                   ? (farms.find((x) => x.value === farmId)?.name ?? "")
-                  : def?.id
+                  : def?.$id
                     ? (farms.find((x) => x.value === def.farmId)?.name ?? "")
                     : "Select farm"
               }
@@ -274,7 +272,7 @@ export function NoteForm({
               placeholder={
                 fieldId
                   ? (fields.find((x) => x.value === fieldId)?.name ?? "")
-                  : def?.id
+                  : def?.$id
                     ? ((fields.find((x) => x.value === def.fieldId)?.name ??
                         "Select Field") as string)
                     : "Select field"
@@ -290,7 +288,7 @@ export function NoteForm({
               control={form.control}
               label="Priority"
               placeholder={
-                def?.id
+                def?.$id
                   ? ((priority.find(
                       (x) => x.value === (def.priority as string).toLowerCase(),
                     )?.name ?? "Select priority") as string)
@@ -304,7 +302,7 @@ export function NoteForm({
               control={form.control}
               label="Type"
               placeholder={
-                def?.id
+                def?.$id
                   ? ((type.find(
                       (x) => x.value === (def.type as string).toLowerCase(),
                     )?.name ?? "Select Type") as string)
@@ -345,11 +343,11 @@ export function NoteForm({
               {status === "pending" || upStat === "pending" ? (
                 <>
                   <ButtonLoader />
-                  {def?.id ? "Updating..." : "Creating..."}
+                  {def?.$id ? "Updating..." : "Creating..."}
                 </>
               ) : (
                 <div className="flex items-center gap-2">
-                  <FaRegSave /> {def?.id ? "Update Note" : "Save Note"}
+                  <FaRegSave /> {def?.$id ? "Update Note" : "Save Note"}
                 </div>
               )}
             </Button>
