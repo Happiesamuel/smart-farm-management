@@ -60,7 +60,7 @@ export default function TaskIdHeader({
         id: task.id,
         workspaceId: workspace.id,
         userId: user.id,
-        data: { status: val },
+        data: { status: val } as Partial<TaskInfo>,
       },
       {
         onSuccess: () => {

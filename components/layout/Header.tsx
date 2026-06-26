@@ -15,6 +15,7 @@ import { GoTasklist } from "react-icons/go";
 import { FiActivity } from "react-icons/fi";
 import { DashboardSheet, WorkerDashboardSheet } from "./DashboardSheet";
 import { useApp } from "@/stores/useAppStore";
+import { LuNotepadText } from "react-icons/lu";
 
 export default function Header() {
   const links = [
@@ -78,6 +79,12 @@ export default function Header() {
       base: "worker",
       slug: "tasks",
       svg: <GoTasklist className="text-lg text-dark" />,
+    },
+    {
+      name: "Notes",
+      slug: "notes",
+      base: "worker",
+      svg: <LuNotepadText className="text-lg text-dark" />,
     },
     {
       name: "Activity Log",

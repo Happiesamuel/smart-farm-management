@@ -109,7 +109,7 @@ export const createActivity = async ({
 }: {
   workspaceId: string;
   farmId?: string | null;
-  userId: string;
+  userId: string | null;
   entityType: string;
   entityId: string;
   action: string;
@@ -388,7 +388,17 @@ export const updateDoc = async ({
 }: {
   collection: string;
   id: string;
-  data: Record<string, string>;
+  data: Omit<
+    | CropInfo
+    | FieldInfo
+    | HarvestInfo
+    | TaskInfo
+    | SalesInfo
+    | ExpenseInfo
+    | FarmInfo
+    | NoteInfo,
+    "id" | "workspaces" | "users"
+  >;
   workspaceId: string;
   userId: string;
 }) => {
@@ -410,13 +420,14 @@ export const updateDoc = async ({
   );
   const user = await getGuestByGuestId(userId);
   if (
+    "assignTo" in data &&
     collection === "tasks" &&
     data.assignTo &&
     data.assignTo !== prev.assignTo
   ) {
     await createActivity({
       workspaceId,
-      userId: data.assignTo,
+      userId: data.assignTo as string,
       farmId: prev.farms,
       entityType: "tasks",
       entityId: id,

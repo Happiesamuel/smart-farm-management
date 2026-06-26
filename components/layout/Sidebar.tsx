@@ -16,6 +16,7 @@ import { GrMoney } from "react-icons/gr";
 import { GoTasklist } from "react-icons/go";
 import { Plus } from "lucide-react";
 import { useApp } from "@/stores/useAppStore";
+import { LuNotepadText } from "react-icons/lu";
 export function ManagerSidebar() {
   const pathname = usePathname();
   const { workspaceId } = useParams();
@@ -320,6 +321,11 @@ export function WorkerSidebar() {
           icon: GoTasklist,
         },
         {
+          name: "Notes",
+          slug: "notes",
+          icon: LuNotepadText,
+        },
+        {
           name: "Activity Log",
           slug: "activity",
           icon: FiActivity,
@@ -349,9 +355,9 @@ export function WorkerSidebar() {
       icon: GoTasklist,
     },
     {
-      name: "Activity Log",
-      slug: "activity",
-      icon: FiActivity,
+      name: "Notes",
+      slug: "notes",
+      icon: LuNotepadText,
     },
     {
       name: "Settings",
