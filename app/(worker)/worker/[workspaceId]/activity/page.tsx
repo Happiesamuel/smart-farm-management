@@ -8,7 +8,7 @@ export default function Page() {
         <div className=" space-y-1">
           <h6 className="text-dark font-semibold  text-2xl">Activity Log</h6>
           <p className="text-dark/80 text-sm">
-            Track all activities and actions on your farm.
+            Track all activities and actions.
           </p>
         </div>
       </div>

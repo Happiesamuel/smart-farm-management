@@ -47,7 +47,9 @@ const resolveFarmId = (collection: string, data: { [key: string]: string }) => {
       return data.farms;
 
     case "tasks":
-      return data.farms || null; // if you store it
+      return data.farms || null;
+    case "notes":
+      return data.farms || null;
 
     case "harvests":
       return data.farms; // or derive from crop if needed

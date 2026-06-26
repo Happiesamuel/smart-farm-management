@@ -1,7 +1,6 @@
 "use client";
 import { NoteInfo } from "@/lib/types";
 import { createDoc, getDocs, getFarmDocs } from "@/servers/crud-actions";
-import { getSingleTaskDocs } from "@/servers/task-actions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateNote = () => {

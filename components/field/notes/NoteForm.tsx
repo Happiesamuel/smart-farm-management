@@ -277,7 +277,9 @@ export function NoteForm({
                         "Select Field") as string)
                     : "Select field"
               }
-              array={fields as { [key: string]: string }[]}
+              array={
+                fieldId || fId ? [] : (fields as { [key: string]: string }[])
+              }
               Icon={IoMdGrid}
               disabled={fieldId ? true : false}
             />

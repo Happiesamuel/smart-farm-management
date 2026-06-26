@@ -506,6 +506,8 @@ export const buildActivityMessage = (
   switch (collection) {
     case "tasks":
       return `Task "${data.taskTitle}" created`;
+    case "notes":
+      return `Notes "${data.title}" created`;
 
     case "fields":
       return `Field "${data.fieldName}" added`;
@@ -585,6 +587,7 @@ export const buildUpdateMessage = ({
     prev.fieldName ||
     prev.farmName ||
     prev.name ||
+    prev.title ||
     "item";
 
   // 🎯 SPECIAL CASES (optional but powerful)
@@ -622,6 +625,7 @@ export const buildDeleteMessage = (
     prev.cropName ||
     prev.farmName ||
     prev.name ||
+    prev.title ||
     "item";
 
   return `${name} deleted ${collection.slice(0, -1)} "${label}"`;
