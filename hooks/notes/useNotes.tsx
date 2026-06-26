@@ -1,6 +1,7 @@
 "use client";
 import { NoteInfo } from "@/lib/types";
 import { createDoc, getDocs, getFarmDocs } from "@/servers/crud-actions";
+import { getWorkerNotes } from "@/servers/task-actions";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateNote = () => {
@@ -64,6 +65,25 @@ export const useGetNotes = (
         collection: "notes",
         workspaceId: workspaceId as string,
         userId: userId as string,
+      }),
+    enabled: !!workspaceId && !!userId,
+  });
+  return { notes, error, status };
+};
+export const useWorkerNotes = (
+  workspaceId: string | null,
+  userId: string | null,
+) => {
+  const {
+    data: notes,
+    status,
+    error,
+  } = useQuery({
+    queryKey: ["notes", workspaceId, userId],
+    queryFn: () =>
+      getWorkerNotes({
+        workspaceId: workspaceId!,
+        userId: userId!,
       }),
     enabled: !!workspaceId && !!userId,
   });

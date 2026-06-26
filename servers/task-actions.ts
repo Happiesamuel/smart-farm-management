@@ -41,3 +41,51 @@ export const getSingleTaskDocs = async ({
     updatedAt: d.$updatedAt,
   };
 };
+
+export const getWorkerNotes = async ({
+  workspaceId,
+  userId,
+}: {
+  workspaceId: string;
+  userId: string;
+}) => {
+  await validateWorkspaceAccess({ workspaceId, userId });
+
+  const { database } = await createAdminClient();
+
+  // Get worker tasks
+  const taskDocs = await database.listDocuments(
+    appwriteConfig.databaseId,
+    "tasks",
+    [Query.equal("workspaces", workspaceId), Query.equal("assignTo", userId)],
+  );
+
+  const fieldIds = [...new Set(taskDocs.documents.map((t) => t.fields))];
+
+  if (!fieldIds.length) return [];
+
+  const noteDocs = await database.listDocuments(
+    appwriteConfig.databaseId,
+    "notes",
+    [
+      Query.equal("workspaces", workspaceId),
+      Query.equal("fields", fieldIds),
+      Query.orderDesc("$createdAt"),
+    ],
+  );
+
+  return noteDocs.documents.map((n) => {
+    return {
+      title: n.title,
+      farms: n.farms,
+      fields: n.fields,
+      priority: n.priority,
+      description: n.description,
+      type: n.type,
+      $id: n.$id,
+      workspaces: n.workspaces,
+      users: n.users,
+      $createdAt: n.$createdAt,
+    };
+  });
+};
