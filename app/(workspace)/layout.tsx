@@ -5,6 +5,7 @@ import LayoutApp from "@/LayoutApp";
 import NextTopLoader from "nextjs-toploader";
 
 import AuthLayoutImage from "@/components/auth/AuthLayoutImage";
+import { Toaster } from "sonner";
 const geistSans = Geist({
   subsets: ["latin"],
   display: "swap",
@@ -59,6 +60,7 @@ export default function RootLayout({
             {children}
           </div>
         </LayoutApp>
+           <Toaster position="top-center" />
       </body>
     </html>
   );

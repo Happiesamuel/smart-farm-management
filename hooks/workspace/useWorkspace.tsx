@@ -9,6 +9,7 @@ import {
   removeWorkspaceMember,
   updateWorkspaceMemberRole,
 } from "@/servers/workspace-action";
+import { useApp } from "@/stores/useAppStore";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useCreateWorkspace() {
@@ -101,13 +102,19 @@ export function useCreateWorkspaceMember() {
 
 export const useRemoveWorkspaceMember = () => {
   const queryClient = useQueryClient();
-
+const {user,workspace} = useApp()
   const { mutate: remove, status } = useMutation({
     mutationFn: (id: string) => removeWorkspaceMember(id),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["workspaceMembers"],
+      });
+      queryClient.invalidateQueries({
+ queryKey: ["workspaceMembers", workspace?.id],
+      });
+      queryClient.invalidateQueries({
+         queryKey: ["workspace",user?.id],
       });
     },
   });

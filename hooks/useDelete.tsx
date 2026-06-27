@@ -18,6 +18,9 @@ export const useDeleteDoc = () => {
       queryClient.invalidateQueries({
         queryKey: [variables.collection, variables.workspaceId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["workspace", variables.userId],
+      });
 
       // 🔥 invalidate related finance (important for your app)
       queryClient.invalidateQueries({

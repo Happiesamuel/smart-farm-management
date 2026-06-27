@@ -131,13 +131,12 @@ export const getUserWorkspacesWithRole = async ({
 }) => {
   const { database } = await createAdminClient();
 
-  // 🔥 FILTER BY ROLE HERE
   const memberships = await database.listDocuments(
     appwriteConfig.databaseId,
     appwriteConfig.workspaceMembersCollectionId,
     [
       Query.equal("users", userId),
-      Query.equal("role", role), // ✅ KEY LINE
+      Query.equal("role", role),
     ],
   );
 
@@ -151,15 +150,26 @@ export const getUserWorkspacesWithRole = async ({
     [Query.equal("$id", workspaceIds)],
   );
 
-  return documents.map((doc) => ({
-    id: doc.$id,
-    name: doc.name,
-    users: doc.user,
-    workspaceId: doc.workspaceId,
-    inviteCode: doc.inviteCode,
-    createdAt: doc.$createdAt,
-    role, // ✅ already known, no need to find again
-  }));
+  // Map workspaceId -> membership
+  const membershipMap = new Map(
+    memberships.documents.map((m) => [m.workspaces, m])
+  );
+
+  return documents.map((doc) => {
+    const member = membershipMap.get(doc.$id);
+
+    return {
+      id: doc.$id,
+      name: doc.name,
+      users: doc.user,
+      workspaceId: doc.workspaceId,
+      inviteCode: doc.inviteCode,
+      createdAt: doc.$createdAt,
+      role,
+
+      memberId: member?.$id,
+    };
+  });
 };
 // export const getUserWorkspacesWithRole = async ({
 //   userId,
@@ -291,7 +301,6 @@ export const updateLastSeen = async (userId: string) => {
 
 export const removeWorkspaceMember = async (memberId: string) => {
   const { database } = await createAdminClient();
-  console.log(memberId, "sss");
   await database.deleteDocument(
     appwriteConfig.databaseId,
     appwriteConfig.workspaceMembersCollectionId,

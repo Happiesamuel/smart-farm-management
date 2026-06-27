@@ -37,6 +37,7 @@ export interface WorkerWorspace {
   workspaceId: string;
   inviteCode: string;
   createdAt: string;
+  memberId:string;
 }
 
 export interface WorkspaceMemberObj {

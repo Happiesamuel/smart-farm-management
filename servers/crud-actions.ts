@@ -542,7 +542,7 @@ export const deleteDoc = async ({
   // ✅ 2. DELETE
   await database.deleteDocument(appwriteConfig.databaseId, collection, id);
   const user = await getGuestByGuestId(userId);
-  // ✅ 3. ACTIVITY LOG
+if( collection !== 'workspaces')
   await createActivity({
     workspaceId,
     userId,
