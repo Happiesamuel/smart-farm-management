@@ -13,15 +13,26 @@ import WorkspaceField from "./WorkspaceField";
 import { RiUserCommunityLine } from "react-icons/ri";
 import { toast } from "sonner";
 import ButtonLoader from "../layout/ButtonLoader";
-import { useCreateWorkspace } from "@/hooks/workspace/useWorkspace";
+import { useCreateWorkspace, useUpdateWorkspace } from "@/hooks/workspace/useWorkspace";
 import { createWorkspaceMember } from "@/servers/auth-actions";
+import { WorkspaceObjId } from "@/lib/types";
+import { useUpdateDoc } from "@/hooks/useUpdate";
 
-export function WorkspaceForm({ id }: { id: string }) {
+export function WorkspaceForm({ id,work,onClose }: { id: string ,onClose?:()=>void,work?:WorkspaceObjId}) {
   const { create, status, error } = useCreateWorkspace();
   const pathname = usePathname();
   const router = useRouter();
+const { update, status:upStat } = useUpdateWorkspace();
+
+
+
+  const def = work ? {
+name:work.name,workspaceId:work.workspaceId
+  } : {name:'',workspaceId:''}
+
   const form = useForm<z.infer<typeof workspaceFormSchema>>({
     resolver: zodResolver(workspaceFormSchema),
+    defaultValues: def
   });
 
   const push =
@@ -40,7 +51,34 @@ export function WorkspaceForm({ id }: { id: string }) {
         inviteCode: nanoid(6),
         users: id,
       };
+    if (work?.id) {
+  update(
+  {
+    workspaceId: work.id,
+    userId: id,
+    data: {
+      name: values.name,
+      workspaceId: values.workspaceId,
+    },
+  },
+  {
+    onSuccess: () => {
+      toast("Workspace updated successfully", {
+        description: "Your workspace has been updated.",
+      });
 
+      onClose?.();
+    },
+
+    onError: (err) =>
+      toast("Error updating workspace", {
+        description: err.message,
+      }),
+  },
+);
+
+   
+    } else {
       create(
         { obj: newObj, slug: values.workspaceId },
         {
@@ -69,7 +107,7 @@ export function WorkspaceForm({ id }: { id: string }) {
               closeButton: true,
             }),
         },
-      );
+      )}
     } catch (error) {
       toast("Error creating workspace", {
         description: (error as Error).message,
@@ -104,16 +142,18 @@ export function WorkspaceForm({ id }: { id: string }) {
 
         <Button
           type="submit"
-          disabled={status === "pending"}
+          disabled={status === "pending" || upStat === 'pending'}
           className="disabled:opacity-70 text-white transition-all duration-200 bg-primary-green h-10 rounded-md w-full cursor-pointer border-none flex items-center justify-center gap-2"
         >
-          {status === "pending" ? (
+       {status === "pending" || upStat === 'pending' ? (
             <>
               <ButtonLoader />
-              Creating...
+              {work ?'Updating...' :'Creating...'}
             </>
           ) : (
-            "Create Wokspace"
+            <>
+            {work? 'Update Workspace':"Create Wokspace"}
+            </>
           )}
         </Button>
       </form>

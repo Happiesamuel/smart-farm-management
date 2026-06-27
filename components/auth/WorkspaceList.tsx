@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { X } from "lucide-react";
 import {
   useGetWorkspace,
   useGetWorkspaceMembersWithWorkspaceId,
@@ -19,6 +19,9 @@ import { LuPencil, LuTrash2 } from "react-icons/lu";
 import { toast } from "sonner";
 import { useDeleteDoc } from "@/hooks/useDelete";
 import { DeleteWorkspaceModal, ValidationDeleteWorkspaceModal } from "../layout/Modals";
+import { FinanceModal } from "../modals/FinanceModal";
+import { WorkspaceForm } from "./WorkpaceForm";
+import { RiFileList3Line } from "react-icons/ri";
 export default function WorkspaceList({ user }: { user: UserObjId }) {
   const [active, setActive] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -216,25 +219,63 @@ function WorkItem({
         </Button>
       </div>
 
-      <div className="w-[2%]">
-        <TableActions
-          actions={[
-            {
-              type: "callback",
-              label: "Edit",
-              icon: <LuPencil className="text-sm" />,
-              onClick: () => setOpen(true),
-            },
-            {
-              type: "callback",
-              label: "Delete",
-              icon: <LuTrash2 className="text-sm" />,
-              variant: "danger",
-              onClick: () => onDelete(work.id), // 👈 just signal parent
-            },
-          ]}
-        />
+<div className="w-[2%]" onClick={(e) => e.stopPropagation()}> 
+  <TableActions
+    actions={[
+      {
+        type: "callback",
+        label: "Edit",
+        icon: <LuPencil className="text-sm" />,
+        onClick: () => setOpen(true),
+      },
+      {
+        type: "callback",
+        label: "Delete",
+        icon: <LuTrash2 className="text-sm" />,
+        variant: "danger",
+        onClick: () => onDelete(work.id),
+      },
+    ]}
+  />
+
+
+
+{open && (
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+    onClick={() => setOpen(false)} // 👈 click outside to close
+  >
+    <div
+      className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+      onClick={(e) => e.stopPropagation()} // 👈 prevent close when clicking inside
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 pt-5 pb-2 border-b border-border">
+        <div className="flex items-center gap-3">
+          <div className="size-9 rounded-full bg-green-100 text-green-500 flex items-center justify-center">
+            <RiFileList3Line className="text-lg" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-dark">Edit Workspace</h2>
+            <p className="text-xs text-zinc-500">Edit this workspace</p>
+          </div>
+        </div>
+        <button
+          onClick={() => setOpen(false)}
+          className="p-1.5 rounded-full hover:bg-zinc-100 transition cursor-pointer"
+        >
+          <X className="w-4 h-4 text-zinc-500" />
+        </button>
       </div>
+
+      {/* Content */}
+      <div className="px-5 pb-5 pt-2">
+        <WorkspaceForm work={work} id={userId} onClose={() => setOpen(false)} />
+      </div>
+    </div>
+  </div>
+)}
+</div>
     </div>
   );
 }

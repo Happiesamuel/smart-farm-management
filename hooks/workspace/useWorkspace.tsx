@@ -1,6 +1,7 @@
 "use client";
 import { WorkspaceMemberObj, WorkspaceObj } from "@/lib/types";
 import { createWorkspace, createWorkspaceMember } from "@/servers/auth-actions";
+import { updateWorkspace } from "@/servers/crud-actions";
 import {
   getUserWorkspacesWithRole,
   getWorkspace,
@@ -140,4 +141,30 @@ export const useUpdateMemberRole = () => {
     },
   });
   return { update, status };
+};
+
+
+
+export const useUpdateWorkspace = () => {
+  const queryClient = useQueryClient();
+  const { mutate: update, status } = useMutation({
+    mutationFn: updateWorkspace,
+
+    onSuccess: (_,vars) => {
+          queryClient.invalidateQueries({
+        queryKey: ["workspaceMembers"],
+      });
+      queryClient.invalidateQueries({
+ queryKey: ["workspaceMembers", vars.workspaceId],
+      });
+      queryClient.invalidateQueries({
+         queryKey: ["workspace",vars.userId],
+      });
+    },
+  });
+
+  return {
+    update,
+    status,
+  };
 };

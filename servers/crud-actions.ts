@@ -379,6 +379,69 @@ export const getDocs = async ({
 //   return true;
 // };
 
+
+export const updateWorkspace = async ({
+  workspaceId,
+  userId,
+  data,
+}: {
+  workspaceId: string;
+  userId: string;
+  data: {
+    name?: string;
+    workspaceId?: string;
+  };
+}) => {
+  const { database } = await createAdminClient();
+
+  // Verify ownership
+  const workspace = await database.getDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.workspaceCollectionId,
+    workspaceId,
+  );
+
+  if (workspace.users !== userId) {
+    throw new Error("Only the workspace owner can update this workspace.");
+  }
+
+  // Optional: ensure workspace slug is unique
+  if (data.workspaceId) {
+    const existing = await database.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.workspaceCollectionId,
+      [Query.equal("workspaceId", data.workspaceId)]
+    );
+
+    const duplicate = existing.documents.find(
+      (doc) => doc.$id !== workspaceId
+    );
+
+    if (duplicate) {
+      throw new Error("Workspace ID already exists.");
+    }
+  }
+
+  const updated = await database.updateDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.workspaceCollectionId,
+    workspaceId,
+    data,
+  );
+
+  await createActivity({
+    workspaceId,
+    userId,
+    entityType: "workspace",
+    entityId: workspaceId,
+    action: "updated",
+    message: `Workspace "${updated.name}" was updated.`,
+  });
+
+  return true
+
+};
+
 export const updateDoc = async ({
   collection,
   id,
