@@ -64,7 +64,7 @@ export const useGetHarvest = (
       });
       if (!result.success) throw new Error(result.error);
       return result.data;
-    },
+    }, enabled: !!workspaceId && !!userId,
     staleTime: HARVESTS_STALE_TIME,
   });
 

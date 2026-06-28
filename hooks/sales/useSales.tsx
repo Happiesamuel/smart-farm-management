@@ -66,6 +66,7 @@ export const useGetSales = (
       if (!result.success) throw new Error(result.error);
       return result.data;
     },
+     enabled: !!workspaceId && !!userId,
     staleTime: SALES_STALE_TIME,
   });
 

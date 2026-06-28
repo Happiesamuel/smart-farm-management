@@ -105,7 +105,13 @@ export default function Dashboard() {
     taskErr?.message ||
     saleErr?.message ||
     expErr?.message;
-
+console.log(error?.message ,'sam',
+    fieldErr?.message ,'mic',
+    harvestErr?.message ,
+    farmErr?.message ,
+    taskErr?.message ,
+    saleErr?.message ,
+    expErr?.message)
   if (errorMessage)
     return (
       <div className="h-[92vh]">
