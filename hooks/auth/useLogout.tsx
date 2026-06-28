@@ -1,3 +1,4 @@
+// logout-hook.ts
 "use client";
 import { logout } from "@/servers/auth-actions";
 import { useApp } from "@/stores/useAppStore";
@@ -6,20 +7,25 @@ import { toast } from "sonner";
 
 export function useLogout() {
   const { clearAll } = useApp();
+
   const { mutate: logoutUser, status } = useMutation({
-    mutationFn: async () => await logout(),
+    mutationFn: async () => {
+      const result = await logout();
+      if (!result.success) throw new Error(result.error);
+      return result;
+    },
     onSuccess: () => {
+      clearAll();
       window.location.href = "/";
       toast("Logged out successfully", {
-        description: "You can continue with your new password",
+        description: "You have been logged out.",
       });
-      clearAll();
     },
     onError: (err) => {
+      clearAll();
       toast("Logout Failed", {
         description: err.message || "Failed to logout",
       });
-      clearAll();
     },
   });
 

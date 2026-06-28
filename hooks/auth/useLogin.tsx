@@ -7,7 +7,6 @@ export function useLogin() {
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
       const result = await login(email, password);
 
-      // Throw here (client-side) so onError still fires normally
       if (!result.success) throw new Error(result.error);
 
    return result.data;

@@ -16,30 +16,38 @@ export const getSingleTaskDocs = async ({
   userId: string;
   taskId: string;
 }) => {
-  await validateWorkspaceAccess({ userId, workspaceId });
-  const { database } = await createAdminClient();
-  const res = await database.listDocuments(
-    appwriteConfig.databaseId,
-    collection,
-    [Query.equal("workspaces", workspaceId), Query.equal("$id", taskId)],
-  );
-  const d = res.documents.at(0);
-  if (!d?.$id) throw new Error("Task not found!");
-  return {
-    taskTitle: d.taskTitle,
-    farms: d.farms,
-    fields: d.fields,
-    priority: d.priority,
-    assignTo: d.assignTo,
-    description: d.description,
-    status: d.status,
-    dueDate: d.dueDate,
-    id: d.$id,
-    workspaces: d.workspaces,
-    users: d.users,
-    createdAt: d.$createdAt,
-    updatedAt: d.$updatedAt,
-  };
+  try {
+    await validateWorkspaceAccess({ userId, workspaceId });
+    const { database } = await createAdminClient();
+    const res = await database.listDocuments(
+      appwriteConfig.databaseId,
+      collection,
+      [Query.equal("workspaces", workspaceId), Query.equal("$id", taskId)],
+    );
+    const d = res.documents.at(0);
+    if (!d?.$id) throw new Error("Task not found!");
+
+    return {
+      success: true,
+      data: {
+        taskTitle: d.taskTitle,
+        farms: d.farms,
+        fields: d.fields,
+        priority: d.priority,
+        assignTo: d.assignTo,
+        description: d.description,
+        status: d.status,
+        dueDate: d.dueDate,
+        id: d.$id,
+        workspaces: d.workspaces,
+        users: d.users,
+        createdAt: d.$createdAt,
+        updatedAt: d.$updatedAt,
+      },
+    };
+  } catch (err: any) {
+    return { success: false, error: err?.message ?? "Unknown error" };
+  }
 };
 
 export const getWorkerNotes = async ({
@@ -49,45 +57,47 @@ export const getWorkerNotes = async ({
   workspaceId: string;
   userId: string;
 }) => {
-  await validateWorkspaceAccess({ workspaceId, userId });
+  try {
+    await validateWorkspaceAccess({ workspaceId, userId });
 
-  const { database } = await createAdminClient();
+    const { database } = await createAdminClient();
 
-  // Get worker tasks
-  const taskDocs = await database.listDocuments(
-    appwriteConfig.databaseId,
-    "tasks",
-    [Query.equal("workspaces", workspaceId), Query.equal("assignTo", userId)],
-  );
+    const taskDocs = await database.listDocuments(
+      appwriteConfig.databaseId,
+      "tasks",
+      [Query.equal("workspaces", workspaceId), Query.equal("assignTo", userId)],
+    );
 
-  const farmIds = [...new Set(taskDocs.documents.map((t) => t.farms))];
-  // const fieldIds = [...new Set(taskDocs.documents.map((t) => t.fields))];
+    const farmIds = [...new Set(taskDocs.documents.map((t) => t.farms))];
 
-  if (!farmIds.length) return [];
+    if (!farmIds.length) return { success: true, data: [] };
 
-  const noteDocs = await database.listDocuments(
-    appwriteConfig.databaseId,
-    "notes",
-    [
-      Query.equal("workspaces", workspaceId),
-      Query.equal("farms", farmIds),
-      // Query.equal("fields", fieldIds),
-      Query.orderDesc("$createdAt"),
-    ],
-  );
+    const noteDocs = await database.listDocuments(
+      appwriteConfig.databaseId,
+      "notes",
+      [
+        Query.equal("workspaces", workspaceId),
+        Query.equal("farms", farmIds),
+        Query.orderDesc("$createdAt"),
+      ],
+    );
 
-  return noteDocs.documents.map((n) => {
     return {
-      title: n.title,
-      farms: n.farms,
-      fields: n.fields,
-      priority: n.priority,
-      description: n.description,
-      type: n.type,
-      $id: n.$id,
-      workspaces: n.workspaces,
-      users: n.users,
-      $createdAt: n.$createdAt,
+      success: true,
+      data: noteDocs.documents.map((n) => ({
+        title: n.title,
+        farms: n.farms,
+        fields: n.fields,
+        priority: n.priority,
+        description: n.description,
+        type: n.type,
+        $id: n.$id,
+        workspaces: n.workspaces,
+        users: n.users,
+        $createdAt: n.$createdAt,
+      })),
     };
-  });
+  } catch (err: any) {
+    return { success: false, error: err?.message ?? "Unknown error" };
+  }
 };

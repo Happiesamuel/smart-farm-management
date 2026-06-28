@@ -8,15 +8,12 @@ import {
 } from "@/servers/user-action";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
+const USER_STALE_TIME = 1000 * 60 * 10; // 10 minutes — user profile rarely changes
+
 export default function useGetSession() {
-  const {
-    data: user,
-    status,
-    error,
-    refetch,
-  } = useQuery({
+  const { data: user, status, error, refetch } = useQuery({
     queryKey: ["user"],
-    queryFn: async () => await getCurrentUser(),
+    queryFn: async () => await getCurrentUser(), // intentionally no { success } wrap — returns null on no session
     retry: false,
   });
 
@@ -26,28 +23,30 @@ export default function useGetSession() {
 export function useGetUser() {
   const { user, status } = useGetSession();
 
-  const {
-    data,
-    status: userStat,
-    error,
-  } = useQuery({
+  const { data, status: userStat, error } = useQuery({
     queryKey: ["guest", user?.id],
-    queryFn: async () => await getGuestById(user!.id),
-    staleTime: 1000 * 60 * 10,
+    queryFn: async () => {
+      const result = await getGuestById(user!.id);
+      if (!result.success) throw new Error(result.error);
+      return result.data;
+    },
+    staleTime: USER_STALE_TIME,
     enabled: status === "success" && !!user?.id,
   });
 
   return { data, userStat, error };
 }
-export function useGetUserWithoutSeeion(userId: string) {
-  const {
-    data,
-    status: userStat,
-    error,
-  } = useQuery({
+
+export function useGetUserWithoutSession(userId: string) {
+  const { data, status: userStat, error } = useQuery({
     queryKey: ["guest", userId],
-    queryFn: async () => await getGuestByGuestId(userId),
+    queryFn: async () => {
+      const result = await getGuestByGuestId(userId);
+      if (!result.success) throw new Error(result.error);
+      return result.data;
+    },
     enabled: !!userId,
+    staleTime: USER_STALE_TIME,
   });
 
   return { data, userStat, error };
@@ -55,8 +54,11 @@ export function useGetUserWithoutSeeion(userId: string) {
 
 export function useGetUserByEmail() {
   const { mutate: getUser, status } = useMutation({
-    mutationFn: async ({ email }: { email: string }) =>
-      await getGuestByEmail(email),
+    mutationFn: async ({ email }: { email: string }) => {
+      const result = await getGuestByEmail(email);
+      if (!result.success) throw new Error(result.error);
+      return result.data;
+    },
   });
 
   return { getUser, status };

@@ -15,7 +15,7 @@ import { useState } from "react";
 import { LuPhone } from "react-icons/lu";
 import { Checkbox } from "../ui/checkbox";
 import ButtonLoader from "../layout/ButtonLoader";
-import { useGetUserWithoutSeeion } from "@/hooks/useGetSession";
+import {useGetUserWithoutSession } from "@/hooks/useGetSession";
 import { useGetWorkspaceByWorkspaceId } from "@/hooks/workspace/useWorkspace";
 import { parseInviteDetails } from "@/lib/constants";
 import GeneralLoader from "../loader/GeneralLoader";
@@ -57,7 +57,7 @@ export function JoinWorkspaceForm({
       const { confirmPassword, ...rest } = values;
 
       // ✅ CHECK FIRST (VERY IMPORTANT)
-      const alreadyJoined = await checkUserInWorkspace({
+      const {data:alreadyJoined }= await checkUserInWorkspace({
         userId: user!.id,
         workspaceId,
       });
@@ -243,7 +243,7 @@ export function JoinWorkspace({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { setRole } = useApp();
   const router = useRouter();
-  const { data, userStat } = useGetUserWithoutSeeion(userId);
+  const { data, userStat } =useGetUserWithoutSession(userId);
   const { workspace, status } = useGetWorkspaceByWorkspaceId(workspaceId);
 
   if (userStat === "pending" || status === "pending") {
@@ -267,10 +267,9 @@ export function JoinWorkspace({
     try {
       if (isSubmitting) return;
       setIsSubmitting(true);
-
       await login(data!.email, data!.password);
 
-      const alreadyJoined = await checkUserInWorkspace({
+      const {data:alreadyJoined }= await checkUserInWorkspace({
         userId: data!.id,
         workspaceId,
       });

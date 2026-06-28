@@ -27,3 +27,6 @@ export const useDashboardStats = (workspaceId: string, userId: string) => {
   });
   return { data, status, error };
 };
+
+
+// One thing to consider — if you want dashboard stats to reflect mutations immediately, you can add queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] }) and ["analytics"] inside your createDoc, updateDoc, and deleteDoc mutation onSuccess callbacks. That way the staleTime guards against unnecessary background refetches, but the data still updates instantly after user actions.

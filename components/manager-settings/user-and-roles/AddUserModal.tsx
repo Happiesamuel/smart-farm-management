@@ -93,11 +93,11 @@ export function AddUserFormModal({
     try {
       setLoad(true);
 
-      const guest = await getGuestByEmail(values.email);
+      const {data:guest} = await getGuestByEmail(values.email);
 
       // ✅ IF USER EXISTS → CHECK MEMBERSHIP FIRST
       if (guest) {
-        const alreadyJoined = await checkUserInWorkspace({
+        const {data:alreadyJoined} = await checkUserInWorkspace({
           userId: guest.id,
           workspaceId: workspace!.id,
         });
@@ -145,19 +145,20 @@ export function AddUserFormModal({
         },
         {
           onSuccess: async (newUser) => {
+         
             try {
               // ✅ CHECK AGAIN AFTER CREATION (SAFETY)
-              const alreadyJoined = await checkUserInWorkspace({
-                userId: newUser.id,
+              const {data:alreadyJoined} = await checkUserInWorkspace({
+                userId: newUser!.id,
                 workspaceId,
               });
 
               if (!alreadyJoined) {
                 await inviteUser(
-                  newUser.email,
-                  newUser.name,
+                  newUser!.email,
+                  newUser!.name,
                   workspace!.name,
-                  `${appwriteConfig.appUrl}/worker/join-workspace/${workspace!.id}/${workspace!.inviteCode}-${newUser.id}-abc`,
+                  `${appwriteConfig.appUrl}/worker/join-workspace/${workspace!.id}/${workspace!.inviteCode}-${newUser!.id}-abc`,
                 );
               }
 

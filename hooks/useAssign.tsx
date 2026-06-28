@@ -6,15 +6,18 @@ import {
 } from "@/servers/workspace-action";
 import { useQuery } from "@tanstack/react-query";
 
+const WORKSPACE_MEMBERS_STALE_TIME = 1000 * 60 * 5; // 5 minutes — members change infrequently
+
 export const useWorkspaceAssignOptions = (workspaceId: string | null) => {
   const { data, status, error } = useQuery({
     queryKey: ["workspace-assign", workspaceId],
     enabled: !!workspaceId,
     queryFn: async () => {
-      if (!workspaceId) return [];
-
-      return await getWorkspaceAssignOptions(workspaceId);
+      const result = await getWorkspaceAssignOptions(workspaceId as string);
+      if (!result.success) throw new Error(result.error);
+      return result.data;
     },
+    staleTime: WORKSPACE_MEMBERS_STALE_TIME,
   });
 
   return {
@@ -23,11 +26,17 @@ export const useWorkspaceAssignOptions = (workspaceId: string | null) => {
     error,
   };
 };
+
 export const useWorkspaceUser = (workspaceId: string | null) => {
   const { data, status, error } = useQuery({
     queryKey: ["workspaceMembers", workspaceId],
     enabled: !!workspaceId,
-    queryFn: async () => await getWorkspaceUser(workspaceId as string),
+    queryFn: async () => {
+      const result = await getWorkspaceUser(workspaceId as string);
+      if (!result.success) throw new Error(result.error);
+      return result.data;
+    },
+    staleTime: WORKSPACE_MEMBERS_STALE_TIME,
   });
 
   return {
@@ -36,6 +45,7 @@ export const useWorkspaceUser = (workspaceId: string | null) => {
     error,
   };
 };
+
 export function buildAssignOptions(
   members: { users: string; role: string }[],
   users: { $id: string; name?: string; email?: string }[],
@@ -44,10 +54,9 @@ export function buildAssignOptions(
 
   return members.map((m) => {
     const user = userMap.get(m.users);
-
     return {
       name: user?.name || user?.email || "Unknown User",
-      value: m.users, // ✅ always userId
+      value: m.users,
       role: m.role,
     };
   });

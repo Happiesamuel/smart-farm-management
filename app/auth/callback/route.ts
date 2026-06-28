@@ -37,7 +37,8 @@ export async function GET(req: Request) {
     const sessionAccount = new Account(sessionClient);
     const user = await sessionAccount.get();
 
-    let guest = await getGuestById(user.$id);
+    const res = await getGuestById(user.$id);
+    let guest = res?.data
 
     if (!guest) {
       const avatarUrl = avatar.getInitials({
@@ -47,7 +48,7 @@ export async function GET(req: Request) {
         background: "2e7d32",
       });
 
-      guest = await createUser({
+      const res = await createUser({
         userId: user.$id,
         email: user.email,
         fullName: user.name,
@@ -57,12 +58,12 @@ export async function GET(req: Request) {
         password: "hs_password",
         lastSeen: new Date().toISOString(),
       });
+      guest = res?.data
     }
-
-    const workspace = await getWorkspace(guest.id);
+    const {data:workspace} = await getWorkspace(guest!.id);
 
     if (!workspace || workspace.length === 0) {
-      cookieStore.set("guestId", guest.id, {
+      cookieStore.set("guestId", guest!.id, {
         httpOnly: false,
         secure: true,
         sameSite: "lax",
