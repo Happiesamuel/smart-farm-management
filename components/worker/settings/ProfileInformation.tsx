@@ -37,8 +37,8 @@ export default function ProfileInformation({ user }: { user: UserObjId }) {
       };
 
       await updateName(values.fullName);
-      const u = await updateUserData(updateObj, user.id);
-      setUser(u);
+      const {data:u} = await updateUserData(updateObj, user.id);
+      setUser(u?u:null);
       toast("Profile updated successfully", {
         description: "Your name has been updated",
       });

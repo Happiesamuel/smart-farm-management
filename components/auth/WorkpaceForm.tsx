@@ -83,7 +83,8 @@ name:work.name,workspaceId:work.workspaceId
         { obj: newObj, slug: values.workspaceId },
         {
           onSuccess: async (data) => {
-            await createWorkspaceMember({
+if(data){
+              await createWorkspaceMember({
               users: id,
               workspaces: data.id,
               role: "owner",
@@ -99,6 +100,7 @@ name:work.name,workspaceId:work.workspaceId
             setTimeout(() => {
               router.push(push);
             }, 100);
+}
           },
           onError: (err) =>
             toast("Error creating workspace", {

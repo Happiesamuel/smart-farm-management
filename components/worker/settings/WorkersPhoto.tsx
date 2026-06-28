@@ -33,10 +33,10 @@ export default function WorkersProfilePhoto({ user }: { user: UserObjId }) {
   const handleRemove = async () => {
     try {
       setLoading(true);
-      const updated = await removeUserAvatar(user.id, user.fullName);
-      setAvatar(updated.avatar);
+      const {data:updated} = await removeUserAvatar(user.id, user.fullName);
+   if(updated)  { setAvatar(updated.avatar);
       setUser(updated);
-      toast("Photo removed", { description: "Reset to default avatar" });
+      toast("Photo removed", { description: "Reset to default avatar" });}
     } catch (err) {
       toast("Error", { description: (err as Error).message });
     } finally {
@@ -56,13 +56,16 @@ export default function WorkersProfilePhoto({ user }: { user: UserObjId }) {
       // Upload new file
       const formData = new FormData();
       formData.append("file", file);
-      const { url } = await uploadAvatarToStorage(formData);
-
+      const { data } = await uploadAvatarToStorage(formData);
+const url = data?.url ?? null
       // Save URL to DB
-      const updated = await updateUserAvatar({ avatar: url }, user.id);
+    if(url){
+        const{data: updated} = await updateUserAvatar({ avatar: url }, user.id);
+    if(updated){  
       setAvatar(updated.avatar);
       setUser(updated);
-      toast("Photo updated", { description: "Your avatar has been updated" });
+      toast("Photo updated", { description: "Your avatar has been updated" });}
+    }
     } catch (err) {
       toast("Error", { description: (err as Error).message });
     } finally {

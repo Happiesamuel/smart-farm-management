@@ -34,16 +34,18 @@ export function OwnerSignupForm() {
         {
           onSuccess: async (user) => {
     
-            toast("User created successfully", {
+         if(user){
+             toast("User created successfully", {
               description:
                 "A verification link has been sent to your email address.",
               duration: 4000,
               closeButton: true,
             });
-            localStorage.setItem("manager-email", user!.email);
-            localStorage.setItem("manager-id", user!.id);
+            localStorage.setItem("manager-email", user.email);
+            localStorage.setItem("manager-id", user.id);
             localStorage.setItem("manager-password", values.password);
             router.push(`/owner/verify-otp`);
+         }
           },
           onError: (err) =>
             toast("Error Signing up", {
