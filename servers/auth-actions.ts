@@ -15,11 +15,11 @@ import { createOtp } from "./email-actions";
 import { appwriteConfig } from "./appwrite-client";
 import { cookies } from "next/headers";
 import { checkUserInWorkspace } from "./workspace-action";
+import { ActionError } from "@/lib/error";
 
 export const loginWithGoogle = async () => {
   const { account } = await createAdminClient();
 
-  // ✅ createOAuth2Token works server-side and gives you userId + secret on callback
   const redirectUrl = await account.createOAuth2Token(
     OAuthProvider.Google,
     `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
@@ -47,7 +47,7 @@ export const login = async (email: string, password: string) => {
       secret: session.secret,
     };
   } catch (err) {
-    throw new Error(err instanceof Error ? err.message : "Unknown error");
+    throw new ActionError(err instanceof Error ? err.message : "Unknown error");
   }
 };
 
@@ -68,7 +68,7 @@ export const logout = async () => {
 
     return { success: true };
   } catch (err) {
-    console.log(err);
+    
     throw new Error(err instanceof Error ? err.message : "Unknown error");
   }
 };
