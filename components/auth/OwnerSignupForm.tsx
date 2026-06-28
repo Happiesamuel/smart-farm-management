@@ -33,21 +33,15 @@ export function OwnerSignupForm() {
         { ...rest, lastSeen: new Date().toISOString() },
         {
           onSuccess: async (user) => {
-            // await account.createEmailPasswordSession(
-            //   values.email,
-            //   values.password,
-            // );
-            // await account.createVerification(
-            //   `${process.env.NEXT_PUBLIC_URL!}/verify`,
-            // );
+    
             toast("User created successfully", {
               description:
                 "A verification link has been sent to your email address.",
               duration: 4000,
               closeButton: true,
             });
-            localStorage.setItem("manager-email", user.email);
-            localStorage.setItem("manager-id", user.id);
+            localStorage.setItem("manager-email", user!.email);
+            localStorage.setItem("manager-id", user!.id);
             localStorage.setItem("manager-password", values.password);
             router.push(`/owner/verify-otp`);
           },

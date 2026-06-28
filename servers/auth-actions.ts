@@ -104,7 +104,7 @@ export async function createWorkerUser(
     const {data:existingUser} = await getGuestByEmail(obj.email);
 
     if (existingUser) {
-      const alreadyJoined = await checkUserInWorkspace({
+      const {data:alreadyJoined} = await checkUserInWorkspace({
         userId: existingUser.id,
         workspaceId: work.id,
       });
