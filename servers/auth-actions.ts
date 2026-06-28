@@ -15,7 +15,6 @@ import { createOtp } from "./email-actions";
 import { appwriteConfig } from "./appwrite-client";
 import { cookies } from "next/headers";
 import { checkUserInWorkspace } from "./workspace-action";
-import { ActionError } from "@/lib/error";
 
 export const loginWithGoogle = async () => {
   const { account } = await createAdminClient();
@@ -47,9 +46,12 @@ export const login = async (email: string, password: string) => {
       secret: session.secret,
     };
   } catch (err) {
-    throw new ActionError(err instanceof Error ? err.message : "Unknown error");
-  }
-};
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+}
+}
 
 export const logout = async () => {
   const cookieStore = await cookies();
