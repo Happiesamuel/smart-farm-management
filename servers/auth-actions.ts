@@ -42,9 +42,12 @@ export const login = async (email: string, password: string) => {
     });
 
     return {
+      success:true,
+      data: {
       id: session.$id,
       secret: session.secret,
-    };
+    }
+    }
   } catch (err) {
     return {
       success: false,

@@ -10,7 +10,7 @@ export function useLogin() {
       // Throw here (client-side) so onError still fires normally
       if (!result.success) throw new Error(result.error);
 
-      return result
+   return result.data;
     },
   });
 
