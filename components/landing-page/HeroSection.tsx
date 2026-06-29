@@ -1,42 +1,17 @@
+"use client";
 import Image from "next/image";
 import bg from "../../public/hero-bg.png";
 import Photo from "../../public/newshot-2.png";
-import { LuLeaf } from "react-icons/lu";
 import { LiaCanadianMapleLeaf } from "react-icons/lia";
 import { Button } from "@/components/ui/button";
 import { MdOutlineArrowRightAlt } from "react-icons/md";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { Users, Leaf, Map, CheckCircle, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import { useLandingStats } from "@/hooks/analytics/useAnalytics";
+import { NoResult } from "../loader/GeneralLoader";
 const arr = ["Easy to Use", "Secure & Reliable", "All-in-One Solution"];
-const stats = [
-  {
-    icon: Users,
-    value: "50+",
-    label: "Active Users",
-  },
-  {
-    icon: Leaf,
-    value: "100+",
-    label: "Farms Managed",
-  },
-  {
-    icon: Map,
-    value: "500+",
-    label: "Fields Monitored",
-  },
-  {
-    icon: CheckCircle,
-    value: "10K+",
-    label: "Tasks Completed",
-  },
-  {
-    icon: ShieldCheck,
-    value: "24/7",
-    label: "Support",
-    isWide: true,
-  },
-];
+
 export default function HeroSection() {
   return (
     <section
@@ -110,7 +85,66 @@ export default function HeroSection() {
           </div>
         </div>
 
-        <div className="mx-4 lg:absolute left-[0%] right-0 lg:bottom-[-30%] xl:bottom-[-25%] md:max-w-3xl lg:max-w-4xl xl:max-w-6xl md:mx-auto mt-6 lg:mt-4 bg-white/80 backdrop-blur-md border border-gray-200 rounded-lg md:rounded-2xl shadow-md grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 divide-x divide-gray-200 overflow-hidden">
+        <Stats />
+      </div>
+    </section>
+  );
+}
+
+function Stats() {
+  const { data, status, error } = useLandingStats();
+  const stats = [
+    {
+      icon: Users,
+      value: data?.users?.toLocaleString() ?? "0",
+      label: "Active Users",
+    },
+    {
+      icon: Leaf,
+      value: data?.farms?.toLocaleString() ?? "0",
+      label: "Farms Managed",
+    },
+    {
+      icon: Map,
+      value: data?.fields?.toLocaleString() ?? "0",
+      label: "Fields Monitored",
+    },
+    {
+      icon: CheckCircle,
+      value: data?.tasks?.toLocaleString() ?? "0",
+      label: "Tasks Completed",
+    },
+    {
+      icon: ShieldCheck,
+      value: data?.workspaces?.toLocaleString() ?? "0",
+      label: "Workspaces",
+      isWide: true,
+    },
+  ];
+  return (
+    <div className="mx-4 lg:absolute left-[0%] right-0 lg:bottom-[-30%] xl:bottom-[-25%] md:max-w-3xl lg:max-w-4xl xl:max-w-6xl md:mx-auto mt-6 lg:mt-4 bg-white/80 backdrop-blur-md border border-gray-200 rounded-lg md:rounded-2xl shadow-md overflow-hidden">
+      {status === "pending" ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 divide-x divide-gray-200">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 px-6 py-8 animate-pulse"
+            >
+              <div className="size-8 rounded-full bg-gray-200" />
+
+              <div className="space-y-2">
+                <div className="h-4 w-12 bg-gray-200 rounded" />
+                <div className="h-3 w-20 bg-gray-100 rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : error ? (
+        <div className="py-8 text-center">
+          <NoResult>Unable to load platform statistics</NoResult>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 divide-x divide-gray-200">
           {stats.map((item, index) => {
             const Icon = item.icon;
 
@@ -129,13 +163,14 @@ export default function HeroSection() {
                   <p className="text-lg font-semibold text-gray-800">
                     {item.value}
                   </p>
+
                   <p className="text-sm text-gray-500">{item.label}</p>
                 </div>
               </div>
             );
           })}
         </div>
-      </div>
-    </section>
+      )}
+    </div>
   );
 }

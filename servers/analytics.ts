@@ -16,22 +16,41 @@ export const getWorkspaceAnalytics = async ({
 
     const { database } = await createAdminClient();
 
-    const [farmsRes, fieldsRes, cropsRes, salesRes, expensesRes] = await Promise.all([
-      database.listDocuments(appwriteConfig.databaseId, "farms", [Query.equal("workspaceId", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "fields", [Query.equal("workspaceId", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "crops", [Query.equal("workspaceId", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "sales", [Query.equal("workspaceId", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "expenses", [Query.equal("workspaceId", workspaceId)]),
-    ]);
+    const [farmsRes, fieldsRes, cropsRes, salesRes, expensesRes] =
+      await Promise.all([
+        database.listDocuments(appwriteConfig.databaseId, "farms", [
+          Query.equal("workspaceId", workspaceId),
+        ]),
+        database.listDocuments(appwriteConfig.databaseId, "fields", [
+          Query.equal("workspaceId", workspaceId),
+        ]),
+        database.listDocuments(appwriteConfig.databaseId, "crops", [
+          Query.equal("workspaceId", workspaceId),
+        ]),
+        database.listDocuments(appwriteConfig.databaseId, "sales", [
+          Query.equal("workspaceId", workspaceId),
+        ]),
+        database.listDocuments(appwriteConfig.databaseId, "expenses", [
+          Query.equal("workspaceId", workspaceId),
+        ]),
+      ]);
 
     const totalFarms = farmsRes.documents.length;
     const totalFields = fieldsRes.documents.length;
     const totalCrops = cropsRes.documents.length;
-    const totalRevenue = salesRes.documents.reduce((sum, s) => sum + (s.revenue || 0), 0);
-    const totalExpenses = expensesRes.documents.reduce((sum, e) => sum + (e.amount || 0), 0);
+    const totalRevenue = salesRes.documents.reduce(
+      (sum, s) => sum + (s.revenue || 0),
+      0,
+    );
+    const totalExpenses = expensesRes.documents.reduce(
+      (sum, e) => sum + (e.amount || 0),
+      0,
+    );
     const profit = totalRevenue - totalExpenses;
-    const fieldsPerFarm = totalFarms > 0 ? Math.round(totalFields / totalFarms) : 0;
-    const revenuePerFarm = totalFarms > 0 ? Math.round(totalRevenue / totalFarms) : 0;
+    const fieldsPerFarm =
+      totalFarms > 0 ? Math.round(totalFields / totalFarms) : 0;
+    const revenuePerFarm =
+      totalFarms > 0 ? Math.round(totalRevenue / totalFarms) : 0;
 
     return {
       success: true,
@@ -46,7 +65,8 @@ export const getWorkspaceAnalytics = async ({
         revenuePerFarm,
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -63,20 +83,37 @@ export const getDashboardStats = async ({
 
     const { database } = await createAdminClient();
 
-    const [farmsRes, fieldsRes, cropsRes, tasksRes, salesRes, expensesRes] = await Promise.all([
-      database.listDocuments(appwriteConfig.databaseId, "farms", [Query.equal("workspaceId", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "fields", [Query.equal("workspaceId", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "crops", [Query.equal("workspaceId", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "tasks", [
-        Query.equal("workspaceId", workspaceId),
-        Query.equal("status", "active"),
-      ]),
-      database.listDocuments(appwriteConfig.databaseId, "sales", [Query.equal("workspaceId", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "expenses", [Query.equal("workspaceId", workspaceId)]),
-    ]);
+    const [farmsRes, fieldsRes, cropsRes, tasksRes, salesRes, expensesRes] =
+      await Promise.all([
+        database.listDocuments(appwriteConfig.databaseId, "farms", [
+          Query.equal("workspaceId", workspaceId),
+        ]),
+        database.listDocuments(appwriteConfig.databaseId, "fields", [
+          Query.equal("workspaceId", workspaceId),
+        ]),
+        database.listDocuments(appwriteConfig.databaseId, "crops", [
+          Query.equal("workspaceId", workspaceId),
+        ]),
+        database.listDocuments(appwriteConfig.databaseId, "tasks", [
+          Query.equal("workspaceId", workspaceId),
+          Query.equal("status", "active"),
+        ]),
+        database.listDocuments(appwriteConfig.databaseId, "sales", [
+          Query.equal("workspaceId", workspaceId),
+        ]),
+        database.listDocuments(appwriteConfig.databaseId, "expenses", [
+          Query.equal("workspaceId", workspaceId),
+        ]),
+      ]);
 
-    const totalRevenue = salesRes.documents.reduce((sum, s) => sum + (s.revenue || 0), 0);
-    const totalExpenses = expensesRes.documents.reduce((sum, e) => sum + (e.amount || 0), 0);
+    const totalRevenue = salesRes.documents.reduce(
+      (sum, s) => sum + (s.revenue || 0),
+      0,
+    );
+    const totalExpenses = expensesRes.documents.reduce(
+      (sum, e) => sum + (e.amount || 0),
+      0,
+    );
     const netProfit = totalRevenue - totalExpenses;
     const formatCurrency = (num: number) => `₦${num.toLocaleString()}`;
 
@@ -103,7 +140,8 @@ export const getDashboardStats = async ({
         },
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -138,8 +176,14 @@ export const getFarmFinanceStats = async ({
       ]),
     ]);
 
-    const totalRevenue = salesRes.documents.reduce((acc, s) => acc + (s.totalAmount || 0), 0);
-    const totalExpenses = expensesRes.documents.reduce((acc, e) => acc + (e.amount || 0), 0);
+    const totalRevenue = salesRes.documents.reduce(
+      (acc, s) => acc + (s.totalAmount || 0),
+      0,
+    );
+    const totalExpenses = expensesRes.documents.reduce(
+      (acc, e) => acc + (e.amount || 0),
+      0,
+    );
     const profit = totalRevenue - totalExpenses;
     const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
 
@@ -152,11 +196,19 @@ export const getFarmFinanceStats = async ({
       .reduce((acc, e) => acc + (e.amount || 0), 0);
 
     const lastMonthRevenue = salesRes.documents
-      .filter((s) => new Date(s.saleDate) >= startOfLastMonth && new Date(s.saleDate) <= endOfLastMonth)
+      .filter(
+        (s) =>
+          new Date(s.saleDate) >= startOfLastMonth &&
+          new Date(s.saleDate) <= endOfLastMonth,
+      )
       .reduce((acc, s) => acc + (s.totalAmount || 0), 0);
 
     const lastMonthExpenses = expensesRes.documents
-      .filter((e) => new Date(e.expenseDate) >= startOfLastMonth && new Date(e.expenseDate) <= endOfLastMonth)
+      .filter(
+        (e) =>
+          new Date(e.expenseDate) >= startOfLastMonth &&
+          new Date(e.expenseDate) <= endOfLastMonth,
+      )
       .reduce((acc, e) => acc + (e.amount || 0), 0);
 
     const calcChange = (current: number, prev: number) => {
@@ -166,8 +218,10 @@ export const getFarmFinanceStats = async ({
 
     const thisMonthProfit = thisMonthRevenue - thisMonthExpenses;
     const lastMonthProfit = lastMonthRevenue - lastMonthExpenses;
-    const thisMonthMargin = thisMonthRevenue > 0 ? (thisMonthProfit / thisMonthRevenue) * 100 : 0;
-    const lastMonthMargin = lastMonthRevenue > 0 ? (lastMonthProfit / lastMonthRevenue) * 100 : 0;
+    const thisMonthMargin =
+      thisMonthRevenue > 0 ? (thisMonthProfit / thisMonthRevenue) * 100 : 0;
+    const lastMonthMargin =
+      lastMonthRevenue > 0 ? (lastMonthProfit / lastMonthRevenue) * 100 : 0;
 
     return {
       success: true,
@@ -182,7 +236,45 @@ export const getFarmFinanceStats = async ({
         marginChange: calcChange(thisMonthMargin, lastMonthMargin),
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
+    return { success: false, error: err?.message ?? "Unknown error" };
+  }
+};
+
+export const getLandingStats = async () => {
+  try {
+    const { database } = await createAdminClient();
+
+    const [users, farms, fields, tasks, workspaces, crops] = await Promise.all([
+      database.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.userCollectionId,
+        [],
+      ),
+      database.listDocuments(appwriteConfig.databaseId, "farms", []),
+      database.listDocuments(appwriteConfig.databaseId, "fields", []),
+      database.listDocuments(appwriteConfig.databaseId, "tasks", [
+        Query.equal("status", "completed"),
+      ]),
+      database.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.workspaceCollectionId,
+        [],
+      ),
+      database.listDocuments(appwriteConfig.databaseId, "crops", []),
+    ]);
+
+    return {
+      users: users.total,
+      farms: farms.total,
+      fields: fields.total,
+      tasks: tasks.total,
+      workspaces: workspaces.total,
+      crops: crops.total,
+    };
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };

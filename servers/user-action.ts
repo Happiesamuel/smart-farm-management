@@ -28,12 +28,16 @@ export const createUser = async (obj: User) => {
         lastSeen: document.lastSeen,
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Failed to create user" };
   }
 };
 
-export const updateUser = async (obj: Record<string, string>, userId: string) => {
+export const updateUser = async (
+  obj: Record<string, string>,
+  userId: string,
+) => {
   try {
     const { database } = await createAdminClient();
     const x = await database.updateDocument(
@@ -54,17 +58,30 @@ export const updateUser = async (obj: Record<string, string>, userId: string) =>
         lastSeen: x.lastSeen,
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Failed to update user" };
   }
 };
 
-export const updateUserData = async (obj: Record<string, string | undefined>, userId: string) => {
+export const updateUserData = async (
+  obj: Record<string, string | undefined>,
+  userId: string,
+) => {
   try {
     const { database, avatar } = await createAdminClient();
 
-    if (obj.fullName && obj.avatar?.startsWith("https://fra.cloud.appwrite.io/v1/avatars/initials")) {
-      const newAvatar = avatar.getInitials({ name: obj.fullName, width: 200, height: 200 });
+    if (
+      obj.fullName &&
+      obj.avatar?.startsWith(
+        "https://fra.cloud.appwrite.io/v1/avatars/initials",
+      )
+    ) {
+      const newAvatar = avatar.getInitials({
+        name: obj.fullName,
+        width: 200,
+        height: 200,
+      });
       obj.avatar = newAvatar.toString();
     }
 
@@ -87,12 +104,16 @@ export const updateUserData = async (obj: Record<string, string | undefined>, us
         lastSeen: x.lastSeen,
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Failed to update user" };
   }
 };
 
-export const updateUserAvatar = async (obj: Record<string, string | undefined>, userId: string) => {
+export const updateUserAvatar = async (
+  obj: Record<string, string | undefined>,
+  userId: string,
+) => {
   try {
     const { database } = await createAdminClient();
     const x = await database.updateDocument(
@@ -114,7 +135,8 @@ export const updateUserAvatar = async (obj: Record<string, string | undefined>, 
         lastSeen: x.lastSeen,
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Failed to update user" };
   }
 };
@@ -123,10 +145,15 @@ export const uploadAvatarToStorage = async (formData: FormData) => {
   try {
     const { storage } = await createAdminClient();
     const file = formData.get("file") as File;
-    const uploaded = await storage.createFile(appwriteConfig.bucketId, ID.unique(), file);
+    const uploaded = await storage.createFile(
+      appwriteConfig.bucketId,
+      ID.unique(),
+      file,
+    );
     const url = `${appwriteConfig.endpoint}/storage/buckets/${appwriteConfig.bucketId}/files/${uploaded.$id}/view?project=${appwriteConfig.projectId}`;
     return { success: true, data: { url } };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Failed to upload avatar" };
   }
 };
@@ -136,7 +163,8 @@ export const deleteAvatarFromStorage = async (fileId: string) => {
     const { storage } = await createAdminClient();
     await storage.deleteFile(appwriteConfig.bucketId, fileId);
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Failed to delete avatar" };
   }
 };
@@ -155,7 +183,11 @@ export const removeUserAvatar = async (userId: string, fullName: string) => {
     const fileId = match?.[1];
     if (fileId) await storage.deleteFile(appwriteConfig.bucketId, fileId);
 
-    const newAvatar = avatar.getInitials({ name: fullName, width: 200, height: 200 });
+    const newAvatar = avatar.getInitials({
+      name: fullName,
+      width: 200,
+      height: 200,
+    });
 
     const x = await database.updateDocument(
       appwriteConfig.databaseId,
@@ -176,7 +208,8 @@ export const removeUserAvatar = async (userId: string, fullName: string) => {
         lastSeen: x.lastSeen,
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Failed to remove avatar" };
   }
 };
@@ -186,7 +219,8 @@ export const updateName = async (fullName: string) => {
     const { account } = await createSessionClient();
     await account.updateName(fullName);
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Failed to update name" };
   }
 };
@@ -225,7 +259,8 @@ export async function getGuestById(userId: string | undefined) {
         lastSeen: doc.lastSeen,
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }
@@ -254,7 +289,8 @@ export async function getGuestByGuestId(userId: string | undefined) {
         lastSeen: doc.lastSeen,
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }
@@ -282,7 +318,8 @@ export async function getGuestByEmail(email: string | undefined) {
         lastSeen: doc.lastSeen,
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }

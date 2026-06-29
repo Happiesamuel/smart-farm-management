@@ -1,4 +1,3 @@
-
 "use server";
 
 import { ID, OAuthProvider, Query } from "appwrite";
@@ -41,7 +40,8 @@ export const login = async (email: string, password: string) => {
     });
 
     return { success: true, data: { id: session.$id, secret: session.secret } };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -61,17 +61,22 @@ export const logout = async () => {
     cookieStore.delete("role");
 
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
 
-export const changePassword = async (oldPassword: string, newPassword: string) => {
+export const changePassword = async (
+  oldPassword: string,
+  newPassword: string,
+) => {
   try {
     const { account } = await createSessionClient();
     await account.updatePassword(newPassword, oldPassword);
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -79,18 +84,36 @@ export const changePassword = async (oldPassword: string, newPassword: string) =
 export async function createManagerUser(obj: UserObj) {
   try {
     const { account, avatar } = await createAdminClient();
-    const avatarUrl = avatar.getInitials({ name: obj.fullName, width: 200, height: 200 });
+    const avatarUrl = avatar.getInitials({
+      name: obj.fullName,
+      width: 200,
+      height: 200,
+    });
 
-    const user = await account.create(ID.unique(), obj.email, obj.password, obj.fullName);
+    const user = await account.create(
+      ID.unique(),
+      obj.email,
+      obj.password,
+      obj.fullName,
+    );
 
-    const userObj = { ...obj, userId: user.$id, avatar: avatarUrl, isVerified: false };
-    const {data} = (await createUser(userObj))
-const guest = data  as UserObjId;
+    const userObj = {
+      ...obj,
+      userId: user.$id,
+      avatar: avatarUrl,
+      isVerified: false,
+    };
+    const { data } = await createUser(userObj);
+    const guest = data as UserObjId;
     const otp = await sendOtp(guest.email);
     await createOtp(otp, guest.id);
 
-    return { success: true, data: { id: guest.id, email: guest.email, name: guest.fullName } };
-  } catch (err: any) {
+    return {
+      success: true,
+      data: { id: guest.id, email: guest.email, name: guest.fullName },
+    };
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }
@@ -101,15 +124,16 @@ export async function createWorkerUser(
 ) {
   try {
     const { account, avatar } = await createAdminClient();
-    const {data:existingUser} = await getGuestByEmail(obj.email);
+    const { data: existingUser } = await getGuestByEmail(obj.email);
 
     if (existingUser) {
-      const {data:alreadyJoined} = await checkUserInWorkspace({
+      const { data: alreadyJoined } = await checkUserInWorkspace({
         userId: existingUser.id,
         workspaceId: work.id,
       });
 
-      if (alreadyJoined) throw new Error("User already belongs to this workspace");
+      if (alreadyJoined)
+        throw new Error("User already belongs to this workspace");
 
       await inviteUser(
         existingUser.email,
@@ -118,14 +142,35 @@ export async function createWorkerUser(
         `${appwriteConfig.appUrl}/worker/join-workspace/${work.id}/${work.inviteCode}-${existingUser.id}-xyz`,
       );
 
-      return { success: true, data: { id: existingUser.id, email: existingUser.email, name: existingUser.fullName } };
+      return {
+        success: true,
+        data: {
+          id: existingUser.id,
+          email: existingUser.email,
+          name: existingUser.fullName,
+        },
+      };
     }
 
-    const avatarUrl = avatar.getInitials({ name: obj.fullName, width: 200, height: 200 });
-    const user = await account.create(ID.unique(), obj.email, obj.password, obj.fullName);
-    const userObj = { ...obj, userId: user.$id, avatar: avatarUrl, isVerified: true };
-    const {data} = (await createUser(userObj)) 
-const guest = data as UserObjId;
+    const avatarUrl = avatar.getInitials({
+      name: obj.fullName,
+      width: 200,
+      height: 200,
+    });
+    const user = await account.create(
+      ID.unique(),
+      obj.email,
+      obj.password,
+      obj.fullName,
+    );
+    const userObj = {
+      ...obj,
+      userId: user.$id,
+      avatar: avatarUrl,
+      isVerified: true,
+    };
+    const { data } = await createUser(userObj);
+    const guest = data as UserObjId;
     await inviteUser(
       guest.email,
       guest.fullName,
@@ -133,8 +178,12 @@ const guest = data as UserObjId;
       `${appwriteConfig.appUrl}/worker/join-workspace/${work.id}/${work.inviteCode}-${guest.id}-abc`,
     );
 
-    return { success: true, data: { id: guest.id, email: guest.email, name: guest.fullName } };
-  } catch (err: any) {
+    return {
+      success: true,
+      data: { id: guest.id, email: guest.email, name: guest.fullName },
+    };
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }
@@ -148,7 +197,8 @@ export async function createWorkspace(slug: string, obj: WorkspaceObj) {
       [Query.equal("workspaceId", slug)],
     );
 
-    if (existing.documents.length > 0) throw new Error("Workspace ID already taken");
+    if (existing.documents.length > 0)
+      throw new Error("Workspace ID already taken");
 
     const data = await database.createDocument(
       appwriteConfig.databaseId,
@@ -158,7 +208,8 @@ export async function createWorkspace(slug: string, obj: WorkspaceObj) {
     );
 
     return { success: true, data: { id: data.$id } };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }
@@ -174,7 +225,8 @@ export async function createWorkspaceMember(obj: WorkspaceMemberObj) {
     );
 
     return { success: true, data: { id: data.$id } };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }
@@ -192,10 +244,12 @@ export async function validateOTP(userId: string, otp: string) {
       ],
     );
 
-    if (result.documents.length === 0) throw new Error("OTP may be invalid or expired");
+    if (result.documents.length === 0)
+      throw new Error("OTP may be invalid or expired");
 
     const otpDoc = result.documents[0];
-    if (new Date(otpDoc.expirationTime) < new Date()) throw new Error("OTP expired");
+    if (new Date(otpDoc.expirationTime) < new Date())
+      throw new Error("OTP expired");
 
     await database.updateDocument(
       appwriteConfig.databaseId,
@@ -212,7 +266,8 @@ export async function validateOTP(userId: string, otp: string) {
     );
 
     return { success: true, data: { message: "OTP verified" } };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }
@@ -222,8 +277,9 @@ export const recreateOtp = async (email: string, userId: string) => {
     const otp = await sendOtp(email);
     await createOtp(otp, userId);
     return { success: true };
-  } catch (err: any) {
-    return { success: false, error: err?.message ?? "Failed to resend OTP" };
+  } catch (error) {
+    const err = error as unknown as Error;
+    return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
 
@@ -252,7 +308,8 @@ export async function setupUserSessionAndProfile({
     }
 
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }

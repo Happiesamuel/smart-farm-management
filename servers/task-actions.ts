@@ -45,7 +45,8 @@ export const getSingleTaskDocs = async ({
         updatedAt: d.$updatedAt,
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -97,7 +98,8 @@ export const getWorkerNotes = async ({
         $createdAt: n.$createdAt,
       })),
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };

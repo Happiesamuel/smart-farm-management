@@ -24,7 +24,8 @@ export async function getWorkspace(userId: string | undefined) {
         workspaceId: doc.workspaceId,
       })),
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }
@@ -44,12 +45,15 @@ export const checkUserInWorkspace = async ({
       [Query.equal("users", userId), Query.equal("workspaces", workspaceId)],
     );
     return { success: true, data: existing.total > 0 };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
 
-export async function getWorkspaceByWorkspaceId(workspaceId: string | undefined) {
+export async function getWorkspaceByWorkspaceId(
+  workspaceId: string | undefined,
+) {
   try {
     const { database } = await createAdminClient();
     const result = await database.listDocuments(
@@ -70,7 +74,8 @@ export async function getWorkspaceByWorkspaceId(workspaceId: string | undefined)
         workspaceId: doc.workspaceId,
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }
@@ -99,7 +104,8 @@ export async function getWorkspaceMembersWithWorkspaceId(
         joinedAt: doc.joinedAt,
       })),
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }
@@ -122,7 +128,8 @@ export const getWorkspaceMembers = async (workspaceId: string) => {
         id: x.$id,
       })),
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -172,7 +179,8 @@ export const getUserWorkspacesWithRole = async ({
         };
       }),
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -207,7 +215,8 @@ export const getWorkspaceAssignOptions = async (workspaceId: string) => {
         };
       }),
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -246,7 +255,8 @@ export const getWorkspaceUser = async (workspaceId: string) => {
         };
       }),
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -261,7 +271,8 @@ export const updateLastSeen = async (userId: string) => {
       { lastSeen: new Date().toISOString() },
     );
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -275,7 +286,8 @@ export const removeWorkspaceMember = async (memberId: string) => {
       memberId,
     );
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -296,7 +308,8 @@ export const updateWorkspaceMemberRole = async ({
       { role },
     );
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };

@@ -1,4 +1,3 @@
-
 "use server";
 
 import { ID, Query } from "appwrite";
@@ -131,9 +130,6 @@ export const createActivity = async ({
   );
 };
 
-
-
-
 export const validateWorkspaceAccess = async ({
   userId,
   workspaceId,
@@ -153,16 +149,33 @@ export const validateWorkspaceAccess = async ({
   }
 };
 
-export const createDoc = async ({ collection, data, workspaceId, userId }: {
+export const createDoc = async ({
+  collection,
+  data,
+  workspaceId,
+  userId,
+}: {
   collection: string;
   workspaceId: string;
   userId: string;
-  data: Omit<CropInfo | FieldInfo | HarvestInfo | TaskInfo | SalesInfo | ExpenseInfo | FarmInfo | NoteInfo, "id" | "workspaces" | "users">;
+  data: Omit<
+    | CropInfo
+    | FieldInfo
+    | HarvestInfo
+    | TaskInfo
+    | SalesInfo
+    | ExpenseInfo
+    | FarmInfo
+    | NoteInfo,
+    "id" | "workspaces" | "users"
+  >;
 }) => {
   try {
     let newData;
     if (collection === "fields") {
-      const a = await img(data as Omit<FieldInfo, "id" | "workspaces" | "users">);
+      const a = await img(
+        data as Omit<FieldInfo, "id" | "workspaces" | "users">,
+      );
       newData = { ...data, ...a };
     } else {
       newData = { ...data };
@@ -182,21 +195,37 @@ export const createDoc = async ({ collection, data, workspaceId, userId }: {
       appwriteConfig.userCollectionId,
       userId,
     );
-    await createSecondaryActivities({ collection, data: newData, workspaceId, docId: doc.$id, creatorName: creator.fullName });
+    await createSecondaryActivities({
+      collection,
+      data: newData,
+      workspaceId,
+      docId: doc.$id,
+      creatorName: creator.fullName,
+    });
     await createActivity({
-      workspaceId, userId,
+      workspaceId,
+      userId,
       farmId: resolveFarmId(collection, newData),
-      entityType: collection, entityId: doc.$id,
-      action: "created", message: buildActivityMessage(collection, newData),
+      entityType: collection,
+      entityId: doc.$id,
+      action: "created",
+      message: buildActivityMessage(collection, newData),
     });
 
     return { success: true, data: { id: doc.$id } };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
 
-export const updateFarm = async ({ id, data, workspaceId, userId, collection }: {
+export const updateFarm = async ({
+  id,
+  data,
+  workspaceId,
+  userId,
+  collection,
+}: {
   id: string;
   data: Record<string, number | string | File>;
   workspaceId: string;
@@ -207,7 +236,11 @@ export const updateFarm = async ({ id, data, workspaceId, userId, collection }: 
     await validateWorkspaceAccess({ userId, workspaceId });
 
     const { database } = await createAdminClient();
-    const prev = await database.getDocument(appwriteConfig.databaseId, collection, id);
+    const prev = await database.getDocument(
+      appwriteConfig.databaseId,
+      collection,
+      id,
+    );
 
     let lnk: string = "";
     let imageKey = "";
@@ -232,22 +265,35 @@ export const updateFarm = async ({ id, data, workspaceId, userId, collection }: 
       users: userId,
     });
 
-    const {data:user} = await getGuestByGuestId(userId);
+    const { data: user } = await getGuestByGuestId(userId);
     await createActivity({
-      workspaceId, userId,
+      workspaceId,
+      userId,
       farmId: collection === "farms" ? prev.$id : (prev?.farms ?? null),
-      entityType: collection, entityId: id,
+      entityType: collection,
+      entityId: id,
       action: "updated",
-      message: buildUpdateMessage({ collection, prev, data: finalData, userName: user?.fullName ?? "Guest" }),
+      message: buildUpdateMessage({
+        collection,
+        prev,
+        data: finalData,
+        userName: user?.fullName ?? "Guest",
+      }),
     });
 
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
 
-export const getDoc = async ({ collection, id, workspaceId, userId }: {
+export const getDoc = async ({
+  collection,
+  id,
+  workspaceId,
+  userId,
+}: {
   collection: string;
   workspaceId: string;
   userId: string;
@@ -256,17 +302,27 @@ export const getDoc = async ({ collection, id, workspaceId, userId }: {
   try {
     await validateWorkspaceAccess({ userId, workspaceId });
     const { database } = await createAdminClient();
-    const doc = await database.getDocument(appwriteConfig.databaseId, collection, id);
+    const doc = await database.getDocument(
+      appwriteConfig.databaseId,
+      collection,
+      id,
+    );
 
     if (doc.workspaceId !== workspaceId) throw new Error("Access denied");
 
     return { success: true, data: doc };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
 
-export const getFarmDocs = async ({ collection, workspaceId, userId, farmId }: {
+export const getFarmDocs = async ({
+  collection,
+  workspaceId,
+  userId,
+  farmId,
+}: {
   collection: string;
   workspaceId: string;
   userId: string;
@@ -278,15 +334,24 @@ export const getFarmDocs = async ({ collection, workspaceId, userId, farmId }: {
     const res = await database.listDocuments(
       appwriteConfig.databaseId,
       collection,
-      [Query.equal("workspaces", workspaceId), Query.equal("farms", farmId), Query.orderDesc("$createdAt")],
+      [
+        Query.equal("workspaces", workspaceId),
+        Query.equal("farms", farmId),
+        Query.orderDesc("$createdAt"),
+      ],
     );
     return { success: true, data: res.documents.map((d) => ({ ...d })) };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
 
-export const getDocs = async ({ collection, workspaceId, userId }: {
+export const getDocs = async ({
+  collection,
+  workspaceId,
+  userId,
+}: {
   collection: string;
   workspaceId: string;
   userId: string;
@@ -300,12 +365,17 @@ export const getDocs = async ({ collection, workspaceId, userId }: {
       [Query.equal("workspaces", workspaceId), Query.orderDesc("$createdAt")],
     );
     return { success: true, data: res.documents.map((d) => ({ ...d })) };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
 
-export const updateWorkspace = async ({ workspaceId, userId, data }: {
+export const updateWorkspace = async ({
+  workspaceId,
+  userId,
+  data,
+}: {
   workspaceId: string;
   userId: string;
   data: { name?: string; workspaceId?: string };
@@ -318,7 +388,8 @@ export const updateWorkspace = async ({ workspaceId, userId, data }: {
       workspaceId,
     );
 
-    if (workspace.users !== userId) throw new Error("Only the workspace owner can update this workspace.");
+    if (workspace.users !== userId)
+      throw new Error("Only the workspace owner can update this workspace.");
 
     if (data.workspaceId) {
       const existing = await database.listDocuments(
@@ -326,7 +397,9 @@ export const updateWorkspace = async ({ workspaceId, userId, data }: {
         appwriteConfig.workspaceCollectionId,
         [Query.equal("workspaceId", data.workspaceId)],
       );
-      const duplicate = existing.documents.find((doc) => doc.$id !== workspaceId);
+      const duplicate = existing.documents.find(
+        (doc) => doc.$id !== workspaceId,
+      );
       if (duplicate) throw new Error("Workspace ID already exists.");
     }
 
@@ -338,55 +411,108 @@ export const updateWorkspace = async ({ workspaceId, userId, data }: {
     );
 
     await createActivity({
-      workspaceId, userId,
-      entityType: "workspace", entityId: workspaceId,
-      action: "updated", message: `Workspace "${updated.name}" was updated.`,
+      workspaceId,
+      userId,
+      entityType: "workspace",
+      entityId: workspaceId,
+      action: "updated",
+      message: `Workspace "${updated.name}" was updated.`,
     });
 
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
 
-export const updateDoc = async ({ collection, id, data, workspaceId, userId }: {
+export const updateDoc = async ({
+  collection,
+  id,
+  data,
+  workspaceId,
+  userId,
+}: {
   collection: string;
   id: string;
-  data: Omit<CropInfo | FieldInfo | HarvestInfo | TaskInfo | SalesInfo | ExpenseInfo | FarmInfo | NoteInfo, "id" | "workspaces" | "users">;
+  data: Omit<
+    | CropInfo
+    | FieldInfo
+    | HarvestInfo
+    | TaskInfo
+    | SalesInfo
+    | ExpenseInfo
+    | FarmInfo
+    | NoteInfo,
+    "id" | "workspaces" | "users"
+  >;
   workspaceId: string;
   userId: string;
 }) => {
   try {
     await validateWorkspaceAccess({ userId, workspaceId });
     const { database } = await createAdminClient();
-    const prev = await database.getDocument(appwriteConfig.databaseId, collection, id);
+    const prev = await database.getDocument(
+      appwriteConfig.databaseId,
+      collection,
+      id,
+    );
 
-    await database.updateDocument(appwriteConfig.databaseId, collection, id, data);
+    await database.updateDocument(
+      appwriteConfig.databaseId,
+      collection,
+      id,
+      data,
+    );
 
-    const {data:user} = await getGuestByGuestId(userId);
-    if ("assignTo" in data && collection === "tasks" && data.assignTo && data.assignTo !== prev.assignTo) {
+    const { data: user } = await getGuestByGuestId(userId);
+    if (
+      "assignTo" in data &&
+      collection === "tasks" &&
+      data.assignTo &&
+      data.assignTo !== prev.assignTo
+    ) {
       await createActivity({
-        workspaceId, userId: data.assignTo as string,
-        farmId: prev.farms, entityType: "tasks", entityId: id,
-        action: "assigned", message: `You were assigned task "${prev.taskTitle}"`,
+        workspaceId,
+        userId: data.assignTo as string,
+        farmId: prev.farms,
+        entityType: "tasks",
+        entityId: id,
+        action: "assigned",
+        message: `You were assigned task "${prev.taskTitle}"`,
       });
     }
 
     await createActivity({
-      workspaceId, userId,
+      workspaceId,
+      userId,
       farmId: prev?.farms ?? null,
-      entityType: collection, entityId: id,
+      entityType: collection,
+      entityId: id,
       action: "updated",
-      message: buildUpdateMessage({ collection, prev, data, userName: user?.fullName ?? "Guest" }),
+      message: buildUpdateMessage({
+        collection,
+        prev,
+        data,
+        userName: user?.fullName ?? "Guest",
+      }),
     });
 
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
 
-export const updateField = async ({ collection, id, field, value, workspaceId, userId }: {
+export const updateField = async ({
+  collection,
+  id,
+  field,
+  value,
+  workspaceId,
+  userId,
+}: {
   collection: string;
   id: string;
   value: string;
@@ -397,26 +523,45 @@ export const updateField = async ({ collection, id, field, value, workspaceId, u
   try {
     await validateWorkspaceAccess({ userId, workspaceId });
     const { database } = await createAdminClient();
-    const prev = await database.getDocument(appwriteConfig.databaseId, collection, id);
+    const prev = await database.getDocument(
+      appwriteConfig.databaseId,
+      collection,
+      id,
+    );
 
-    await database.updateDocument(appwriteConfig.databaseId, collection, id, { [field]: value });
+    await database.updateDocument(appwriteConfig.databaseId, collection, id, {
+      [field]: value,
+    });
 
-    const {data:user} = await getGuestByGuestId(userId);
+    const { data: user } = await getGuestByGuestId(userId);
     await createActivity({
-      workspaceId, userId,
+      workspaceId,
+      userId,
       farmId: prev?.farms ?? null,
-      entityType: collection, entityId: id,
+      entityType: collection,
+      entityId: id,
       action: "updated",
-      message: buildUpdateMessage({ collection, prev, data: { [field]: value }, userName: user?.fullName ?? "Guest" }),
+      message: buildUpdateMessage({
+        collection,
+        prev,
+        data: { [field]: value },
+        userName: user?.fullName ?? "Guest",
+      }),
     });
 
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
 
-export const deleteDoc = async ({ collection, id, workspaceId, userId }: {
+export const deleteDoc = async ({
+  collection,
+  id,
+  workspaceId,
+  userId,
+}: {
   collection: string;
   id: string;
   workspaceId: string;
@@ -425,23 +570,34 @@ export const deleteDoc = async ({ collection, id, workspaceId, userId }: {
   try {
     await validateWorkspaceAccess({ userId, workspaceId });
     const { database } = await createAdminClient();
-    const prev = await database.getDocument(appwriteConfig.databaseId, collection, id);
+    const prev = await database.getDocument(
+      appwriteConfig.databaseId,
+      collection,
+      id,
+    );
 
     await database.deleteDocument(appwriteConfig.databaseId, collection, id);
 
-    const {data:user} = await getGuestByGuestId(userId);
+    const { data: user } = await getGuestByGuestId(userId);
     if (collection !== "workspaces") {
       await createActivity({
-        workspaceId, userId,
+        workspaceId,
+        userId,
         farmId: prev?.farms ?? null,
-        entityType: collection, entityId: `${collection}_${id}`,
+        entityType: collection,
+        entityId: `${collection}_${id}`,
         action: "deleted",
-        message: buildDeleteMessage(collection, prev, user?.fullName ?? "Guest"),
+        message: buildDeleteMessage(
+          collection,
+          prev,
+          user?.fullName ?? "Guest",
+        ),
       });
     }
 
     return { success: true };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -804,7 +960,6 @@ export const deleteDoc = async ({ collection, id, workspaceId, userId }: {
 //   });
 // };
 
-
 // export const updateWorkspace = async ({
 //   workspaceId,
 //   userId,
@@ -1027,5 +1182,3 @@ export const deleteDoc = async ({ collection, id, workspaceId, userId }: {
 
 //   return true;
 // };
-
-

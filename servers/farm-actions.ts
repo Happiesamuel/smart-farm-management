@@ -26,7 +26,8 @@ export async function createFarm(obj: FarmObj) {
     );
 
     return { success: true, data: { id: farm.$id, name: farm.name } };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }
@@ -72,7 +73,8 @@ export const getFarmInWorkspace = async ({
         size: doc.size,
       })),
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -106,7 +108,8 @@ export async function getFarm(userId: string | undefined) {
         size: doc.size,
       })),
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 }
@@ -124,10 +127,18 @@ export const getFarmsWithStats = async ({
     const { database } = await createAdminClient();
 
     const [farmsRes, fieldsRes, cropsRes, harvestRes] = await Promise.all([
-      database.listDocuments(appwriteConfig.databaseId, "farms", [Query.equal("workspaces", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "fields", [Query.equal("workspaces", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "crops", [Query.equal("workspaces", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "harvests", [Query.equal("workspaces", workspaceId)]),
+      database.listDocuments(appwriteConfig.databaseId, "farms", [
+        Query.equal("workspaces", workspaceId),
+      ]),
+      database.listDocuments(appwriteConfig.databaseId, "fields", [
+        Query.equal("workspaces", workspaceId),
+      ]),
+      database.listDocuments(appwriteConfig.databaseId, "crops", [
+        Query.equal("workspaces", workspaceId),
+      ]),
+      database.listDocuments(appwriteConfig.databaseId, "harvests", [
+        Query.equal("workspaces", workspaceId),
+      ]),
     ]);
 
     const farmsWithStats = farmsRes.documents.map((farm) => ({
@@ -135,14 +146,17 @@ export const getFarmsWithStats = async ({
       name: farm.farmName,
       image: farm.farmImage,
       location: formatLocation(farm.address),
-      totalFields: fieldsRes.documents.filter((f) => f.farms === farm.$id).length,
+      totalFields: fieldsRes.documents.filter((f) => f.farms === farm.$id)
+        .length,
       totalCrops: cropsRes.documents.filter((c) => c.farms === farm.$id).length,
-      totalHarvest: harvestRes.documents.filter((s) => s.farms === farm.$id).length,
+      totalHarvest: harvestRes.documents.filter((s) => s.farms === farm.$id)
+        .length,
       status: farm.status || "active",
     }));
 
     return { success: true, data: farmsWithStats };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -160,10 +174,18 @@ export const getAllFarmStats = async ({
     const { database } = await createAdminClient();
 
     const [farmsRes, fieldsRes, cropsRes, salesRes] = await Promise.all([
-      database.listDocuments(appwriteConfig.databaseId, "farms", [Query.equal("workspaces", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "fields", [Query.equal("workspaces", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "crops", [Query.equal("workspaces", workspaceId)]),
-      database.listDocuments(appwriteConfig.databaseId, "sales", [Query.equal("workspaces", workspaceId)]),
+      database.listDocuments(appwriteConfig.databaseId, "farms", [
+        Query.equal("workspaces", workspaceId),
+      ]),
+      database.listDocuments(appwriteConfig.databaseId, "fields", [
+        Query.equal("workspaces", workspaceId),
+      ]),
+      database.listDocuments(appwriteConfig.databaseId, "crops", [
+        Query.equal("workspaces", workspaceId),
+      ]),
+      database.listDocuments(appwriteConfig.databaseId, "sales", [
+        Query.equal("workspaces", workspaceId),
+      ]),
     ]);
 
     return {
@@ -172,10 +194,14 @@ export const getAllFarmStats = async ({
         totalFarms: farmsRes.total,
         totalFields: fieldsRes.total,
         totalCrops: cropsRes.total,
-        totalRevenue: salesRes.documents.reduce((acc, sale) => acc + (sale.totalAmount || 0), 0),
+        totalRevenue: salesRes.documents.reduce(
+          (acc, sale) => acc + (sale.totalAmount || 0),
+          0,
+        ),
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -220,7 +246,8 @@ export const getSingleFarmDocs = async ({
         id: d.$id,
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -270,7 +297,8 @@ export const getSingleFieldDocs = async ({
         users: d.users,
       },
     };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
@@ -304,7 +332,8 @@ export const getAssignedFarms = async ({
     );
 
     return { success: true, data: farmDocs.documents.map((x) => ({ ...x })) };
-  } catch (err: any) {
+  } catch (error) {
+    const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
   }
 };
