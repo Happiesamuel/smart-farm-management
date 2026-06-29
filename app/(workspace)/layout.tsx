@@ -55,12 +55,12 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <NextTopLoader color="#66bb6a" height={4} showSpinner={false} />
         <LayoutApp>
-          <div className="grid grid-cols-1 lg:grid-cols-[0.4fr_1fr]">
+          <div className="grid grid-cols-1 lg:grid-cols-[0.4fr_1fr] bg-white/95">
             <AuthLayoutImage />
             {children}
           </div>
         </LayoutApp>
-           <Toaster position="top-center" />
+        <Toaster position="top-center" />
       </body>
     </html>
   );

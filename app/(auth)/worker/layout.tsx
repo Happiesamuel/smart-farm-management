@@ -39,12 +39,9 @@ export default function RootLayout({
         className={`  bg-background max-w-480 mx-auto my-0 antialiased  flex flex-col `}
       >
         <NextTopLoader color="#f98842" height={4} showSpinner={false} />
-        <div className="grid grid-cols-1 lg:grid-cols-[0.7fr_1fr]">
+        <div className="grid grid-cols-1 lg:grid-cols-[0.7fr_1fr] bg-white/95">
           <WorkerAuthImage />
-          <div className="mx-auto max-w-[90%] w-full">
-            {/* <AuthHeader /> */}
-            {children}
-          </div>
+          <div className="mx-auto max-w-[90%] w-full">{children}</div>
           <Toaster position="top-center" />
         </div>
       </body>

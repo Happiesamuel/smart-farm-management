@@ -16,7 +16,7 @@ import LayoutApp from "@/LayoutApp";
 export default function Page() {
   return (
     <LayoutApp>
-      <div className=" max-w-480 mx-auto my-0">
+      <div className=" max-w-480 mx-auto my-0 bg-white/95">
         <Navbar />
         <HeroSection />
         <AboutSecction />
