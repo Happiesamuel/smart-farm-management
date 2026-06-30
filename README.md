@@ -374,9 +374,10 @@ If you'd like to improve this project:
 
 Full-Stack Developer
 
-- GitHub: https://github.com/Happiesamuel
-- LinkedIn: [https://www.linkedin.com/in/hs-the-dev](https://www.linkedin.com/in/hs-the-dev)
-- Portfolio: [https://YOUR_PORTFOLIO.com](https://linktr.ee/hs_the_dev)
+- GitHub: [Happie Samuel](https://github.com/Happiesamuel)
+- Twitter: [Happie Samuel](https://x.com/hs_the_dev)
+- LinkedIn: [Happie Samuel](https://www.linkedin.com/in/hs-the-dev)
+- Portfolio: [Happie Samuel](https://linktr.ee/hs_the_dev)
 
 ---
 
