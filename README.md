@@ -252,7 +252,13 @@ Designed for
 
 ## Landing Page
 
-![Landing Page](<img width="1585" height="3491" alt="Image" src="https://github.com/user-attachments/assets/4c89beb0-ab1f-4cb5-b112-f5d338a17a82" />)
+<p align="center">
+  <img
+    src="https://github.com/user-attachments/assets/4c89beb0-ab1f-4cb5-b112-f5d338a17a82"
+    alt="Smart Farm Management System"
+    width="100%"
+  />
+</p>
 
 ---
 
