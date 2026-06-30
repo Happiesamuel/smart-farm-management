@@ -4,6 +4,7 @@ import "./globals.css";
 import NavbarProvider from "@/context/NavbarContext";
 import "aos/dist/aos.css";
 import AOSProvider from "@/context/AOSProvider";
+import { Toaster } from "sonner";
 const geistSans = Geist({
   subsets: ["latin"],
   display: "swap",
@@ -54,6 +55,7 @@ export default function RootLayout({
         <NavbarProvider>
           <AOSProvider>{children}</AOSProvider>
         </NavbarProvider>
+        <Toaster position="top-center" />
       </body>
     </html>
   );

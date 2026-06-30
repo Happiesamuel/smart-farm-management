@@ -12,13 +12,28 @@ import z from "zod";
 import { contactFormSchema } from "@/lib/schemas";
 import ContactInput, { ContactText } from "./ContactField";
 import { Button } from "../ui/button";
+import { useGetInTouch } from "@/hooks/useGetInTouch";
 
 export default function ContactSection() {
   const form = useForm<z.infer<typeof contactFormSchema>>({
     resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      email: "",
+      message: "",
+      name: "",
+      subject: "",
+    },
   });
 
-  async function onSubmit(values: z.infer<typeof contactFormSchema>) {}
+  const { send, status } = useGetInTouch();
+
+  async function onSubmit(values: z.infer<typeof contactFormSchema>) {
+    send(values, {
+      onSuccess: () => {
+        form.reset();
+      },
+    });
+  }
 
   return (
     <section id="contact" className="flex flex-col gap-6">
@@ -42,7 +57,7 @@ export default function ContactSection() {
             </div>
             <div>
               <p className="font-semibold text-gray-800 text-xs">Email</p>
-              <p className="text-gray-500 text-xs">support@smartfarm.com</p>
+              <p className="text-gray-500 text-xs">odionsamuel2005@gmail.com</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -51,7 +66,7 @@ export default function ContactSection() {
             </div>
             <div>
               <p className="font-semibold text-gray-800 text-xs">Phone</p>
-              <p className="text-gray-500 text-xs">+94 70 123 4567</p>
+              <p className="text-gray-500 text-xs">+234 90 6541 6113</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -100,9 +115,10 @@ export default function ContactSection() {
             <div className="flex items-center gap-4 relative justify-end">
               <Button
                 type="submit"
+                disabled={status === "pending"}
                 className="text-white bg-dark-green rounded-md w-fit px-6 h-9 cursor-pointer border-none"
               >
-                <p>Send Message</p>
+                <p>{status === "pending" ? "Sending..." : "Send Message"}</p>
                 <MdOutlineArrowRightAlt />
               </Button>
             </div>

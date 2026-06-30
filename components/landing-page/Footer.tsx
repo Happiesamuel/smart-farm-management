@@ -19,11 +19,11 @@ const quickLinks: NavLink[] = [
 ];
 
 const moduleLinks: NavLink[] = [
-  { name: "Farms", route: "/modules/farms" },
-  { name: "Fields", route: "/modules/fields" },
-  { name: "Crops", route: "/modules/crops" },
-  { name: "Tasks", route: "/modules/tasks" },
-  { name: "Finance", route: "/modules/finance" },
+  { name: "Farms", route: "/onboard" },
+  { name: "Fields", route: "/onboard" },
+  { name: "Crops", route: "/onboard" },
+  { name: "Tasks", route: "/onboard" },
+  { name: "Finance", route: "/onboard" },
 ];
 
 const supportLinks: NavLink[] = [
