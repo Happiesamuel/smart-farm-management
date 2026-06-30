@@ -253,7 +253,7 @@ Designed for
 ## Landing Page
 
 <p align="center">
-  <img
+ 
 <img height="500" alt="Image" src="https://github.com/user-attachments/assets/6ddc1980-c7b3-4115-a5ad-645dd9abfe72" />
 </p>
 
@@ -261,31 +261,47 @@ Designed for
 
 ## Dashboard
 
-![Dashboard](./screenshots/dashboard.png)
+<p align="center">
+
+<img height="500" alt="Image" src="https://github.com/user-attachments/assets/16b9aea2-cfe4-4d3d-b4ca-f2c4af6f5bbe" />
+</p>
 
 ---
 
 ## Farm Overview
 
-![Farm Overview](./screenshots/farm-overview.png)
+<p align="center">
+<img height="500" alt="Image" src="https://github.com/user-attachments/assets/12204e60-9c88-4959-82dd-159fbb308cf0" />
+</p>
+
 
 ---
 
 ## Crop Management
 
-![Crop Management](./screenshots/crops.png)
+<p align="center">
+<img height="500" alt="Image" src="https://github.com/user-attachments/assets/54c347c9-9a8d-46ed-9de6-6b6072b30c10" />
+</p>
+
 
 ---
 
 ## Reports
 
-![Reports](./screenshots/reports.png)
+<p align="center">
+<img height="500" alt="Image" src="https://github.com/user-attachments/assets/7b7615a1-f0b9-42ed-9d93-a655da58d7c7" />
+</p>
+
 
 ---
 
-## Smart Insights
+## Finance (Sales & Expenses)
 
-![Smart Insights](./screenshots/smart-insights.png)
+<p align="center">
+  <img
+<img height="500" alt="Image" src="https://github.com/user-attachments/assets/d441b484-7648-4d2b-ad3a-a1535759d2cd" />
+</p>
+
 
 ---
 
