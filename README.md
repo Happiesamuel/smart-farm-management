@@ -254,10 +254,7 @@ Designed for
 
 <p align="center">
   <img
-    src="https://github.com/user-attachments/assets/4c89beb0-ab1f-4cb5-b112-f5d338a17a82"
-    alt="Smart Farm Management System"
-    width="100%"
-  />
+<img height="500" alt="Image" src="https://github.com/user-attachments/assets/6ddc1980-c7b3-4115-a5ad-645dd9abfe72" />
 </p>
 
 ---
