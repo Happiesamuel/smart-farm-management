@@ -24,6 +24,8 @@ import { formatLocation } from "@/lib/functions";
 import FarmMap from "./FarmMap";
 import { useGetFarmActivity } from "@/hooks/activity/useActivity";
 import { useWorkspaceUser } from "@/hooks/useAssign";
+import FarmInsightGrid from "./FarmInsightGrid";
+import { buildDashboardInsights } from "@/lib/insight";
 export default function FarmOverview() {
   const { farmId } = useParams();
   const { workspace, user, ready } = useApp();
@@ -180,6 +182,19 @@ export default function FarmOverview() {
       };
     }) ?? [];
   const userMap = new Map(users.map((u) => [u.id, u]));
+  const arrFar = farm ? [farm] : [];
+
+  const insights = buildDashboardInsights({
+    farms: arrFar,
+    fields: fields ?? [],
+    crops: crops ?? [],
+    tasks: tasks ?? [],
+    harvests: harvests ?? [],
+    sales: sales ?? [],
+    expenses: expenses ?? [],
+    users: users ?? [],
+    activities: activity ?? [],
+  });
   return (
     <div>
       <FarmOvervewBoxes
@@ -212,7 +227,7 @@ export default function FarmOverview() {
           harvests={harvests as { [key: string]: string | number }[]}
         />
       </div>
-
+      <FarmInsightGrid alerts={insights} />
       <div className="flex lg:flex-row flex-col pt-4 items-center justify-between gap-4">
         <FarmActivites activities={activity ?? []} userMap={userMap} />
         <FarmFieldOverview fieldArr={fieldArr} />
@@ -221,7 +236,16 @@ export default function FarmOverview() {
           fields={fields as { [key: string]: string }[]}
         />
       </div>
-      <FarmSmartAlerts />
+
+      <FarmSmartAlerts
+        farm={farm!}
+        tasks={tasks ?? []}
+        crops={crops ?? []}
+        harvests={harvests ?? []}
+        expenses={expenses ?? []}
+        sales={sales ?? []}
+        fields={fields ?? []}
+      />
     </div>
   );
 }

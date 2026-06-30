@@ -1,6 +1,6 @@
 "use server";
 import { Query } from "appwrite";
-import { validateWorkspaceAccess } from "./crud-actions";
+import { getDocs, validateWorkspaceAccess } from "./crud-actions";
 import { createAdminClient } from "./appwrite";
 import { appwriteConfig } from "./appwrite-client";
 
@@ -276,5 +276,134 @@ export const getLandingStats = async () => {
   } catch (error) {
     const err = error as unknown as Error;
     return { success: false, error: err?.message ?? "Unknown error" };
+  }
+};
+
+export const getInsightData = async ({
+  workspaceId,
+  userId,
+}: {
+  workspaceId: string;
+  userId: string;
+}) => {
+  try {
+    const [
+      farms,
+      fields,
+      crops,
+      tasks,
+      harvests,
+      expenses,
+      sales,
+      notes,
+      alerts,
+      activities,
+    ] = await Promise.all([
+      getDocs({
+        collection: "farms",
+        workspaceId,
+        userId,
+      }),
+
+      getDocs({
+        collection: "fields",
+        workspaceId,
+        userId,
+      }),
+
+      getDocs({
+        collection: "crops",
+        workspaceId,
+        userId,
+      }),
+
+      getDocs({
+        collection: "tasks",
+        workspaceId,
+        userId,
+      }),
+
+      getDocs({
+        collection: "harvests",
+        workspaceId,
+        userId,
+      }),
+
+      getDocs({
+        collection: "expenses",
+        workspaceId,
+        userId,
+      }),
+
+      getDocs({
+        collection: "sales",
+        workspaceId,
+        userId,
+      }),
+
+      getDocs({
+        collection: "notes",
+        workspaceId,
+        userId,
+      }),
+
+      getDocs({
+        collection: "alerts",
+        workspaceId,
+        userId,
+      }),
+
+      getDocs({
+        collection: "activities",
+        workspaceId,
+        userId,
+      }),
+    ]);
+
+    const collections = [
+      farms,
+      fields,
+      crops,
+      tasks,
+      harvests,
+      expenses,
+      sales,
+      notes,
+      alerts,
+      activities,
+    ];
+
+    const failed = collections.find((c) => !c.success);
+
+    if (failed) {
+      return {
+        success: false,
+        error: failed.error,
+      };
+    }
+
+    return {
+      success: true,
+
+      data: {
+        farms: farms.data,
+        fields: fields.data,
+        crops: crops.data,
+        tasks: tasks.data,
+        harvests: harvests.data,
+        expenses: expenses.data,
+        sales: sales.data,
+        notes: notes.data,
+        alerts: alerts.data,
+        activities: activities.data,
+      },
+    };
+  } catch (error) {
+    const err = error as Error;
+
+    return {
+      success: false,
+      error: err.message,
+    };
   }
 };

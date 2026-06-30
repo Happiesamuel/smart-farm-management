@@ -26,6 +26,9 @@ import {
   buildRecentTasks,
 } from "@/lib/stat";
 import { useState } from "react";
+import { buildDashboardInsights } from "@/lib/insight";
+import { useWorkspaceUser } from "@/hooks/useAssign";
+import { useGetActivity } from "@/hooks/activity/useActivity";
 const NOW = Date.now();
 
 export default function Dashboard() {
@@ -37,10 +40,20 @@ export default function Dashboard() {
     user?.id ?? null,
   );
   const {
+    users,
+    status: uStat,
+    error: uErr,
+  } = useWorkspaceUser(workspace?.id ?? null);
+  const {
     farms,
     status: farmStat,
     error: farmErr,
   } = useGetFarm(workspace?.id ?? null, user?.id ?? null);
+  const {
+    activity,
+    status: actStat,
+    error: actErr,
+  } = useGetActivity(workspace?.id ?? null, user?.id ?? null);
   const {
     fields,
     status: fieldStat,
@@ -88,7 +101,8 @@ export default function Dashboard() {
     farmStat === "pending" ||
     taskStat === "pending" ||
     saleStat === "pending" ||
-    expStat === "pending";
+    expStat === "pending" ||
+    uStat === "pending";
 
   if (isLoading)
     return (
@@ -104,14 +118,8 @@ export default function Dashboard() {
     farmErr?.message ||
     taskErr?.message ||
     saleErr?.message ||
-    expErr?.message;
-console.log(error?.message ,'sam',
-    fieldErr?.message ,'mic',
-    harvestErr?.message ,
-    farmErr?.message ,
-    taskErr?.message ,
-    saleErr?.message ,
-    expErr?.message)
+    expErr?.message ||
+    uErr?.message;
   if (errorMessage)
     return (
       <div className="h-[92vh]">
@@ -215,6 +223,19 @@ console.log(error?.message ,'sam',
         };
       })
       .slice(0, 6) ?? [];
+
+  const insights = buildDashboardInsights({
+    farms: farms ?? [],
+    fields: fields ?? [],
+    crops: crops ?? [],
+    tasks: tasks ?? [],
+    harvests: harvests ?? [],
+    sales: sales ?? [],
+    expenses: expenses ?? [],
+    users: users ?? [],
+    activities: activity ?? [],
+  });
+
   return (
     <div className="pt-18 px-2 sm:px-4 pb-8">
       <div className="pb-5 space-y-1">
@@ -238,7 +259,7 @@ console.log(error?.message ,'sam',
         <DashboardPieChart chartData={data} total={total} />
       </div>
       <div className=" grid grid-cols-1 pt-4  md:grid-cols-2 xl:grid-cols-3 items-stretch  justify-between gap-4">
-        <DashboardSmartAlertts />
+        <DashboardSmartAlertts alerts={insights} />
         <DashboardCropsStatus crops={cropArr} />
         <DashboardRecentTasks tasks={recentTasks} />
       </div>

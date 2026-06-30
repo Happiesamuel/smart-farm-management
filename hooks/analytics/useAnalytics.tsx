@@ -1,6 +1,7 @@
 "use client";
 import {
   getDashboardStats,
+  getInsightData,
   getLandingStats,
   getWorkspaceAnalytics,
 } from "@/servers/analytics";
@@ -39,4 +40,34 @@ export const useLandingStats = () => {
   return { data, status, error };
 };
 
-// One thing to consider — if you want dashboard stats to reflect mutations immediately, you can add queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] }) and ["analytics"] inside your createDoc, updateDoc, and deleteDoc mutation onSuccess callbacks. That way the staleTime guards against unnecessary background refetches, but the data still updates instantly after user actions.
+export const useInsights = (
+  workspaceId: string | null,
+  userId: string | null,
+) => {
+  const { data, status, error } = useQuery({
+    queryKey: ["insights", workspaceId],
+
+    queryFn: async () => {
+      const result = await getInsightData({
+        workspaceId: workspaceId as string,
+        userId: userId as string,
+      });
+
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      return result.data;
+    },
+
+    enabled: !!workspaceId && !!userId,
+
+    staleTime: 1000 * 60 * 10,
+  });
+
+  return {
+    insights: data,
+    status,
+    error,
+  };
+};
