@@ -39,8 +39,10 @@ export const metadata: Metadata = {
     "AgriTech",
     "Nigeria Farming",
   ],
+  verification: {
+    google: "OxObSxOdniZ-e23Pd2rwUc9HhgO-Zh-GCerThDg6SyI",
+  },
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
