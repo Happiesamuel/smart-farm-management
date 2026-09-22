@@ -42,6 +42,43 @@ export const metadata: Metadata = {
   verification: {
     google: "OxObSxOdniZ-e23Pd2rwUc9HhgO-Zh-GCerThDg6SyI",
   },
+  metadataBase: new URL("https://smart-farm-managementt.vercel.app"),
+  openGraph: {
+    title: "Smart Farm Management System",
+    description:
+      "Monitor crops, manage farm operations, track finances, and improve agricultural productivity — all in one platform.",
+    url: "https://smart-farm-managementt.vercel.app",
+    siteName: "Smart Farm Management System",
+    images: [
+      {
+        url: "/farm-2.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Smart Farm Management System - Farm Overview",
+      },
+      {
+        url: "/farm-3.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Smart Farm Management System - Dashboard",
+      },
+      {
+        url: "/farm-4.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Smart Farm Management System - Crop Monitoring",
+      },
+    ],
+    locale: "en_NG",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Smart Farm Management System",
+    description:
+      "Monitor crops, manage farm operations, track finances, and improve agricultural productivity.",
+    images: ["/farm-1.jpg"],
+  },
 };
 export default function RootLayout({
   children,
