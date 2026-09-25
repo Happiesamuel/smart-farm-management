@@ -1,3 +1,12 @@
+<p align="center">
+  <img
+    src="https://github.com/user-attachments/assets/3a0f2bf8-19d3-4216-b55e-0b2f4eee0ce4"
+    alt="Smart Farm Banner"
+    width="100%"
+  />
+</p>
+
+
 # 🌱 Smart Farm Management System (SFMS)
 
 > A modern, intelligent farm management platform that helps farmers and agribusinesses manage farms, fields, crops, harvests, finances, workers, and daily operations from one centralized dashboard.
