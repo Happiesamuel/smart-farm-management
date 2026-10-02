@@ -38,11 +38,26 @@ function AuthBottom() {
         />
         <p className="">Sign in with Google</p>
       </Button>
-      <p className="text-zinc-500 text-center pb-5 text-sm">
+      <p className="text-zinc-500 text-center pb-3 text-sm">
         By continuing you agree to our{" "}
         <span className="text-primary-green font-medium">Terms of Use</span> and{" "}
         <span className="text-primary-green font-medium">Privacy Policy</span>
       </p>
+      <div className="space-y-2 pb-5">
+        <p className="text-zinc-500 text-center  text-sm">Test</p>
+        <div className="space-y-1">
+          <p className="text-zinc-500 text-center  text-sm">
+            Email:{" "}
+            <span className="text-primary-green font-medium">
+              odionsamuel2005@gmail.com
+            </span>
+          </p>
+          <p className="text-zinc-500 text-center text-sm">
+            Password:{" "}
+            <span className="text-primary-green font-medium"> Samuel2005.</span>
+          </p>
+        </div>
+      </div>
     </div>
   ) : (
     ""

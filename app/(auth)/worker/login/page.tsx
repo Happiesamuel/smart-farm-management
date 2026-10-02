@@ -35,6 +35,21 @@ export default function page() {
 
         <WorkerLoginFom />
       </div>
+      <div className="space-y-2 pb-5">
+        <p className="text-zinc-500 text-center  text-sm">Test</p>
+        <div className="space-y-1">
+          <p className="text-zinc-500 text-center  text-sm">
+            Email:{" "}
+            <span className="text-[#f0782d] font-medium">
+              eghogho.odion@physci.uniben.edu
+            </span>
+          </p>
+          <p className="text-zinc-500 text-center text-sm">
+            Password:{" "}
+            <span className="text-[#f0782d] font-medium"> Samuel2005.</span>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
